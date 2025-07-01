@@ -1,27 +1,51 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { ClerkProvider, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "sonner";
+import { AuthButtons } from "@/components/auth-buttons";
 
-const inter = Inter({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-})
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Study Log",
-  description: "Transform your learning journey with focused study sessions and intelligent progress tracking",
-}
+  description:
+    "Transform your learning journey with focused study sessions and intelligent progress tracking",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className={`${inter.className} antialiased`}>{children}</body>
-    </html>
-  )
+    <ClerkProvider>
+      <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Toaster richColors />
+        <body className="antialiased">
+          <header className="flex justify-between items-center p-4 gap-4 h-16">
+            <div>
+              <a href="/">home</a>
+            </div>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+            <SignedOut>
+              <AuthButtons />
+            </SignedOut>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
+  );
 }

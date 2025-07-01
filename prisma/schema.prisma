@@ -1,0 +1,44 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum SessionType {
+  WORK
+  BREAK
+  LONG_BREAK
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  username  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studySessions StudySession[]
+}
+
+model StudySession {
+  id     String  @id @default(uuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  startTime   DateTime  @default(now())
+  endTime     DateTime? // Optional — can be null if session still in progress
+  durationMin Int       @default(0) // Can be updated per minute or on finish
+
+  type      SessionType // 'WORK' | 'BREAK' | 'LONG_BREAK'
+  completed Boolean     @default(false) // Whether the session was fully finished
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([startTime])
+  @@index([durationMin])
+}
