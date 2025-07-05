@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
 import PomodoroTimer from "@/components/pomodoro-timer";
 import StudyStats from "@/components/study-stats";
 import { toast } from "sonner";
+
 type StudySession = {
   id: string;
   userId: string | null;
@@ -26,7 +27,6 @@ export default function StudyLog() {
 
   const createSession = async () => {
     try {
-      // Handle session creation here
       const response = await fetch("/api/add_session", {
         method: "POST",
         headers: {
@@ -39,7 +39,6 @@ export default function StudyLog() {
       });
 
       if (!response.ok) {
-        // Show error related to session creation
         toast.error("Failed to create study session. Please try again.");
         return;
       }
@@ -47,7 +46,6 @@ export default function StudyLog() {
       const data = await response.json();
       currentSession.current = data.message;
       console.log("Study session created:", currentSession.current);
-      // Optionally update UI or stats here
     } catch (error) {
       toast.error("Failed to create study session. Please try again.");
       throw new Error("Failed to create study session");
@@ -56,11 +54,9 @@ export default function StudyLog() {
 
   const updateTimer = async (minutes: number) => {
     try {
-      // Handle incrementing study time here
       if (minutes <= 0) {
         return;
       }
-      console.log("Updating timer with minutes:", minutes);
       if (!currentSession) {
         console.error("No current session to update");
         return;
@@ -71,22 +67,18 @@ export default function StudyLog() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: currentSession?.current?.id, // Replace with actual session ID
+          id: currentSession?.current?.id,
         }),
       });
 
       if (!response.ok) {
-        // Show error related to incrementing study time
         console.error("Failed to increment study time");
         return;
       }
 
       const newTotal = totalStudyTime + minutes;
       setTotalStudyTime(newTotal);
-      const data = await response.json();
-
-      console.log("Study time incremented:", data);
-      // Optionally update UI or stats here
+      await response.json();
     } catch (error) {
       console.error("Failed to increment study time");
       throw new Error("Failed to increment study time");
@@ -98,7 +90,6 @@ export default function StudyLog() {
       setIsLoading(true);
       const response = await fetch("/api/get_time", {});
       if (!response.ok) {
-        console.error("Failed to fetch total study time");
         toast.error("Failed to fetch total study time. Please try again.");
         return;
       }
@@ -108,7 +99,6 @@ export default function StudyLog() {
         setTotalStudyTime(data.totalMinutes);
       }
     } catch (error) {
-      console.error("Failed to fetch total study time");
       toast.error("Failed to fetch total study time. Please try again.");
     } finally {
       setIsLoading(false);
@@ -120,7 +110,6 @@ export default function StudyLog() {
   }, []);
   useEffect(() => {
     if (isActive) {
-      // If the timer is active, create a new session
       if (!currentSession.current) {
         createSession();
       }
@@ -133,7 +122,6 @@ export default function StudyLog() {
   const updateTotalStudyTime = (minutes: number) => {
     const newTotal = totalStudyTime + minutes;
     setTotalStudyTime(newTotal);
-    // localStorage.setItem("totalStudyTime", newTotal.toString());
     updateTimer(minutes);
   };
 
@@ -145,9 +133,9 @@ export default function StudyLog() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-study-text-secondary">
+      <div className="flex flex-col items-center justify-center min-h-screen text-muted-foreground">
         <div className="relative w-12 h-12 mb-4">
-          <div className="absolute inset-0 rounded-full border-4 border-t-study-primary border-b-transparent animate-spin"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-b-transparent animate-spin"></div>
         </div>
         <div className="text-lg font-medium animate-pulse">
           Loading your study data...
@@ -157,109 +145,95 @@ export default function StudyLog() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-violet-50 bg-mesh relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-violet-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-500"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
-        {/* Enhanced Header */}
+    <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl shadow-lg">
-              <Sparkles className="h-8 w-8 text-white" />
+            <div className="p-3 bg-muted rounded-2xl">
+              <Sparkles className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-5xl font-bold gradient-text tracking-tight">
-              Study Log
-            </h1>
+            <h1 className="text-4xl font-bold tracking-tight">Study Log</h1>
           </div>
-          <p className="text-xl text-study-text-secondary font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto leading-relaxed">
             Transform your learning journey with focused study sessions and
             intelligent progress tracking
           </p>
         </div>
 
-        {/* Enhanced Stats Overview */}
+        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-purple-50/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-              <CardTitle className="text-sm font-semibold text-study-text-secondary">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Total Study Time
               </CardTitle>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Clock className="h-4 w-4 text-purple-600" />
+              <div className="p-2 bg-muted rounded-lg">
+                <Clock className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-study-text mb-1">
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
                 {formatTime(totalStudyTime)}
               </div>
-              <p className="text-sm text-study-text-muted font-medium">
+              <p className="text-sm text-muted-foreground font-medium">
                 All time progress
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-violet-50/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-              <CardTitle className="text-sm font-semibold text-study-text-secondary">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Sessions Today
               </CardTitle>
-              <div className="p-2 bg-violet-100 rounded-lg">
-                <BookOpen className="h-4 w-4 text-violet-600" />
+              <div className="p-2 bg-muted rounded-lg">
+                <BookOpen className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-study-text mb-1">0</div>
-              <p className="text-sm text-study-text-muted font-medium">
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">0</div>
+              <p className="text-sm text-muted-foreground font-medium">
                 Coming soon
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-indigo-50/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-              <CardTitle className="text-sm font-semibold text-study-text-secondary">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Weekly Goal
               </CardTitle>
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <Target className="h-4 w-4 text-indigo-600" />
+              <div className="p-2 bg-muted rounded-lg">
+                <Target className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-study-text mb-1">10h</div>
-              <p className="text-sm text-study-text-muted font-medium">
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">10h</div>
+              <p className="text-sm text-muted-foreground font-medium">
                 Target
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-pink-50/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-              <CardTitle className="text-sm font-semibold text-study-text-secondary">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Streak
               </CardTitle>
-              <div className="p-2 bg-pink-100 rounded-lg">
-                <TrendingUp className="h-4 w-4 text-pink-600" />
+              <div className="p-2 bg-muted rounded-lg">
+                <TrendingUp className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-study-text mb-1">0</div>
-              <p className="text-sm text-study-text-muted font-medium">Days</p>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">0</div>
+              <p className="text-sm text-muted-foreground font-medium">Days</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Main Content Grid - Streamlined */}
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Pomodoro Timer - Enhanced */}
           <div className="xl:col-span-2">
             <PomodoroTimer
               onStudyTimeUpdate={updateTotalStudyTime}
@@ -267,8 +241,6 @@ export default function StudyLog() {
               setIsActive={setIsActive}
             />
           </div>
-
-          {/* Study Stats - Enhanced */}
           <div className="space-y-6">
             <StudyStats totalMinutes={totalStudyTime} />
           </div>

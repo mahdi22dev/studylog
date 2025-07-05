@@ -226,46 +226,30 @@ export default function PomodoroTimer({
   };
 
   return (
-    <Card className="w-full border-0 shadow-xl bg-gradient-to-br from-white via-purple-50/30 to-violet-50/30 backdrop-blur-sm relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-violet-500/5"></div>
-
-      <CardHeader className="text-center relative z-10 pb-6">
+    <Card className="w-full">
+      <CardHeader className="text-center pb-6">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl shadow-lg">
-            <Timer className="h-6 w-6 text-white" />
+          <div className="p-3 bg-muted rounded-xl">
+            <Timer className="h-6 w-6 text-muted-foreground" />
           </div>
-          <CardTitle className="text-3xl font-bold gradient-text">
-            Pomodoro Timer
-          </CardTitle>
+          <CardTitle className="text-3xl font-bold">Pomodoro Timer</CardTitle>
 
           <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
             <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-2 hover:bg-purple-100"
-              >
-                <Settings className="h-5 w-5 text-purple-600" />
+              <Button variant="ghost" size="icon" className="ml-2">
+                <Settings className="h-5 w-5" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent>
               <DialogHeader>
-                <DialogTitle className="text-xl font-semibold">
-                  Timer Settings
-                </DialogTitle>
+                <DialogTitle>Timer Settings</DialogTitle>
                 <DialogDescription>
                   Customize your Pomodoro timer durations
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="work-duration"
-                    className="text-sm font-medium"
-                  >
-                    Work Duration (minutes)
-                  </Label>
+                  <Label htmlFor="work-duration">Work Duration (minutes)</Label>
                   <Input
                     id="work-duration"
                     type="number"
@@ -278,16 +262,10 @@ export default function PomodoroTimer({
                         Number.parseInt(e.target.value) || 25
                       )
                     }
-                    className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="break-duration"
-                    className="text-sm font-medium"
-                  >
-                    Short Break (minutes)
-                  </Label>
+                  <Label htmlFor="break-duration">Short Break (minutes)</Label>
                   <Input
                     id="break-duration"
                     type="number"
@@ -300,14 +278,10 @@ export default function PomodoroTimer({
                         Number.parseInt(e.target.value) || 5
                       )
                     }
-                    className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="long-break-duration"
-                    className="text-sm font-medium"
-                  >
+                  <Label htmlFor="long-break-duration">
                     Long Break (minutes)
                   </Label>
                   <Input
@@ -322,14 +296,10 @@ export default function PomodoroTimer({
                         Number.parseInt(e.target.value) || 15
                       )
                     }
-                    className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="sessions-until-long-break"
-                    className="text-sm font-medium"
-                  >
+                  <Label htmlFor="sessions-until-long-break">
                     Sessions until Long Break
                   </Label>
                   <Input
@@ -344,12 +314,11 @@ export default function PomodoroTimer({
                         Number.parseInt(e.target.value) || 4
                       )
                     }
-                    className="border-purple-200 focus:border-purple-400"
                   />
                 </div>
                 <Button
                   onClick={() => setIsSettingsOpen(false)}
-                  className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium"
+                  className="w-full"
                 >
                   Save Settings
                 </Button>
@@ -360,24 +329,33 @@ export default function PomodoroTimer({
 
         <div className="flex items-center justify-center gap-2 mb-4">
           {isLongBreak ? (
-            <Badge className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg">
+            <Badge
+              variant="default"
+              className="flex items-center gap-2 px-4 py-2"
+            >
               <Coffee className="h-4 w-4" />
               Long Break Time
             </Badge>
           ) : isBreak ? (
-            <Badge className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg">
+            <Badge
+              variant="default"
+              className="flex items-center gap-2 px-4 py-2"
+            >
               <Coffee className="h-4 w-4" />
               Break Time
             </Badge>
           ) : (
-            <Badge className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white border-0 shadow-lg">
+            <Badge
+              variant="default"
+              className="flex items-center gap-2 px-4 py-2"
+            >
               <Play className="h-4 w-4" />
               Focus Time
             </Badge>
           )}
         </div>
 
-        <CardDescription className="text-lg text-study-text-secondary font-medium">
+        <CardDescription className="text-lg">
           {isLongBreak
             ? "Take a longer break and fully recharge your mind"
             : isBreak
@@ -386,29 +364,23 @@ export default function PomodoroTimer({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-8 relative z-10">
-        {/* Enhanced Timer Display */}
+      <CardContent className="space-y-8">
         <div className="text-center">
           <div className="relative inline-block">
-            <div className="text-7xl font-mono font-bold gradient-text mb-6 tracking-wider">
+            <div className="text-7xl font-mono font-bold mb-6 tracking-wider">
               {formatTime(timeLeft)}
             </div>
-            <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-violet-500/20 rounded-2xl blur-xl"></div>
           </div>
           <div className="max-w-md mx-auto">
-            <Progress
-              value={getProgress()}
-              className="w-full h-4 bg-purple-100"
-            />
+            <Progress value={getProgress()} />
           </div>
         </div>
 
-        {/* Enhanced Controls */}
         <div className="flex justify-center gap-4">
           <Button
             onClick={toggleTimer}
             size="lg"
-            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold"
           >
             {isActive ? (
               <>
@@ -427,43 +399,37 @@ export default function PomodoroTimer({
             onClick={resetTimer}
             variant="outline"
             size="lg"
-            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold border-2 border-purple-200 hover:border-purple-300 hover:bg-purple-50 text-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
+            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold"
           >
             <RotateCcw className="h-5 w-5" />
             Reset
           </Button>
         </div>
 
-        {/* Enhanced Session Stats */}
-        <div className="grid grid-cols-3 gap-6 pt-6 border-t border-purple-100">
+        <div className="grid grid-cols-3 gap-6 pt-6 border-t">
           <div className="text-center">
-            <div className="text-3xl font-bold gradient-text mb-1">
-              {completedPomodoros}
-            </div>
-            <div className="text-sm text-study-text-muted font-medium">
+            <div className="text-3xl font-bold mb-1">{completedPomodoros}</div>
+            <div className="text-sm text-muted-foreground font-medium">
               Completed
             </div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold gradient-text mb-1">
-              {getCurrentMode()}
-            </div>
-            <div className="text-sm text-study-text-muted font-medium">
+            <div className="text-3xl font-bold mb-1">{getCurrentMode()}</div>
+            <div className="text-sm text-muted-foreground font-medium">
               Current Mode
             </div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold gradient-text mb-1">
+            <div className="text-3xl font-bold mb-1">
               {Math.ceil(completedPomodoros / settings.sessionsUntilLongBreak)}
             </div>
-            <div className="text-sm text-study-text-muted font-medium">
+            <div className="text-sm text-muted-foreground font-medium">
               Cycles
             </div>
           </div>
         </div>
 
-        {/* Settings Preview */}
-        <div className="text-center text-sm text-study-text-muted font-medium bg-purple-50 rounded-lg p-3">
+        <div className="text-center text-sm text-muted-foreground font-medium rounded-lg p-3">
           {settings.workDuration}m work • {settings.breakDuration}m break •{" "}
           {settings.longBreakDuration}m long break
         </div>

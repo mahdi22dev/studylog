@@ -1,11 +1,19 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { ClerkProvider, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { AuthButtons } from "@/components/auth-buttons";
 import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,19 +38,30 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable}`}
+      >
         <Toaster richColors />
         <body className="antialiased">
-          <header className="flex justify-between items-center p-4 gap-4 h-16 backdrop-blur-sm bg-gradient-to-br from-purple-50/80 via-white/70 to-violet-50/80 border-b border-violet-100 shadow-sm">
+          <header className="flex justify-between items-center p-4 gap-4 h-16">
             <Logo />
             <SignedIn>
               <UserButton />
             </SignedIn>
             <SignedOut>
-              <AuthButtons />
+              <div className="flex justify-between gap-4">
+                <SignInButton mode="redirect">
+                  <Button variant="outline">Sign In</Button>
+                </SignInButton>
+                <SignUpButton mode="redirect">
+                  <Button variant="default">Sign Up</Button>
+                </SignUpButton>
+              </div>
             </SignedOut>
           </header>
-          {children}
+          <ThemeProvider>{children}</ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
