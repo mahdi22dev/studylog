@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { AuthButtons } from "@/components/auth-buttons";
+import { Logo } from "@/components/logo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +33,8 @@ export default function RootLayout({
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <Toaster richColors />
         <body className="antialiased">
-          <header className="flex justify-between items-center p-4 gap-4 h-16">
-            <div>
-              <a href="/">home</a>
-            </div>
+          <header className="flex justify-between items-center p-4 gap-4 h-16 backdrop-blur-sm bg-gradient-to-br from-purple-50/80 via-white/70 to-violet-50/80 border-b border-violet-100 shadow-sm">
+            <Logo />
             <SignedIn>
               <UserButton />
             </SignedIn>

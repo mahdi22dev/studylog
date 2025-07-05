@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { addNewTimerSession } from "@/db/actions";
 import { StudySession } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(request: Request) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+    console.log("User ID:", userId);
     const data = (await request.json()) as StudySession;
     console.log("Received data:", data);
     if (!data) {
@@ -16,6 +23,7 @@ export async function POST(request: Request) {
 
     const session: StudySession = {
       ...data,
+      userId: userId,
     };
     const query = await addNewTimerSession(session);
     if (!query) {

@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  SetStateAction,
+  Dispatch,
+} from "react";
 import {
   Card,
   CardContent,
@@ -25,6 +32,8 @@ import { Play, Pause, RotateCcw, Coffee, Settings, Timer } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
+  setIsActive: Dispatch<SetStateAction<boolean>>;
+  isActive: boolean;
 }
 
 interface TimerSettings {
@@ -36,6 +45,8 @@ interface TimerSettings {
 
 export default function PomodoroTimer({
   onStudyTimeUpdate,
+  setIsActive,
+  isActive,
 }: PomodoroTimerProps) {
   const [settings, setSettings] = useState<TimerSettings>(() => {
     const saved = localStorage.getItem("pomodoroSettings");
@@ -52,7 +63,7 @@ export default function PomodoroTimer({
   });
 
   const [timeLeft, setTimeLeft] = useState(settings.workDuration * 60);
-  const [isActive, setIsActive] = useState(false);
+
   const [isBreak, setIsBreak] = useState(false);
   const [isLongBreak, setIsLongBreak] = useState(false);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);

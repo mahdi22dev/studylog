@@ -283,8 +283,8 @@ export default function HomePage() {
               </div>
 
               <p className="text-xl text-study-text-secondary mb-8 max-w-2xl mx-auto">
-                Begin your journey to better study habits and improved focus. No
-                signup required, completely free to use.
+                Begin your journey to better study habits and improved focus.
+                Completely free to use.
               </p>
 
               <div className="flex items-center justify-center gap-4">
@@ -301,14 +301,6 @@ export default function HomePage() {
               </div>
 
               <div className="mt-6 flex items-center justify-center gap-6 text-sm text-study-text-muted">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  No Registration
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  Works Offline
-                </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   Privacy First

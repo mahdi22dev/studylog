@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
 import PomodoroTimer from "@/components/pomodoro-timer";
@@ -22,10 +22,10 @@ export default function StudyLog() {
   const [totalStudyTime, setTotalStudyTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const currentSession = useRef<StudySession>(null);
+  const [isActive, setIsActive] = useState(false);
 
   const createSession = async () => {
     try {
-      setIsLoading(true);
       // Handle session creation here
       const response = await fetch("/api/add_session", {
         method: "POST",
@@ -33,7 +33,6 @@ export default function StudyLog() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "user-id-placeholder",
           startTime: new Date(),
           type: "WORK",
         }),
@@ -45,10 +44,6 @@ export default function StudyLog() {
         return;
       }
 
-      const savedTime = localStorage.getItem("totalStudyTime");
-      if (savedTime) {
-        setTotalStudyTime(Number.parseInt(savedTime, 10));
-      }
       const data = await response.json();
       currentSession.current = data.message;
       console.log("Study session created:", currentSession.current);
@@ -56,14 +51,16 @@ export default function StudyLog() {
     } catch (error) {
       toast.error("Failed to create study session. Please try again.");
       throw new Error("Failed to create study session");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const updateTimer = async (minutes: number) => {
     try {
       // Handle incrementing study time here
+      if (minutes <= 0) {
+        return;
+      }
+      console.log("Updating timer with minutes:", minutes);
       if (!currentSession) {
         console.error("No current session to update");
         return;
@@ -96,18 +93,47 @@ export default function StudyLog() {
     }
   };
 
-  const getTotalTime = () => {
+  const getTotalTime = async () => {
     try {
-    } catch (error) {}
+      setIsLoading(true);
+      const response = await fetch("/api/get_time", {});
+      if (!response.ok) {
+        console.error("Failed to fetch total study time");
+        toast.error("Failed to fetch total study time. Please try again.");
+        return;
+      }
+
+      const data = await response.json();
+      if (typeof data.totalMinutes === "number") {
+        setTotalStudyTime(data.totalMinutes);
+      }
+    } catch (error) {
+      console.error("Failed to fetch total study time");
+      toast.error("Failed to fetch total study time. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   useEffect(() => {
-    createSession();
+    getTotalTime();
   }, []);
+  useEffect(() => {
+    if (isActive) {
+      // If the timer is active, create a new session
+      if (!currentSession.current) {
+        createSession();
+      }
+    }
+    return () => {
+      currentSession.current = null;
+    };
+  }, [isActive]);
 
   const updateTotalStudyTime = (minutes: number) => {
     const newTotal = totalStudyTime + minutes;
     setTotalStudyTime(newTotal);
-    localStorage.setItem("totalStudyTime", newTotal.toString());
+    // localStorage.setItem("totalStudyTime", newTotal.toString());
     updateTimer(minutes);
   };
 
@@ -119,8 +145,13 @@ export default function StudyLog() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-study-text-secondary">Loading...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen text-study-text-secondary">
+        <div className="relative w-12 h-12 mb-4">
+          <div className="absolute inset-0 rounded-full border-4 border-t-study-primary border-b-transparent animate-spin"></div>
+        </div>
+        <div className="text-lg font-medium animate-pulse">
+          Loading your study data...
+        </div>
       </div>
     );
   }
@@ -230,7 +261,11 @@ export default function StudyLog() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Pomodoro Timer - Enhanced */}
           <div className="xl:col-span-2">
-            <PomodoroTimer onStudyTimeUpdate={updateTotalStudyTime} />
+            <PomodoroTimer
+              onStudyTimeUpdate={updateTotalStudyTime}
+              isActive={isActive}
+              setIsActive={setIsActive}
+            />
           </div>
 
           {/* Study Stats - Enhanced */}
