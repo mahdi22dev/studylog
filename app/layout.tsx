@@ -14,6 +14,7 @@ import { Toaster } from "sonner";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "next-themes";
+import { ThemeChanger } from "@/components/useThemes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,23 +46,29 @@ export default function RootLayout({
       >
         <Toaster richColors />
         <body className="antialiased">
-          <header className="flex justify-between items-center p-4 gap-4 h-16">
-            <Logo />
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-            <SignedOut>
-              <div className="flex justify-between gap-4">
-                <SignInButton mode="redirect">
-                  <Button variant="outline">Sign In</Button>
-                </SignInButton>
-                <SignUpButton mode="redirect">
-                  <Button variant="default">Sign Up</Button>
-                </SignUpButton>
+          <ThemeProvider>
+            <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
+              <Logo />
+
+              <div className="flex justify-end gap-4">
+                <ThemeChanger />
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+                <SignedOut>
+                  <div className="flex justify-between gap-4">
+                    <SignInButton mode="redirect">
+                      <Button variant="outline">Sign In</Button>
+                    </SignInButton>
+                    <SignUpButton mode="redirect">
+                      <Button variant="default">Sign Up</Button>
+                    </SignUpButton>
+                  </div>
+                </SignedOut>
               </div>
-            </SignedOut>
-          </header>
-          <ThemeProvider>{children}</ThemeProvider>
+            </header>
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

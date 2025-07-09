@@ -82,7 +82,6 @@ export default function HomePage() {
             <h1 className="text-5xl font-bold tracking-tight">Study Log</h1>
           </div>
 
-          <ThemeChanger />
           <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto mb-8">
             Transform your learning journey with focused study sessions,
             intelligent progress tracking, and personalized productivity
