@@ -25,7 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { ThemeChanger } from "@/components/useThemes";
+import { ThemeChanger } from "@/components/use-themes";
 
 export default function HomePage() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);

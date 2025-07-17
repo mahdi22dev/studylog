@@ -2,9 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import {
   ClerkProvider,
-  SignedIn,
   SignedOut,
-  UserButton,
   SignInButton,
   SignUpButton,
 } from "@clerk/nextjs";
@@ -14,8 +12,9 @@ import { Toaster } from "sonner";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "next-themes";
-import { ThemeChanger } from "@/components/useThemes";
-
+import { ThemeChanger } from "@/components/use-themes";
+import { Timer } from "lucide-react";
+import { UserButtonModel } from "@/components/user-button";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -49,12 +48,9 @@ export default function RootLayout({
           <ThemeProvider>
             <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
               <Logo />
-
               <div className="flex justify-end gap-4">
                 <ThemeChanger />
-                <SignedIn>
-                  <UserButton />
-                </SignedIn>
+                <UserButtonModel />
                 <SignedOut>
                   <div className="flex justify-between gap-4">
                     <SignInButton mode="redirect">
