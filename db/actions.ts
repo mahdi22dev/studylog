@@ -23,7 +23,7 @@ export async function increament(sessionId: string) {
 
 export async function addNewTimerSession(params: StudySession) {
   try {
-    const { userId, startTime, endTime, durationMin } = params;
+    const { userId, startTime, endTime } = params;
     const result = await prisma.studySession.create({
       data: {
         userId,
@@ -53,6 +53,20 @@ export async function getTotalMinutes(userId: string) {
   } catch (error) {
     console.log(`Error calculating total minutes: ${error}`);
     throw new Error(`Failed to calculate total minutes: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function resetStudyData(userId: string) {
+  try {
+    const result = await prisma.studySession.deleteMany({
+      where: { userId },
+    });
+    return result;
+  } catch (error) {
+    console.log(`Error resetting study data: ${error}`);
+    throw new Error(`Failed to reset study data: ${error}`);
   } finally {
     await prisma.$disconnect();
   }
