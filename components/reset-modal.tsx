@@ -12,12 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dispatch, SetStateAction } from "react";
 
-export function DeleteModal({
+export function ResetModal({
   isOpen,
   setIsOpen,
 }: {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  handleReset?: () => void;
 }) {
   return (
     <Dialog defaultOpen={false} open={isOpen} onOpenChange={setIsOpen}>
@@ -34,8 +35,7 @@ export function DeleteModal({
             <div className="grid gap-2">
               <Label htmlFor="delete-confirm">
                 To confirm, please type{" "}
-                <span className="font-bold text-destructive">DELETE</span>{" "}
-                below.
+                <span className="font-bold text-destructive">RESET</span> below.
               </Label>
               <Input id="delete-confirm" autoComplete="off" />
             </div>

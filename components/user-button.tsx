@@ -1,11 +1,14 @@
 "use client";
-import { Timer, Trash2 } from "lucide-react";
+
+import { Timer, Trash2, RotateCcw } from "lucide-react";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { useState } from "react";
-import { DeleteModal } from "./delete-modal";
+import { ResetModal } from "./reset-modal";
+import { useSettingsDialog } from "@/contexts/settingsDialogContext";
 
 export const UserButtonModel = () => {
   const [isDelete, setIsDelete] = useState(false);
+  const { setIsOpen } = useSettingsDialog();
 
   return (
     <>
@@ -17,22 +20,22 @@ export const UserButtonModel = () => {
             <UserButton.Action
               label="Pomodoro settings"
               labelIcon={<Timer className="w-[17px] h-[17px]" />}
-              onClick={() => setIsDelete(!isDelete)}
+              onClick={() => setIsOpen(true)}
             />
           </UserButton.MenuItems>
           <UserButton.MenuItems>
             {/* TODO: Implement delete data functionality */}
             <UserButton.Action
-              label="Delete data"
+              label="Reset data"
               labelIcon={
-                <Trash2 className="w-[17px] h-[17px] text-destructive" />
+                <RotateCcw className="w-[17px] h-[17px] text-destructive" />
               }
               onClick={() => setIsDelete(true)}
             />
           </UserButton.MenuItems>
         </UserButton>
       </SignedIn>
-      <DeleteModal isOpen={isDelete} setIsOpen={setIsDelete} />
+      <ResetModal isOpen={isDelete} setIsOpen={setIsDelete} />
     </>
   );
 };

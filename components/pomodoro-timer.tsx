@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/dialog";
 import { Play, Pause, RotateCcw, Coffee, Settings, Timer } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
+import { useSettingsDialog } from "@/contexts/settingsDialogContext";
+
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
   setIsActive: Dispatch<SetStateAction<boolean>>;
@@ -68,11 +70,10 @@ export default function PomodoroTimer({
   const [isLongBreak, setIsLongBreak] = useState(false);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [minutesToAdd, setMinutesToAdd] = useState(0);
   const firstMount = useRef<boolean>(false);
   const intervalRef = useRef<number | null>(null);
-  const lastMinuteRef = useRef<number>(0);
+  const { isOpen, setIsOpen } = useSettingsDialog();
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -234,7 +235,7 @@ export default function PomodoroTimer({
           </div>
           <CardTitle className="text-3xl font-bold">Pomodoro Timer</CardTitle>
 
-          <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" className="ml-2">
                 <Settings className="h-5 w-5" />
@@ -316,10 +317,7 @@ export default function PomodoroTimer({
                     }
                   />
                 </div>
-                <Button
-                  onClick={() => setIsSettingsOpen(false)}
-                  className="w-full"
-                >
+                <Button onClick={() => setIsOpen(false)} className="w-full">
                   Save Settings
                 </Button>
               </div>

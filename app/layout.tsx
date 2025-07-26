@@ -13,8 +13,8 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "next-themes";
 import { ThemeChanger } from "@/components/use-themes";
-import { Timer } from "lucide-react";
 import { UserButtonModel } from "@/components/user-button";
+import { GlobalProvider } from "@/contexts/globalProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -45,26 +45,29 @@ export default function RootLayout({
       >
         <Toaster richColors />
         <body className="antialiased">
-          <ThemeProvider>
-            <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
-              <Logo />
-              <div className="flex justify-end gap-4">
-                <ThemeChanger />
-                <UserButtonModel />
-                <SignedOut>
-                  <div className="flex justify-between gap-4">
-                    <SignInButton mode="redirect">
-                      <Button variant="outline">Sign In</Button>
-                    </SignInButton>
-                    <SignUpButton mode="redirect">
-                      <Button variant="default">Sign Up</Button>
-                    </SignUpButton>
-                  </div>
-                </SignedOut>
-              </div>
-            </header>
-            {children}
-          </ThemeProvider>
+          {" "}
+          <GlobalProvider>
+            <ThemeProvider>
+              <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
+                <Logo />
+                <div className="flex justify-end gap-4">
+                  <ThemeChanger />
+                  <UserButtonModel />
+                  <SignedOut>
+                    <div className="flex justify-between gap-4">
+                      <SignInButton mode="redirect">
+                        <Button variant="outline">Sign In</Button>
+                      </SignInButton>
+                      <SignUpButton mode="redirect">
+                        <Button variant="default">Sign Up</Button>
+                      </SignUpButton>
+                    </div>
+                  </SignedOut>
+                </div>
+              </header>
+              {children}
+            </ThemeProvider>
+          </GlobalProvider>
         </body>
       </html>
     </ClerkProvider>
