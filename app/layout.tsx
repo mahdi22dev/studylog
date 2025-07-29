@@ -44,7 +44,6 @@ export default function RootLayout({
       >
         <Toaster richColors />
         <body className="antialiased">
-          {" "}
           <GlobalProvider>
             <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
               <Logo />
