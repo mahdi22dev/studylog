@@ -27,6 +27,8 @@ import {
   Fullscreen,
   VolumeX,
   Volume2,
+  LucideFullscreen,
+  Minimize2,
 } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 import { useSettingsDialog } from "@/contexts/settingsDialogContext";
@@ -34,7 +36,8 @@ import { toast } from "sonner";
 import { StudySession } from "@prisma/client";
 // @ts-expect-error: No type definitions for 'howler'
 import { Howl } from "howler";
-import TimerSettings from "./pomodoro/pomodoro-timer-dialog";
+import TimerSettings from "./pomodoro-timer-dialog";
+import { cn } from "@/lib/frontend/utils";
 
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
@@ -86,7 +89,16 @@ export default function PomodoroTimer({
   const firstMount = useRef<boolean>(false);
   const intervalRef = useRef<number | null>(null);
   const { isOpen, setIsOpen } = useSettingsDialog();
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const boxRef = useRef<HTMLDivElement>(null);
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      boxRef.current?.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
   const getPomodoros = async () => {
     try {
       const response = await fetch("/api/pomodoros");
@@ -113,6 +125,16 @@ export default function PomodoroTimer({
       setTimeLeft(parsed.workDuration * 60);
     }
     getPomodoros();
+
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === boxRef.current);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   // Save settings to localStorage when they change
@@ -266,7 +288,13 @@ export default function PomodoroTimer({
   };
 
   return (
-    <Card className="w-full">
+    <Card
+      className={cn(
+        "w-full",
+        isFullscreen && "flex justify-center items-center flex-col"
+      )}
+      ref={boxRef}
+    >
       <CardHeader className="text-center pb-6">
         <div className="flex items-center justify-between mb-4 w-full">
           {/* Left and Center Group */}
@@ -288,8 +316,12 @@ export default function PomodoroTimer({
             />
           </div>
           <div className="flex items-center gap-2">
-            <button>
-              <Fullscreen className="w-5 h-5" />
+            <button onClick={toggleFullscreen}>
+              {isFullscreen ? (
+                <Minimize2 className="w-5 h-5" />
+              ) : (
+                <Fullscreen className="w-5 h-5" />
+              )}
             </button>
             <button
               onClick={() =>
