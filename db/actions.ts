@@ -1,4 +1,5 @@
 "use server";
+
 import prisma from "@/lib/prisma";
 import "dotenv/config";
 import { StudySession } from "@prisma/client";
@@ -36,6 +37,41 @@ export async function addNewTimerSession(params: StudySession) {
     return result;
   } catch (error) {
     throw new Error(`Failed to add timer session: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function updateCompletedSession(params: { id: string }) {
+  try {
+    const { id } = params;
+    const result = await prisma.studySession.update({
+      where: { id },
+      data: {
+        completed: true,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to add timer session: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function getAllCompletedSessions(userId: string) {
+  try {
+    const sessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        completed: true,
+      },
+      orderBy: {
+        startTime: "desc",
+      },
+    });
+    return sessions;
+  } catch (error) {
+    console.log(`Error fetching completed sessions: ${error}`);
+    throw new Error(`Failed to fetch completed sessions: ${error}`);
   } finally {
     await prisma.$disconnect();
   }

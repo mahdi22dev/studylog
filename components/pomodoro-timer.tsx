@@ -31,6 +31,8 @@ import {
 import { Play, Pause, RotateCcw, Coffee, Settings, Timer } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 import { useSettingsDialog } from "@/contexts/settingsDialogContext";
+import { toast } from "sonner";
+import { StudySession } from "@prisma/client";
 
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
@@ -40,6 +42,7 @@ interface PomodoroTimerProps {
   setIsLongBreak: Dispatch<SetStateAction<boolean>>;
   isBreak: boolean;
   isLongBreak: boolean;
+  completedPomodoro: () => void;
 }
 
 interface TimerSettings {
@@ -57,6 +60,7 @@ export default function PomodoroTimer({
   setIsLongBreak,
   isBreak,
   isLongBreak,
+  completedPomodoro,
 }: PomodoroTimerProps) {
   const [settings, setSettings] = useState<TimerSettings>(() => {
     const saved = localStorage.getItem("pomodoroSettings");
@@ -78,6 +82,24 @@ export default function PomodoroTimer({
   const intervalRef = useRef<number | null>(null);
   const { isOpen, setIsOpen } = useSettingsDialog();
 
+  const getPomodoros = async () => {
+    try {
+      const response = await fetch("/api/pomodoros");
+
+      if (!response.ok) {
+        toast.error("Failed to fetch pomodoro sessions. Please try again.");
+        return;
+      }
+      const data = (await response.json()) as { message: StudySession[] };
+      if (data.message.length > 0) {
+        setCompletedPomodoros(data.message.length);
+      }
+      return data;
+    } catch (error) {
+      toast.error("Failed to fetch pomodoro sessions. Please try again.");
+      throw new Error("Failed to fetch pomodoro sessions");
+    }
+  };
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem("pomodoroSettings");
@@ -85,6 +107,7 @@ export default function PomodoroTimer({
       const parsed = JSON.parse(savedSettings) as TimerSettings;
       setTimeLeft(parsed.workDuration * 60);
     }
+    getPomodoros();
   }, []);
 
   // Save settings to localStorage when they change
@@ -104,10 +127,6 @@ export default function PomodoroTimer({
       setMinutesToAdd(0);
     }
   }, [minutesToAdd, onStudyTimeUpdate]);
-
-  const toggleTimer = useCallback(() => {
-    setIsActive(!isActive);
-  }, [isActive]);
 
   // Main timer logic
   useEffect(() => {
@@ -152,7 +171,7 @@ export default function PomodoroTimer({
         // Work session completed
         const newCompletedCount = completedPomodoros + 1;
         setCompletedPomodoros(newCompletedCount);
-
+        completedPomodoro();
         console.log(
           `Session completed! Adding ${settings.workDuration} minutes`
         );
@@ -211,6 +230,10 @@ export default function PomodoroTimer({
     if (isBreak) return "Break";
     return "Focus";
   };
+
+  const toggleTimer = useCallback(() => {
+    setIsActive(!isActive);
+  }, [isActive]);
 
   const handleSettingsChange = (key: keyof TimerSettings, value: number) => {
     const newSettings = { ...settings, [key]: value };

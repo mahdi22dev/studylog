@@ -54,6 +54,52 @@ export default function StudyLog() {
       throw new Error("Failed to create study session");
     }
   };
+
+  // Mark a pomodoro as completed
+  const completedPomodoro = async () => {
+    try {
+      const response = await fetch("/api/pomodoros", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: currentSession.current?.id,
+        }),
+      });
+
+      if (!response.ok) {
+        toast.error("Failed to update pomodoros. Please try again.");
+        return;
+      }
+
+      // Only show a text toast for successful update
+      toast.success("Pomodoro completed!");
+      const data = await response.json();
+      currentSession.current = data.message;
+    } catch (error) {
+      toast.error("Failed to update pomodoros. Please try again.");
+      throw new Error("Failed to update pomodoros");
+    }
+  };
+
+  const getPomodoros = async () => {
+    try {
+      const response = await fetch("/api/pomodoros");
+
+      if (!response.ok) {
+        toast.error("Failed to fetch pomodoro sessions. Please try again.");
+        return;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      toast.error("Failed to fetch pomodoro sessions. Please try again.");
+      throw new Error("Failed to fetch pomodoro sessions");
+    }
+  };
+
   const updateTotalStudyTime = (minutes: number) => {
     if (minutes <= 0) {
       return;
@@ -241,6 +287,7 @@ export default function StudyLog() {
               setIsLongBreak={setIsLongBreak}
               isBreak={isBreak}
               isLongBreak={isLongBreak}
+              completedPomodoro={completedPomodoro}
             />
           </div>
           <div className="space-y-6">
