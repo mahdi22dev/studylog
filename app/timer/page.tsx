@@ -6,6 +6,7 @@ import { Clock, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
 import PomodoroTimer from "@/components/pomodoro-timer";
 import StudyStats from "@/components/study-stats";
 import { toast } from "sonner";
+import { formatTime } from "@/lib/frontend/utils";
 
 type StudySession = {
   id: string;
@@ -24,6 +25,8 @@ export default function StudyLog() {
   const [isLoading, setIsLoading] = useState(true);
   const currentSession = useRef<StudySession>(null);
   const [isActive, setIsActive] = useState(false);
+  const [isBreak, setIsBreak] = useState(false);
+  const [isLongBreak, setIsLongBreak] = useState(false);
 
   const createSession = async () => {
     try {
@@ -51,6 +54,14 @@ export default function StudyLog() {
       throw new Error("Failed to create study session");
     }
   };
+  const updateTotalStudyTime = (minutes: number) => {
+    if (minutes <= 0) {
+      return;
+    }
+    const newTotal = totalStudyTime + minutes;
+    setTotalStudyTime(newTotal);
+    updateTimer(minutes);
+  };
 
   const updateTimer = async (minutes: number) => {
     try {
@@ -59,7 +70,7 @@ export default function StudyLog() {
       }
       if (!currentSession) {
         console.error("No current session to update");
-        return;
+        await createSession();
       }
       const response = await fetch("/api/increament", {
         method: "POST",
@@ -75,9 +86,6 @@ export default function StudyLog() {
         console.error("Failed to increment study time");
         return;
       }
-
-      const newTotal = totalStudyTime + minutes;
-      setTotalStudyTime(newTotal);
       await response.json();
     } catch (error) {
       console.error("Failed to increment study time");
@@ -108,28 +116,18 @@ export default function StudyLog() {
   useEffect(() => {
     getTotalTime();
   }, []);
+
   useEffect(() => {
-    if (isActive) {
-      if (!currentSession.current) {
-        createSession();
-      }
+    if (isBreak || isLongBreak) {
+      return;
+    }
+    if (isActive && !currentSession.current) {
+      createSession();
     }
     return () => {
       currentSession.current = null;
     };
   }, [isActive]);
-
-  const updateTotalStudyTime = (minutes: number) => {
-    const newTotal = totalStudyTime + minutes;
-    setTotalStudyTime(newTotal);
-    updateTimer(minutes);
-  };
-
-  const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
 
   if (isLoading) {
     return (
@@ -239,6 +237,10 @@ export default function StudyLog() {
               onStudyTimeUpdate={updateTotalStudyTime}
               isActive={isActive}
               setIsActive={setIsActive}
+              setIsBreak={setIsBreak}
+              setIsLongBreak={setIsLongBreak}
+              isBreak={isBreak}
+              isLongBreak={isLongBreak}
             />
           </div>
           <div className="space-y-6">

@@ -36,6 +36,10 @@ interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   isActive: boolean;
+  setIsBreak: Dispatch<SetStateAction<boolean>>;
+  setIsLongBreak: Dispatch<SetStateAction<boolean>>;
+  isBreak: boolean;
+  isLongBreak: boolean;
 }
 
 interface TimerSettings {
@@ -49,6 +53,10 @@ export default function PomodoroTimer({
   onStudyTimeUpdate,
   setIsActive,
   isActive,
+  setIsBreak,
+  setIsLongBreak,
+  isBreak,
+  isLongBreak,
 }: PomodoroTimerProps) {
   const [settings, setSettings] = useState<TimerSettings>(() => {
     const saved = localStorage.getItem("pomodoroSettings");
@@ -63,13 +71,8 @@ export default function PomodoroTimer({
       };
     }
   });
-
   const [timeLeft, setTimeLeft] = useState(settings.workDuration * 60);
-
-  const [isBreak, setIsBreak] = useState(false);
-  const [isLongBreak, setIsLongBreak] = useState(false);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
-  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [minutesToAdd, setMinutesToAdd] = useState(0);
   const firstMount = useRef<boolean>(false);
   const intervalRef = useRef<number | null>(null);
@@ -102,13 +105,16 @@ export default function PomodoroTimer({
     }
   }, [minutesToAdd, onStudyTimeUpdate]);
 
+  const toggleTimer = useCallback(() => {
+    setIsActive(!isActive);
+  }, [isActive]);
+
   // Main timer logic
   useEffect(() => {
     if (isActive && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
-
           // Only count study time (not break time)
           if (!isBreak && !isLongBreak && prev > 0) {
             const currentMinute = Math.floor(prev / 60);
@@ -169,19 +175,11 @@ export default function PomodoroTimer({
     }
   }, [timeLeft, isActive, isBreak, isLongBreak, completedPomodoros, settings]);
 
-  const toggleTimer = useCallback(() => {
-    if (!isActive) {
-      setSessionStartTime(Date.now());
-    }
-    setIsActive(!isActive);
-  }, [isActive]);
-
   const resetTimer = useCallback(() => {
     setIsActive(false);
     setIsBreak(false);
     setIsLongBreak(false);
     setTimeLeft(settings.workDuration * 60);
-    setSessionStartTime(null);
     setMinutesToAdd(0);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -317,9 +315,46 @@ export default function PomodoroTimer({
                     }
                   />
                 </div>
-                <Button onClick={() => setIsOpen(false)} className="w-full">
-                  Save Settings
-                </Button>
+                <div className="flex justify-between gap-3">
+                  {" "}
+                  <Button
+                    className="w-full"
+                    variant={"outline"}
+                    onClick={() => {
+                      const resetSettings = {
+                        workDuration: 25,
+                        breakDuration: 5,
+                        longBreakDuration: 15,
+                        sessionsUntilLongBreak: 4,
+                      };
+
+                      setSettings(resetSettings);
+                      setTimeLeft(resetSettings.workDuration * 60);
+                      setIsBreak(false);
+                      setIsLongBreak(false);
+                      setIsActive(false);
+                      localStorage.setItem(
+                        "pomodoroSettings",
+                        JSON.stringify(resetSettings)
+                      );
+                      setIsOpen(false);
+                    }}
+                  >
+                    Reset Settings
+                  </Button>{" "}
+                  <Button
+                    onClick={() => {
+                      setTimeLeft(settings.workDuration * 60);
+                      setIsBreak(false);
+                      setIsLongBreak(false);
+                      setIsActive(false);
+                      setIsOpen(false);
+                    }}
+                    className="w-full"
+                  >
+                    Save Settings
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
@@ -412,14 +447,14 @@ export default function PomodoroTimer({
             </div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold mb-1">{getCurrentMode()}</div>
             <div className="text-sm text-muted-foreground font-medium">
               Current Mode
             </div>
+            <div className="text-3xl font-bold mb-1">{getCurrentMode()}</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold mb-1">
-              {Math.ceil(completedPomodoros / settings.sessionsUntilLongBreak)}
+              {Math.floor(completedPomodoros / settings.sessionsUntilLongBreak)}
             </div>
             <div className="text-sm text-muted-foreground font-medium">
               Cycles

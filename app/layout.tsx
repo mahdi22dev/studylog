@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeChanger } from "@/components/use-themes";
 import { UserButtonModel } from "@/components/user-button";
 import { GlobalProvider } from "@/contexts/globalProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
