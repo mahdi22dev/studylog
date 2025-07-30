@@ -74,7 +74,13 @@ export default function StudyLog() {
       }
 
       // Only show a text toast for successful update
-      toast.success("Pomodoro completed!");
+      toast.success("Pomodoro completed!", {
+        style: {
+          background: "hsl(var(--background))",
+          color: "hsl(var(--foreground))",
+          border: "1px solid hsl(var(--border))",
+        },
+      });
       const data = await response.json();
       currentSession.current = data.message;
     } catch (error) {

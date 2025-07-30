@@ -33,7 +33,13 @@ export function ResetModal({
         return;
       }
       await response.json();
-      toast.success("Your data has been successfully reset.");
+      toast.success("Your data has been successfully reset.", {
+        style: {
+          background: "hsl(var(--background))",
+          color: "hsl(var(--foreground))",
+          border: "1px solid hsl(var(--border))",
+        },
+      });
       setIsOpen(false);
       window.location.reload();
     } catch (error) {
