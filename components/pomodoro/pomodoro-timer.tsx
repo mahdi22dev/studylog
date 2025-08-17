@@ -90,8 +90,8 @@ export default function PomodoroTimer({
   const intervalRef = useRef<number | null>(null);
   const { isOpen, setIsOpen } = useSettingsDialog();
   const [isFullscreen, setIsFullscreen] = useState(false);
-
   const boxRef = useRef<HTMLDivElement>(null);
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       boxRef.current?.requestFullscreen();
@@ -99,6 +99,7 @@ export default function PomodoroTimer({
       document.exitFullscreen();
     }
   };
+
   const getPomodoros = async () => {
     try {
       const response = await fetch("/api/pomodoros");

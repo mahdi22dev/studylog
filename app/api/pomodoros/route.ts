@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getAllCompletedSessions, updateCompletedSession } from "@/db/actions";
-import { StudySession } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 
 export async function POST(request: Request) {

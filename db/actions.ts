@@ -57,6 +57,7 @@ export async function updateCompletedSession(params: { id: string }) {
     await prisma.$disconnect();
   }
 }
+
 export async function getAllCompletedSessions(userId: string) {
   try {
     const sessions = await prisma.studySession.findMany({
@@ -68,6 +69,32 @@ export async function getAllCompletedSessions(userId: string) {
         startTime: "desc",
       },
     });
+    return sessions;
+  } catch (error) {
+    console.log(`Error fetching completed sessions: ${error}`);
+    throw new Error(`Failed to fetch completed sessions: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+export async function getDailyPomodorosSessions(userId: string) {
+  try {
+    // Get the current time in UTC and subtract 24 hours
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const sessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startTime: {
+          gte: twentyFourHoursAgo, // Only sessions started in the last 24 hours (UTC)
+        },
+      },
+      orderBy: {
+        startTime: "desc",
+      },
+    });
+    console.log(sessions);
     return sessions;
   } catch (error) {
     console.log(`Error fetching completed sessions: ${error}`);

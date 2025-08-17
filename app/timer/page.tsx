@@ -27,6 +27,7 @@ export default function StudyLog() {
   const [isActive, setIsActive] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [isLongBreak, setIsLongBreak] = useState(false);
+  const [sessionsToday, setSessionsToday] = useState<StudySession[]>([]);
 
   const createSession = async () => {
     try {
@@ -89,9 +90,9 @@ export default function StudyLog() {
     }
   };
 
-  const getPomodoros = async () => {
+  const getDailySessions = async () => {
     try {
-      const response = await fetch("/api/pomodoros");
+      const response = await fetch("/api/sessions");
 
       if (!response.ok) {
         toast.error("Failed to fetch pomodoro sessions. Please try again.");
@@ -99,6 +100,7 @@ export default function StudyLog() {
       }
 
       const data = await response.json();
+      setSessionsToday(data.message);
       return data;
     } catch (error) {
       toast.error("Failed to fetch pomodoro sessions. Please try again.");
@@ -166,6 +168,7 @@ export default function StudyLog() {
   };
 
   useEffect(() => {
+    getDailySessions();
     getTotalTime();
   }, []);
 
@@ -242,7 +245,9 @@ export default function StudyLog() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold mb-1">0</div>
+              <div className="text-3xl font-bold mb-1">
+                {sessionsToday.length < 0 ? 0 : sessionsToday.length}
+              </div>
               <p className="text-sm text-muted-foreground font-medium">
                 Coming soon
               </p>
