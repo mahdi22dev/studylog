@@ -94,7 +94,6 @@ export async function getDailyPomodorosSessions(userId: string) {
         startTime: "desc",
       },
     });
-    console.log(sessions);
     return sessions;
   } catch (error) {
     console.log(`Error fetching completed sessions: ${error}`);

@@ -248,9 +248,7 @@ export default function StudyLog() {
               <div className="text-3xl font-bold mb-1">
                 {sessionsToday.length < 0 ? 0 : sessionsToday.length}
               </div>
-              <p className="text-sm text-muted-foreground font-medium">
-                Coming soon
-              </p>
+              Sessions
             </CardContent>
           </Card>
 
