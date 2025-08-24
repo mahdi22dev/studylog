@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import "dotenv/config";
 import { StudySession } from "@prisma/client";
+import * as luxon from "luxon";
 
 export async function increament(sessionId: string) {
   try {
@@ -77,27 +78,61 @@ export async function getAllCompletedSessions(userId: string) {
     await prisma.$disconnect();
   }
 }
-export async function getDailyPomodorosSessions(userId: string) {
+export async function getDailyPomodorosSessions(
+  userId: string,
+  timezone: { timezone: string }
+) {
   try {
-    // Get the current time in UTC and subtract 24 hours
-    const now = new Date();
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    let startOfDay: Date;
+    let endOfDay: Date;
+
+    if (timezone?.timezone) {
+      // Compute start and end of today in user’s TZ, then convert to JS Date (UTC)
+      startOfDay = luxon.DateTime.now()
+        .setZone(timezone.timezone)
+        .startOf("day")
+        .toUTC()
+        .toJSDate();
+
+      endOfDay = luxon.DateTime.now()
+        .setZone(timezone.timezone)
+        .endOf("day")
+        .toUTC()
+        .toJSDate();
+
+      console.log(
+        `Timezone: ${timezone.timezone}\n` +
+          `Start of Day: ${luxon.DateTime.fromJSDate(startOfDay).toFormat(
+            "dd/MM/yyyy HH:mm:ss"
+          )} UTC\n` +
+          `End of Day:   ${luxon.DateTime.fromJSDate(endOfDay).toFormat(
+            "dd/MM/yyyy HH:mm:ss"
+          )} UTC`
+      );
+    } else {
+      // Fallback → use last 24h from now (rolling window)
+      const now = new Date();
+      startOfDay = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      endOfDay = now;
+
+      console.log("No timezone provided, using rolling 24h window");
+    }
 
     const sessions = await prisma.studySession.findMany({
       where: {
         userId,
         startTime: {
-          gte: twentyFourHoursAgo, // Only sessions started in the last 24 hours (UTC)
+          gte: startOfDay,
+          lte: endOfDay,
         },
       },
-      orderBy: {
-        startTime: "desc",
-      },
+      orderBy: { startTime: "desc" },
     });
+
     return sessions;
   } catch (error) {
-    console.log(`Error fetching completed sessions: ${error}`);
-    throw new Error(`Failed to fetch completed sessions: ${error}`);
+    console.error(`Error fetching daily sessions: ${error}`);
+    throw new Error(`Failed to fetch daily sessions: ${error}`);
   } finally {
     await prisma.$disconnect();
   }

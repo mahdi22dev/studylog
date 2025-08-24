@@ -92,7 +92,19 @@ export default function StudyLog() {
 
   const getDailySessions = async () => {
     try {
-      const response = await fetch("/api/sessions");
+      // Get user's timezone to fetch today's sessions based on their local time
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log(`Fetching sessions for timezone: ${timezone}`);
+
+      const response = await fetch("/api/sessions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          timezone: timezone,
+        }),
+      });
 
       if (!response.ok) {
         toast.error("Failed to fetch pomodoro sessions. Please try again.");
@@ -101,6 +113,9 @@ export default function StudyLog() {
 
       const data = await response.json();
       setSessionsToday(data.message);
+      console.log(
+        `Found ${data.message?.length || 0} sessions for today in ${timezone}`
+      );
       return data;
     } catch (error) {
       toast.error("Failed to fetch pomodoro sessions. Please try again.");
