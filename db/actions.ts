@@ -155,6 +155,69 @@ export async function getTotalMinutes(userId: string) {
   }
 }
 
+export async function getSessionsByPeriod(
+  userId: string,
+  period: "today" | "yesterday",
+  timezone: string
+) {
+  try {
+    let startOfDay: Date;
+    let endOfDay: Date;
+
+    const now = luxon.DateTime.now().setZone(timezone);
+
+    if (period === "today") {
+      // Get today's sessions
+      startOfDay = now.startOf("day").toUTC().toJSDate();
+      endOfDay = now.endOf("day").toUTC().toJSDate();
+    } else {
+      // Get yesterday's sessions
+      const yesterday = now.minus({ days: 1 });
+      startOfDay = yesterday.startOf("day").toUTC().toJSDate();
+      endOfDay = yesterday.endOf("day").toUTC().toJSDate();
+    }
+
+    console.log(
+      `Fetching ${period} sessions for timezone: ${timezone}\n` +
+        `Start: ${luxon.DateTime.fromJSDate(startOfDay).toFormat(
+          "dd/MM/yyyy HH:mm:ss"
+        )} UTC\n` +
+        `End: ${luxon.DateTime.fromJSDate(endOfDay).toFormat(
+          "dd/MM/yyyy HH:mm:ss"
+        )} UTC`
+    );
+
+    const sessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startTime: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      orderBy: { startTime: "desc" },
+    });
+
+    // Calculate total duration
+    const totalMinutes = sessions.reduce(
+      (sum, session) => sum + (session.durationMin || 0),
+      0
+    );
+
+    return {
+      sessions,
+      totalMinutes,
+      period,
+      count: sessions.length,
+    };
+  } catch (error) {
+    console.error(`Error fetching ${period} sessions: ${error}`);
+    throw new Error(`Failed to fetch ${period} sessions: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function resetStudyData(userId: string) {
   try {
     const result = await prisma.studySession.deleteMany({

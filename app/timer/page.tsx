@@ -28,6 +28,8 @@ export default function StudyLog() {
   const [isBreak, setIsBreak] = useState(false);
   const [isLongBreak, setIsLongBreak] = useState(false);
   const [sessionsToday, setSessionsToday] = useState<StudySession[]>([]);
+  const [todayStudyTime, setTodayStudyTime] = useState(0);
+  const [yesterdayStudyTime, setYesterdayStudyTime] = useState(0);
 
   const createSession = async () => {
     try {
@@ -182,9 +184,56 @@ export default function StudyLog() {
     }
   };
 
+  const getTodayStudyTime = async () => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await fetch(
+        `/api/sessions_period?period=today&timezone=${encodeURIComponent(
+          timezone
+        )}`
+      );
+      if (!response.ok) {
+        console.error("Failed to fetch today's study time");
+        return;
+      }
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setTodayStudyTime(result.data.totalMinutes);
+      }
+    } catch (error) {
+      console.error("Failed to fetch today's study time:", error);
+    }
+  };
+
+  const getYesterdayStudyTime = async () => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await fetch(
+        `/api/sessions_period?period=yesterday&timezone=${encodeURIComponent(
+          timezone
+        )}`
+      );
+
+      if (!response.ok) {
+        console.error("Failed to fetch yesterday's study time");
+        return;
+      }
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        setYesterdayStudyTime(result.data.totalMinutes);
+      }
+    } catch (error) {
+      console.error("Failed to fetch yesterday's study time:", error);
+    }
+  };
+
   useEffect(() => {
     getDailySessions();
     getTotalTime();
+    getTodayStudyTime();
+    getYesterdayStudyTime();
   }, []);
 
   useEffect(() => {
@@ -253,6 +302,44 @@ export default function StudyLog() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Today's Study Time
+              </CardTitle>
+              <div className="p-2 bg-muted rounded-lg">
+                <TrendingUp className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {formatTime(todayStudyTime)}
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">
+                Today's progress
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Yesterday's Study Time
+              </CardTitle>
+              <div className="p-2 bg-muted rounded-lg">
+                <Clock className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold mb-1">
+                {formatTime(yesterdayStudyTime)}
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">
+                Previous day
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Sessions Today
               </CardTitle>
               <div className="p-2 bg-muted rounded-lg">
@@ -263,39 +350,9 @@ export default function StudyLog() {
               <div className="text-3xl font-bold mb-1">
                 {sessionsToday.length < 0 ? 0 : sessionsToday.length}
               </div>
-              Sessions
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Weekly Goal
-              </CardTitle>
-              <div className="p-2 bg-muted rounded-lg">
-                <Target className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">10h</div>
               <p className="text-sm text-muted-foreground font-medium">
-                Target
+                Sessions
               </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Today Total Study Time
-              </CardTitle>
-              <div className="p-2 bg-muted rounded-lg">
-                <TrendingUp className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold mb-1">0</div>
-              <p className="text-sm text-muted-foreground font-medium">Hours</p>
             </CardContent>
           </Card>
         </div>
