@@ -100,24 +100,8 @@ export default function PomodoroTimer({
     }
   };
 
-  const getPomodoros = async () => {
-    try {
-      const response = await fetch("/api/pomodoros");
-
-      if (!response.ok) {
-        toast.error("Failed to fetch pomodoro sessions. Please try again.");
-        return;
-      }
-      const data = (await response.json()) as { message: StudySession[] };
-      if (data.message.length > 0) {
-        setCompletedPomodoros(data.message.length);
-      }
-      return data;
-    } catch (error) {
-      toast.error("Failed to fetch pomodoro sessions. Please try again.");
-      throw new Error("Failed to fetch pomodoro sessions");
-    }
-  };
+  // Removed getPomodoros function - we don't need to load historical sessions
+  // The completedPomodoros state should only track the current timer session
   // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem("pomodoroSettings");
@@ -125,7 +109,7 @@ export default function PomodoroTimer({
       const parsed = JSON.parse(savedSettings) as TimerSettings;
       setTimeLeft(parsed.workDuration * 60);
     }
-    getPomodoros();
+    // Removed getPomodoros() call - we start with 0 completed sessions for current timer
 
     const handleFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === boxRef.current);
@@ -238,6 +222,7 @@ export default function PomodoroTimer({
     setIsLongBreak(false);
     setTimeLeft(settings.workDuration * 60);
     setMinutesToAdd(0);
+    setCompletedPomodoros(0); // Reset completed sessions count for new timer session
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }

@@ -287,7 +287,7 @@ export default function StudyLog() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Streak
+                Today Total Study Time
               </CardTitle>
               <div className="p-2 bg-muted rounded-lg">
                 <TrendingUp className="h-4 w-4 text-primary" />
@@ -295,7 +295,7 @@ export default function StudyLog() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">0</div>
-              <p className="text-sm text-muted-foreground font-medium">Days</p>
+              <p className="text-sm text-muted-foreground font-medium">Hours</p>
             </CardContent>
           </Card>
         </div>
