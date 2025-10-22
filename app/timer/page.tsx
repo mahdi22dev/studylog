@@ -6,7 +6,8 @@ import { Clock, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
 import PomodoroTimer from "@/components/pomodoro/pomodoro-timer";
 import StudyStats from "@/components/study-stats";
 import { toast } from "sonner";
-import { formatTime } from "@/lib/frontend/utils";
+import { formatTime } from "@/lib/utils";
+import StudyHistory from "@/components/history-stats";
 
 type StudySession = {
   id: string;
@@ -277,7 +278,6 @@ export default function StudyLog() {
             intelligent progress tracking
           </p>
         </div>
-
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Card>
@@ -356,7 +356,6 @@ export default function StudyLog() {
             </CardContent>
           </Card>
         </div>
-
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2">
@@ -374,7 +373,8 @@ export default function StudyLog() {
           <div className="space-y-6">
             <StudyStats totalMinutes={totalStudyTime} />
           </div>
-        </div>
+        </div>{" "}
+        <StudyHistory />
       </div>
     </div>
   );

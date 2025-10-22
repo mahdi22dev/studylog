@@ -37,7 +37,7 @@ import { StudySession } from "@prisma/client";
 // @ts-expect-error: No type definitions for 'howler'
 import { Howl } from "howler";
 import TimerSettings from "./pomodoro-timer-dialog";
-import { cn } from "@/lib/frontend/utils";
+import { cn } from "@/lib/utils";
 
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
