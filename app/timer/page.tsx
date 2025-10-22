@@ -373,7 +373,7 @@ export default function StudyLog() {
           <div className="space-y-6">
             <StudyStats totalMinutes={totalStudyTime} />
           </div>
-        </div>{" "}
+        </div>
         <StudyHistory />
       </div>
     </div>

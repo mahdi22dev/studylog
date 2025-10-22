@@ -231,3 +231,38 @@ export async function resetStudyData(userId: string) {
     await prisma.$disconnect();
   }
 }
+
+export async function getAvarage(
+  userId: string,
+  timezone: { timezone: string }
+) {
+  try {
+    let startOfDay: Date;
+    let endOfDay: Date;
+
+    // Fallback → use last 24h from now (rolling window)
+    const now = new Date();
+    startOfDay = new Date(now.getTime() - 168 * 60 * 60 * 1000);
+    endOfDay = now;
+
+    console.log("No timezone provided, using rolling week window");
+
+    const sessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        startTime: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      orderBy: { startTime: "desc" },
+    });
+
+    return sessions;
+  } catch (error) {
+    console.error(`Error fetching daily sessions: ${error}`);
+    throw new Error(`Failed to fetch daily sessions: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}

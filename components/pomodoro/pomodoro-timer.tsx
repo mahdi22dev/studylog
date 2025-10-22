@@ -32,8 +32,6 @@ import {
 } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 import { useSettingsDialog } from "@/contexts/settingsDialogContext";
-import { toast } from "sonner";
-import { StudySession } from "@prisma/client";
 // @ts-expect-error: No type definitions for 'howler'
 import { Howl } from "howler";
 import TimerSettings from "./pomodoro-timer-dialog";
@@ -100,16 +98,12 @@ export default function PomodoroTimer({
     }
   };
 
-  // Removed getPomodoros function - we don't need to load historical sessions
-  // The completedPomodoros state should only track the current timer session
-  // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem("pomodoroSettings");
     if (savedSettings) {
       const parsed = JSON.parse(savedSettings) as TimerSettings;
       setTimeLeft(parsed.workDuration * 60);
     }
-    // Removed getPomodoros() call - we start with 0 completed sessions for current timer
 
     const handleFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === boxRef.current);
@@ -131,7 +125,6 @@ export default function PomodoroTimer({
     }
   }, [settings]);
 
-  // Handle adding minutes to study time (separate from render cycle)
   useEffect(() => {
     if (minutesToAdd > 0) {
       console.log(`Adding ${minutesToAdd} minutes to study time`);

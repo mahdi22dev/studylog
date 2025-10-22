@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ColumnDef } from "@/components/ui/shadcn-io/table";
 import {
   TableBody,
@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/shadcn-io/table";
 import { Clock, Calendar, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { StudySession } from "@prisma/client";
+import { formatTime } from "@/lib/utils";
 
 interface DayStudyData {
   id: string;
@@ -48,8 +51,57 @@ const generateStudyData = (): DayStudyData[] => {
 };
 
 const StudyHistory = () => {
-  const studyData = useMemo(() => generateStudyData(), []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [oldSessions, setOldSessions] = useState<StudySession[]>([]);
 
+  const getAvarageSessions = async () => {
+    try {
+      console.log("fetching avarage");
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      setIsLoading(true);
+      const response = await fetch(
+        `api/avarge?timezone=${encodeURIComponent(timezone)}`
+      );
+
+      if (!response.ok) {
+        toast.error(`Unable to load study sessions. Please try again later.`);
+      }
+
+      const data = (await response.json()) as { message: StudySession[] };
+
+      setOldSessions(data.message);
+
+      if (!data || data.message.length === 0) {
+        // toast.info("No previous study sessions found for your account.");
+      } else {
+        data?.message.map((session) => {
+          console.log(session);
+
+          console.log(
+            new Date(session.startTime).toLocaleDateString("en-US", {
+              weekday: "long",
+            })
+          );
+
+          return;
+        });
+        // toast.success("Study sessions loaded successfully.");
+      }
+    } catch (error) {
+      console.error("Error fetching average sessions:", error);
+      toast.error(
+        "Network error while fetching study sessions. Check your connection and try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAvarageSessions();
+  }, []);
+
+  const studyData = useMemo(() => generateStudyData(), []);
   // Calculate overall statistics
   const totalSessions = studyData.reduce((sum, day) => sum + day.sessions, 0);
   const totalMinutes = studyData.reduce(
@@ -58,12 +110,6 @@ const StudyHistory = () => {
   );
   const averageHoursPerDay = (totalMinutes / 60 / 7).toFixed(1);
   const averageSessionMinutes = Math.floor(totalMinutes / totalSessions);
-
-  const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
 
   const columns: ColumnDef<DayStudyData>[] = [
     {
