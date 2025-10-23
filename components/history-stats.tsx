@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ColumnDef } from "@/components/ui/shadcn-io/table";
 import {
   TableBody,
@@ -25,38 +25,15 @@ interface DayStudyData {
   averageSessionMinutes: number;
 }
 
-// Generate random study data for the last 7 days
-const generateStudyData = (): DayStudyData[] => {
-  const data: DayStudyData[] = [];
-  const today = new Date();
-
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-
-    const sessions = Math.floor(Math.random() * 8) + 1; // 1-8 sessions
-    const totalMinutes = Math.floor(Math.random() * 300) + 60; // 60-360 minutes
-    const averageSessionMinutes = Math.floor(totalMinutes / sessions);
-
-    data.push({
-      id: `day-${i}`,
-      date,
-      sessions,
-      totalMinutes,
-      averageSessionMinutes,
-    });
-  }
-
-  return data;
-};
-
 const StudyHistory = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [oldSessions, setOldSessions] = useState<StudySession[]>([]);
+  const [studyData, setStudyData] = useState<DayStudyData[]>([]);
+
+  const ListOfDays = useRef(new Map<string, StudySession[]>());
 
   const getAvarageSessions = async () => {
     try {
-      console.log("fetching avarage");
+      console.log("fetching average");
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       setIsLoading(true);
       const response = await fetch(
@@ -65,28 +42,64 @@ const StudyHistory = () => {
 
       if (!response.ok) {
         toast.error(`Unable to load study sessions. Please try again later.`);
+        return;
       }
 
       const data = (await response.json()) as { message: StudySession[] };
 
-      setOldSessions(data.message);
+      // Initialize the map with last 7 days
+      ListOfDays.current.clear();
+      const weekData: DayStudyData[] = [];
 
-      if (!data || data.message.length === 0) {
-        // toast.info("No previous study sessions found for your account.");
-      } else {
-        data?.message.map((session) => {
-          console.log(session);
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
 
-          console.log(
-            new Date(session.startTime).toLocaleDateString("en-US", {
-              weekday: "long",
-            })
-          );
+        const dateKey = date.toDateString();
+        console.log(dateKey, "datekey");
 
-          return;
-        });
-        // toast.success("Study sessions loaded successfully.");
+        ListOfDays.current.set(dateKey, []);
       }
+
+      // Group sessions by date
+      data?.message.forEach((session) => {
+        const sessionDate = new Date(session.startTime);
+        sessionDate.setHours(0, 0, 0, 0);
+        const dateKey = sessionDate.toDateString();
+
+        if (ListOfDays.current.has(dateKey)) {
+          ListOfDays.current.get(dateKey)!.push(session);
+        }
+      });
+
+      // Convert map to DayStudyData array
+      ListOfDays.current.forEach((sessions, dateKey) => {
+        console.log("sessions ", dateKey);
+
+        const date = new Date(dateKey);
+        const totalMinutes = sessions.reduce(
+          (sum, session) => sum + (session.durationMin || 0),
+          0
+        );
+        const sessionCount = sessions.length;
+        const averageSessionMinutes =
+          sessionCount > 0 ? Math.floor(totalMinutes / sessionCount) : 0;
+
+        weekData.push({
+          id: dateKey,
+          date,
+          sessions: sessionCount,
+          totalMinutes,
+          averageSessionMinutes,
+        });
+      });
+
+      // Sort by date (most recent first)
+      weekData.sort((a, b) => b.date.getTime() - a.date.getTime());
+      setStudyData(weekData);
+
+      console.log("Processed week data:", weekData);
     } catch (error) {
       console.error("Error fetching average sessions:", error);
       toast.error(
@@ -101,15 +114,22 @@ const StudyHistory = () => {
     getAvarageSessions();
   }, []);
 
-  const studyData = useMemo(() => generateStudyData(), []);
   // Calculate overall statistics
   const totalSessions = studyData.reduce((sum, day) => sum + day.sessions, 0);
   const totalMinutes = studyData.reduce(
     (sum, day) => sum + day.totalMinutes,
     0
   );
-  const averageHoursPerDay = (totalMinutes / 60 / 7).toFixed(1);
-  const averageSessionMinutes = Math.floor(totalMinutes / totalSessions);
+  const averageHoursPerDay =
+    studyData.length > 0
+      ? (totalMinutes / 60 / studyData.length).toFixed(1)
+      : "0.0";
+  const averageSessionMinutes =
+    totalSessions > 0 ? Math.floor(totalMinutes / totalSessions) : 0;
+
+  // Calculate average minutes per day for comparison
+  const averageMinutesPerDay =
+    studyData.length > 0 ? totalMinutes / studyData.length : 0;
 
   const columns: ColumnDef<DayStudyData>[] = [
     {
@@ -189,7 +209,54 @@ const StudyHistory = () => {
         </div>
       ),
     },
+    {
+      accessorKey: "comparison",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="vs Average" />
+      ),
+      cell: ({ row }) => {
+        const dayMinutes = row.original.totalMinutes;
+        const diff = dayMinutes - averageMinutesPerDay;
+        const percentChange =
+          averageMinutesPerDay > 0
+            ? ((diff / averageMinutesPerDay) * 100).toFixed(0)
+            : "0";
+
+        const isPositive = diff > 0;
+        const isNeutral = diff === 0;
+
+        return (
+          <div className="flex items-center gap-2">
+            {isNeutral ? (
+              <span className="text-sm text-muted-foreground">—</span>
+            ) : (
+              <span
+                className={`text-sm font-medium ${
+                  isPositive ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {isPositive ? "+" : ""}
+                {percentChange}%
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground">
+        <div className="relative w-12 h-12 mb-4">
+          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-b-transparent animate-spin"></div>
+        </div>
+        <div className="text-lg font-medium animate-pulse">
+          Loading study history...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 mt-5">
