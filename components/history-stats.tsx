@@ -243,6 +243,70 @@ const StudyHistory = () => {
         );
       },
     },
+    {
+      accessorKey: "dayOverDay",
+      header: ({ column }) => (
+        <TableColumnHeader column={column} title="vs Previous Day" />
+      ),
+      cell: ({ row }) => {
+        const currentIndex = studyData.findIndex(
+          (day) => day.id === row.original.id
+        );
+
+        // Last day in the list has no previous day to compare
+        if (currentIndex === studyData.length - 1) {
+          return (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">—</span>
+            </div>
+          );
+        }
+
+        const previousDay = studyData[currentIndex + 1];
+        const currentMinutes = row.original.totalMinutes;
+        const previousMinutes = previousDay.totalMinutes;
+
+        const diff = currentMinutes - previousMinutes;
+
+        // Handle special cases
+        let percentChange: string;
+        if (previousMinutes === 0 && currentMinutes === 0) {
+          percentChange = "0";
+        } else if (previousMinutes === 0 && currentMinutes > 0) {
+          percentChange = "100";
+        } else if (currentMinutes === 0 && previousMinutes > 0) {
+          percentChange = "-100";
+        } else {
+          percentChange = ((diff / previousMinutes) * 100).toFixed(0);
+        }
+
+        const isPositive = diff > 0;
+        const isNeutral = diff === 0;
+
+        return (
+          <div className="flex items-center gap-2">
+            {isNeutral ? (
+              <span className="text-sm text-muted-foreground">—</span>
+            ) : (
+              <div className="flex items-center gap-1">
+                <span
+                  className={`text-sm font-medium ${
+                    isPositive ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {isPositive ? "+" : ""}
+                  {percentChange}%
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  ({isPositive ? "+" : ""}
+                  {formatTime(Math.abs(diff))})
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
   ];
 
   if (isLoading) {
