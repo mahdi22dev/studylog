@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ interface TimerSettings {
   longBreakDuration: number;
   sessionsUntilLongBreak: number;
   setAudioDisabled: Boolean;
+  skipBreaks: boolean;
 }
 
 interface PomodoroTimerProps {
@@ -30,7 +32,10 @@ interface PomodoroTimerProps {
   setIsLongBreak: (longBreakState: boolean) => void;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  handleSettingsChange: (key: keyof TimerSettings, value: number) => void;
+  handleSettingsChange: <K extends keyof TimerSettings>(
+    key: K,
+    value: TimerSettings[K]
+  ) => void;
 }
 export default function TimerSettings({
   isOpen,
@@ -124,6 +129,21 @@ export default function TimerSettings({
               }
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="skip-breaks"
+              checked={settings.skipBreaks}
+              onCheckedChange={(checked) =>
+                handleSettingsChange("skipBreaks", checked as boolean)
+              }
+            />
+            <Label
+              htmlFor="skip-breaks"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Skip breaks (auto-start next work session)
+            </Label>
+          </div>
           <div className="flex justify-between gap-3">
             <Button
               className="w-full"
@@ -135,6 +155,7 @@ export default function TimerSettings({
                   longBreakDuration: 15,
                   sessionsUntilLongBreak: 4,
                   setAudioDisabled: settings.setAudioDisabled,
+                  skipBreaks: false,
                 };
 
                 setSettings(resetSettings);

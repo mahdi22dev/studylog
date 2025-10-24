@@ -54,6 +54,7 @@ interface TimerSettings {
   longBreakDuration: number;
   sessionsUntilLongBreak: number;
   setAudioDisabled: Boolean;
+  skipBreaks: boolean;
 }
 
 export default function PomodoroTimer({
@@ -77,6 +78,7 @@ export default function PomodoroTimer({
         longBreakDuration: 15,
         sessionsUntilLongBreak: 4,
         setAudioDisabled: false,
+        skipBreaks: false,
       };
     }
   });
@@ -191,13 +193,21 @@ export default function PomodoroTimer({
           `Session completed! Adding ${settings.workDuration} minutes`
         );
 
-        // Check if it's time for a long break
-        if (newCompletedCount % settings.sessionsUntilLongBreak === 0) {
-          setIsLongBreak(true);
-          setTimeLeft(settings.longBreakDuration * 60);
+        // Check if breaks should be skipped
+        if (settings.skipBreaks) {
+          // Skip break, start new work session immediately
+          setIsBreak(false);
+          setIsLongBreak(false);
+          setTimeLeft(settings.workDuration * 60);
         } else {
-          setIsBreak(true);
-          setTimeLeft(settings.breakDuration * 60);
+          // Check if it's time for a long break
+          if (newCompletedCount % settings.sessionsUntilLongBreak === 0) {
+            setIsLongBreak(true);
+            setTimeLeft(settings.longBreakDuration * 60);
+          } else {
+            setIsBreak(true);
+            setTimeLeft(settings.breakDuration * 60);
+          }
         }
       } else {
         // Break completed
