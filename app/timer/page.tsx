@@ -87,6 +87,9 @@ export default function StudyLog() {
       });
       const data = await response.json();
       currentSession.current = data.message;
+
+      // Refresh total study time after completing a pomodoro
+      await getTotalTime();
     } catch (error) {
       toast.error("Failed to update pomodoros. Please try again.");
       throw new Error("Failed to update pomodoros");
