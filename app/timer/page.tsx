@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, BookOpen, Target, TrendingUp, Sparkles } from "lucide-react";
+import { Clock, BookOpen, TrendingUp, Sparkles } from "lucide-react";
 import PomodoroTimer from "@/components/pomodoro/pomodoro-timer";
 import StudyStats from "@/components/study-stats";
 import { toast } from "sonner";

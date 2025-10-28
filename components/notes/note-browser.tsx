@@ -84,6 +84,8 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
   const [editedContent, setEditedContent] = useState("");
   const [newNoteTitle, setNewNoteTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(true);
 
   useEffect(() => {
     fetchGroups();
@@ -106,16 +108,20 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
   }, [selectedGroup]);
 
   const fetchGroups = async () => {
+    setIsLoadingGroups(true);
     try {
       const response = await fetch("/api/notes/groups");
       const data = await response.json();
       setGroups(data);
     } catch (error) {
       console.error("Error fetching groups:", error);
+    } finally {
+      setIsLoadingGroups(false);
     }
   };
 
   const fetchNotes = async (groupId?: string) => {
+    setIsLoadingNotes(true);
     try {
       const url = groupId ? `/api/notes?groupId=${groupId}` : "/api/notes";
       const response = await fetch(url);
@@ -123,6 +129,8 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
+    } finally {
+      setIsLoadingNotes(false);
     }
   };
 
@@ -257,9 +265,14 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
               onValueChange={(value) =>
                 setSelectedGroup(value === "all" ? null : value)
               }
+              disabled={isLoadingGroups}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a group" />
+                <SelectValue
+                  placeholder={
+                    isLoadingGroups ? "Loading groups..." : "Select a group"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Notes</SelectItem>
@@ -277,7 +290,33 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="h-[calc(100vh-350px)]">
-            {filteredNotes.length === 0 ? (
+            {isLoadingNotes ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="relative w-20 h-20">
+                  {/* Pencil/pen writing pattern */}
+                  <div className="absolute inset-0 animate-spin [animation-duration:4s]">
+                    <div className="absolute top-0 left-1/2 w-1 h-6 bg-primary rounded-full -translate-x-1/2"></div>
+                  </div>
+                  <div className="absolute inset-0 animate-spin [animation-duration:3s] [animation-direction:reverse]">
+                    <div className="absolute top-0 left-1/2 w-1 h-5 bg-primary/70 rounded-full -translate-x-1/2 rotate-45"></div>
+                  </div>
+                  <div className="absolute inset-0 animate-spin [animation-duration:2.5s]">
+                    <div className="absolute top-0 left-1/2 w-1 h-4 bg-primary/50 rounded-full -translate-x-1/2 rotate-90"></div>
+                  </div>
+                  {/* Floating study dots */}
+                  <div className="absolute inset-2 animate-pulse [animation-duration:2s]">
+                    <div className="w-full h-full rounded-full border-2 border-dashed border-primary/30"></div>
+                  </div>
+                  {/* Center notebook */}
+                  <div className="absolute inset-6 bg-primary/20 rounded animate-pulse"></div>
+                  <div className="absolute inset-7 flex flex-col gap-0.5 items-center justify-center">
+                    <div className="w-2 h-0.5 bg-primary/60 rounded"></div>
+                    <div className="w-2 h-0.5 bg-primary/60 rounded"></div>
+                    <div className="w-2 h-0.5 bg-primary/60 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ) : filteredNotes.length === 0 ? (
               <div className="p-6 text-center text-muted-foreground">
                 <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm">
@@ -285,23 +324,29 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
                 </p>
               </div>
             ) : (
-              <div className="space-y-1 p-2">
-                {filteredNotes.map((note) => (
+              <div className="space-y-2 p-2">
+                {filteredNotes.map((note, index) => (
                   <button
                     key={note.id}
                     onClick={() => selectNote(note)}
                     className={cn(
-                      "w-full text-left p-3 rounded-lg hover:bg-muted transition-colors",
-                      selectedNote?.id === note.id && "bg-muted"
+                      "group w-full text-left p-3 rounded-lg transition-all duration-200",
+                      "hover:bg-muted hover:shadow-md hover:scale-[1.02]",
+                      "border border-transparent hover:border-primary/20",
+                      selectedNote?.id === note.id &&
+                        "bg-muted shadow-md border-primary/30 scale-[1.01]"
                     )}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                    }}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           {note.isPinned && (
-                            <Pin className="h-3 w-3 text-primary flex-shrink-0" />
+                            <Pin className="h-3 w-3 text-primary flex-shrink-0 animate-pulse" />
                           )}
-                          <p className="font-medium text-sm truncate">
+                          <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                             {note.title}
                           </p>
                         </div>
@@ -311,7 +356,7 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
                         <div className="flex items-center gap-2 mt-1">
                           <Badge
                             variant="outline"
-                            className="text-xs"
+                            className="text-xs transition-all group-hover:scale-105"
                             style={{
                               borderColor: note.group.color,
                               color: note.group.color,
@@ -332,7 +377,31 @@ export default function NoteBrowser({ initialGroupId }: NoteBrowserProps) {
 
       {/* Right side - Note editor */}
       <Card className="lg:col-span-2">
-        {selectedNote ? (
+        {isLoadingNotes && !selectedNote ? (
+          <div className="flex items-center justify-center h-full min-h-[500px]">
+            <div className="relative w-28 h-28">
+              {/* Book stack effect */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute w-20 h-16 bg-primary/10 rounded-lg rotate-[-5deg] animate-pulse"></div>
+                <div className="absolute w-20 h-16 bg-primary/15 rounded-lg rotate-[0deg] animate-pulse [animation-delay:-0.2s]"></div>
+                <div className="absolute w-20 h-16 bg-primary/20 rounded-lg rotate-[5deg] animate-pulse [animation-delay:-0.4s]"></div>
+              </div>
+              {/* Floating study elements in circular pattern */}
+              <div className="absolute inset-0 animate-spin [animation-duration:8s]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-primary/80"></div>
+                <div className="absolute top-[15%] right-[15%] w-2 h-2 rounded-sm bg-primary/60"></div>
+              </div>
+              <div className="absolute inset-0 animate-spin [animation-duration:6s] [animation-direction:reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-primary/70"></div>
+                <div className="absolute bottom-[15%] left-[15%] w-2 h-2 rounded-sm bg-primary/50"></div>
+              </div>
+              <div className="absolute inset-0 animate-spin [animation-duration:10s]">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/60"></div>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/60"></div>
+              </div>
+            </div>
+          </div>
+        ) : selectedNote ? (
           <>
             <CardHeader>
               <div className="flex items-center justify-between">

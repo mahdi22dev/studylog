@@ -54,6 +54,7 @@ export default function NoteGroupsCard() {
   const [newGroupColor, setNewGroupColor] = useState("#3b82f6");
   const [newGroupIcon, setNewGroupIcon] = useState("📁");
   const [loading, setLoading] = useState(false);
+  const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,12 +62,15 @@ export default function NoteGroupsCard() {
   }, []);
 
   const fetchGroups = async () => {
+    setIsLoadingGroups(true);
     try {
       const response = await fetch("/api/notes/groups");
       const data = await response.json();
       setGroups(data);
     } catch (error) {
       console.error("Error fetching groups:", error);
+    } finally {
+      setIsLoadingGroups(false);
     }
   };
 
@@ -232,7 +236,17 @@ export default function NoteGroupsCard() {
         </div>
       </CardHeader>
       <CardContent>
-        {groups.length === 0 ? (
+        {isLoadingGroups ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="relative w-20 h-20">
+              {/* Clean triple ring spinner */}
+              <div className="absolute inset-0 rounded-full border-[3px] border-primary/20"></div>
+              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-[3px] border-transparent border-r-primary/70 animate-spin [animation-duration:1.5s] [animation-direction:reverse]"></div>
+              <div className="absolute inset-4 rounded-full border-[3px] border-transparent border-b-primary/50 animate-spin [animation-duration:2s]"></div>
+            </div>
+          </div>
+        ) : groups.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Folder className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p className="mb-2">No note groups yet</p>
@@ -241,22 +255,36 @@ export default function NoteGroupsCard() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {groups.map((group) => (
               <Card
                 key={group.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-2"
+                className="group relative hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer border-2 overflow-hidden"
                 style={{ borderColor: group.color + "33" }}
                 onClick={() =>
                   router.push(`/notes?tab=notes&group=${group.id}`)
                 }
               >
-                <CardContent className="p-4">
+                {/* Animated background gradient on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, ${group.color}33 0%, transparent 100%)`,
+                  }}
+                />
+                <CardContent className="p-4 relative">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{group.icon}</span>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="text-2xl p-2 rounded-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                        style={{ backgroundColor: group.color + "22" }}
+                      >
+                        {group.icon}
+                      </div>
                       <div>
-                        <h3 className="font-semibold">{group.name}</h3>
+                        <h3 className="font-semibold group-hover:text-primary transition-colors">
+                          {group.name}
+                        </h3>
                         <p className="text-xs text-muted-foreground">
                           {group.notes.length}{" "}
                           {group.notes.length === 1 ? "note" : "notes"}
@@ -266,14 +294,14 @@ export default function NoteGroupsCard() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-8 w-8 hover:bg-destructive/10 transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         setGroupToDelete(group.id);
                         setDeleteDialogOpen(true);
                       }}
                     >
-                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive transition-colors" />
                     </Button>
                   </div>
                   {group.notes.length > 0 && (
