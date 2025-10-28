@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FolderOpen, FileText } from "lucide-react";
 import NoteGroupsCard from "@/components/notes/note-groups-card";
 import NoteBrowser from "@/components/notes/note-browser";
 
-export default function NotesPage() {
+function NotesPageContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("groups");
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
@@ -56,5 +56,24 @@ export default function NotesPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+export default function NotesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Notes</h1>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <NotesPageContent />
+    </Suspense>
   );
 }
