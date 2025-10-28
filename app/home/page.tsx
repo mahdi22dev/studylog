@@ -23,6 +23,7 @@ import {
   CheckCircle,
   ArrowRight,
   Zap,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -61,6 +62,14 @@ export default function HomePage() {
       details:
         "10-hour weekly goals with visual progress indicators and achievement tracking",
       color: "from-purple-600 to-indigo-600",
+    },
+    {
+      icon: FileText,
+      title: "Note Taking",
+      description: "Organize notes into groups with a powerful editor",
+      details:
+        "Create groups like Math, Science, History and manage all your study notes in one place",
+      color: "from-indigo-600 to-blue-600",
     },
   ];
 
@@ -101,7 +110,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-12">
-            <Link href="/app">
+            <Link href="/timer">
               <Button
                 size="lg"
                 className="flex items-center gap-3 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
@@ -112,6 +121,19 @@ export default function HomePage() {
               </Button>
             </Link>
 
+            <Link href="/notes">
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex items-center gap-3 px-8 py-4 text-lg font-semibold border-2"
+              >
+                <FileText className="h-5 w-5" />
+                My Notes
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-center">
             <Badge className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200">
               <CheckCircle className="h-4 w-4 mr-2" />
               Free Forever
@@ -288,7 +310,7 @@ export default function HomePage() {
               </p>
 
               <div className="flex items-center justify-center gap-4">
-                <Link href="/app">
+                <Link href="/timer">
                   <Button
                     size="lg"
                     className="flex items-center gap-3 px-10 py-5 text-xl font-semibold bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"

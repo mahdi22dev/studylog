@@ -32,3 +32,40 @@ model StudySession {
   @@index([startTime])
   @@index([durationMin])
 }
+
+model NoteGroup {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  color     String?  @default("#3b82f6") // Default blue color
+  icon      String?  @default("📁") // Default folder icon
+  order     Int      @default(0) // For custom ordering
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  notes     Note[]
+
+  @@unique([id, userId])
+  @@index([userId])
+  @@index([order])
+}
+
+model Note {
+  id          String     @id @default(uuid())
+  userId      String
+  groupId     String
+  title       String
+  content     String     // Store note content (supports markdown/rich text)
+  format      String     @default("markdown") // markdown, richtext, plain
+  isPinned    Boolean    @default(false)
+  isFavorite  Boolean    @default(false)
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  group       NoteGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([id, userId])
+  @@index([userId])
+  @@index([groupId])
+  @@index([isPinned])
+  @@index([order])
+}

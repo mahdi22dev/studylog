@@ -23,6 +23,7 @@ import {
   CheckCircle,
   ArrowRight,
   Zap,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeChanger } from "@/components/use-themes";
@@ -44,6 +45,13 @@ export default function HomePage() {
       description: "Real-time study time tracking with detailed statistics",
       details:
         "Track every minute studied, view weekly goals, and monitor your learning streaks",
+    },
+    {
+      icon: FileText,
+      title: "Note Taking",
+      description: "Organize notes into groups with powerful editor",
+      details:
+        "Create groups like Math, Science, History and manage all your study notes in one place",
     },
     {
       icon: Settings,
@@ -96,6 +104,18 @@ export default function HomePage() {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
+            <Link href="/notes">
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <FileText className="h-5 w-5" />
+                My Notes
+              </Button>
+            </Link>
+          </div>
+          <div className="flex justify-center">
             <Badge>
               <CheckCircle className="h-4 w-4 mr-2" />
               Free Forever
@@ -131,7 +151,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <Card
                 key={index}

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeChanger } from "@/components/use-themes";
 import { UserButtonModel } from "@/components/user-button";
 import { GlobalProvider } from "@/contexts/globalProvider";
+import { Navigation } from "@/components/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,8 +47,11 @@ export default function RootLayout({
         <Toaster richColors />
         <body className="antialiased">
           <GlobalProvider>
-            <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur">
-              <Logo />
+            <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
+              <div className="flex items-center gap-6">
+                <Logo />
+                <Navigation />
+              </div>
               <div className="flex justify-end gap-4">
                 <ThemeChanger />
                 <UserButtonModel />

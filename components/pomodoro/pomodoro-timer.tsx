@@ -199,6 +199,8 @@ export default function PomodoroTimer({
           setIsBreak(false);
           setIsLongBreak(false);
           setTimeLeft(settings.workDuration * 60);
+          // Keep timer running when skipping breaks
+          // setIsActive remains true, so no need to set it
         } else {
           // Check if it's time for a long break
           if (newCompletedCount % settings.sessionsUntilLongBreak === 0) {
@@ -208,14 +210,16 @@ export default function PomodoroTimer({
             setIsBreak(true);
             setTimeLeft(settings.breakDuration * 60);
           }
+          // Stop timer so user can manually start the break
+          setIsActive(false);
         }
       } else {
-        // Break completed
+        // Break completed - start new work session
         setIsBreak(false);
         setIsLongBreak(false);
         setTimeLeft(settings.workDuration * 60);
+        setIsActive(false);
       }
-      setIsActive(false);
     }
   }, [timeLeft, isActive, isBreak, isLongBreak, completedPomodoros, settings]);
 
