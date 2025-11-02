@@ -247,6 +247,10 @@ export default function StudyLog() {
     if (isActive && !currentSession.current) {
       createSession();
     }
+
+    return () => {
+      currentSession.current = null;
+    };
   }, [isActive, isBreak, isLongBreak]);
 
   if (isLoading) {
