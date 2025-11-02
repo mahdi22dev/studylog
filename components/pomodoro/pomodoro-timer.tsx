@@ -91,6 +91,14 @@ export default function PomodoroTimer({
   const { isOpen, setIsOpen } = useSettingsDialog();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  const [sessionName, setSessionName] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("currentSessionName") || "Study Session";
+    }
+    return "Study Session";
+  });
+  const [isEditingName, setIsEditingName] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -117,6 +125,21 @@ export default function PomodoroTimer({
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
+
+  // Save session name to localStorage
+  useEffect(() => {
+    if (sessionName) {
+      localStorage.setItem("currentSessionName", sessionName);
+    }
+  }, [sessionName]);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.select();
+    }
+  }, [isEditingName]);
 
   // Save settings to localStorage when they change
   useEffect(() => {
@@ -288,7 +311,7 @@ export default function PomodoroTimer({
       )}
       ref={boxRef}
     >
-      <CardHeader className="text-center pb-6">
+      <CardHeader className="text-center pb-2">
         <div className="flex items-center justify-between mb-4 w-full">
           {/* Left and Center Group */}
           <div className="flex items-center gap-3 mx-auto">
@@ -332,6 +355,7 @@ export default function PomodoroTimer({
             </button>
           </div>
         </div>
+        {/* Session Name - Only show during focus time */}
 
         <div className="flex items-center justify-center gap-2 mb-4">
           {isLongBreak ? (
@@ -360,7 +384,39 @@ export default function PomodoroTimer({
             </Badge>
           )}
         </div>
+        {!isBreak && !isLongBreak && (
+          <div className="flex items-center justify-center  mb-2">
+            {!isEditingName && (
+              <p className="text-lg font-medium text-center text-primary">
+                📝 Session Title :
+              </p>
+            )}
 
+            {isEditingName ? (
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={sessionName}
+                onChange={(e) => setSessionName(e.target.value)}
+                onBlur={() => setIsEditingName(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setIsEditingName(false);
+                  }
+                }}
+                className="text-lg font-medium text-center bg-transparent border-b-2 border-primary focus:outline-none px-2 py-1"
+                maxLength={50}
+              />
+            ) : (
+              <button
+                onClick={() => setIsEditingName(true)}
+                className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-muted"
+              >
+                {sessionName}
+              </button>
+            )}
+          </div>
+        )}
         <CardDescription className="text-lg">
           {isLongBreak
             ? "Take a longer break and fully recharge your mind"
