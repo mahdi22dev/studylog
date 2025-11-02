@@ -99,6 +99,25 @@ export default function PomodoroTimer({
   });
   const [isEditingName, setIsEditingName] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [currentQuote, setCurrentQuote] = useState(
+    "Focus deeply on your studies without distractions"
+  );
+
+  // Fetch motivational quote from API
+  const fetchQuote = async () => {
+    try {
+      const response = await fetch("/api/quote");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.quote) {
+          setCurrentQuote(data.quote);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch quote:", error);
+      // Keep default quote if fetch fails
+    }
+  };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -120,6 +139,9 @@ export default function PomodoroTimer({
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    // Fetch motivational quote on mount
+    fetchQuote();
 
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
@@ -385,7 +407,7 @@ export default function PomodoroTimer({
           )}
         </div>
         {!isBreak && !isLongBreak && (
-          <div className="flex items-center justify-center  mb-2">
+          <div className="flex items-center justify-center mb-2">
             {!isEditingName && (
               <p className="text-lg font-medium text-center text-primary">
                 📝 Session Title :
@@ -417,12 +439,11 @@ export default function PomodoroTimer({
             )}
           </div>
         )}
-        <CardDescription className="text-lg">
-          {isLongBreak
-            ? "Take a longer break and fully recharge your mind"
-            : isBreak
-            ? "Take a short break and recharge"
-            : "Focus deeply on your studies without distractions"}
+        <CardDescription className="flex gap-2 items-center justify-center mb-2 ">
+          <p className="text-lg font-medium text-center text-primary">
+            💡 Today Quota :
+          </p>
+          <p className="text-base font-medium"> "{currentQuote}"</p>
         </CardDescription>
       </CardHeader>
 
