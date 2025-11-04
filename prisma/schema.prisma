@@ -69,3 +69,14 @@ model Note {
   @@index([isPinned])
   @@index([order])
 }
+
+model StudySchedule {
+  id        String   @id @default(uuid())
+  userId    String
+  weekData  String   // JSON string containing the full week schedule
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId]) // One schedule per user
+  @@index([userId])
+}

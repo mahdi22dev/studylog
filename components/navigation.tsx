@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Timer, FileText } from "lucide-react";
+import { Home, Timer, FileText, Calendar } from "lucide-react";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -23,6 +23,11 @@ export function Navigation() {
       href: "/notes",
       label: "Notes",
       icon: FileText,
+    },
+    {
+      href: "/schedule",
+      label: "Schedule",
+      icon: Calendar,
     },
   ];
 
