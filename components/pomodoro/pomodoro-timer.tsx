@@ -8,6 +8,7 @@ import {
   SetStateAction,
   Dispatch,
 } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -29,6 +30,7 @@ import {
   Volume2,
   LucideFullscreen,
   Minimize2,
+  Calendar,
 } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 import { useSettingsDialog } from "@/contexts/settingsDialogContext";
@@ -354,6 +356,15 @@ export default function PomodoroTimer({
             />
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/schedule"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">View Schedule</span>
+            </Link>
             <button onClick={toggleFullscreen}>
               {isFullscreen ? (
                 <Minimize2 className="w-5 h-5" />
