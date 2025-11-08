@@ -388,9 +388,9 @@ export default function PomodoroTimer({
             </button>
           </div>
         </div>
-        {/* Session Name - Only show during focus time */}
 
-        <div className="flex items-center justify-center gap-2 mb-4">
+        {/* Session Name - Only show during focus time */}
+        <div className="flex items-center justify-center gap-2 mt-6 mb-4">
           {isLongBreak ? (
             <Badge
               variant="default"
@@ -417,8 +417,9 @@ export default function PomodoroTimer({
             </Badge>
           )}
         </div>
+
         {!isBreak && !isLongBreak && (
-          <div className="flex items-center justify-center mb-2">
+          <div className="flex items-center justify-center gap-2 mb-4">
             {!isEditingName && (
               <p className="text-lg font-medium text-center text-primary">
                 📝 Session Title :
@@ -450,12 +451,34 @@ export default function PomodoroTimer({
             )}
           </div>
         )}
-        <CardDescription className="flex gap-2 items-center justify-center mb-2 ">
-          <p className="text-lg font-medium text-center text-primary">
-            💡 Today Quota :
-          </p>
-          <p className="text-base font-medium"> "{currentQuote}"</p>
-        </CardDescription>
+
+        {/* Duration Selector - Only show when timer is not active and not in break */}
+        {!isActive && !isBreak && !isLongBreak && (
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              Quick Duration:
+            </p>
+            <div className="flex gap-2">
+              {[25, 30, 60].map((duration) => (
+                <button
+                  key={duration}
+                  onClick={() => {
+                    handleSettingsChange("workDuration", duration);
+                    setTimeLeft(duration * 60);
+                  }}
+                  className={cn(
+                    "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors",
+                    settings.workDuration === duration
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-muted/80 text-foreground"
+                  )}
+                >
+                  {duration}m
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-8">
