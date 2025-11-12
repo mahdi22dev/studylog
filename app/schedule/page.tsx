@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Save, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const TIME_PERIODS = [
   "08:00-10:00",
@@ -28,26 +27,7 @@ const WEEKDAYS = [
   "Sunday",
 ];
 
-// Color mapping for time periods - uses subtle backgrounds that work in both light and dark modes
-const getTimePeriodColor = (period: string) => {
-  const colorMap: Record<string, string> = {
-    "08:00-10:00":
-      "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800",
-    "10:00-12:00":
-      "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
-    "12:00-14:00":
-      "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800",
-    "14:00-16:00":
-      "bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800",
-    "16:00-18:00":
-      "bg-pink-50 dark:bg-pink-950/30 border-pink-200 dark:border-pink-800",
-    "18:00-20:00":
-      "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800",
-    "20:00-22:00":
-      "bg-violet-50 dark:bg-violet-950/30 border-violet-200 dark:border-violet-800",
-  };
-  return colorMap[period] || "";
-};
+// No color mapping — inputs use neutral styles
 
 type ScheduleData = Record<string, Record<string, string>>;
 
@@ -213,12 +193,7 @@ export default function SchedulePage() {
                         handleCellChange(period, day, e.target.value)
                       }
                       placeholder="Study goal..."
-                      className={cn(
-                        "text-sm transition-colors",
-                        scheduleData[period]?.[day]?.trim()
-                          ? getTimePeriodColor(period)
-                          : ""
-                      )}
+                      className="text-sm bg-background"
                     />
                   ))}
                 </div>
