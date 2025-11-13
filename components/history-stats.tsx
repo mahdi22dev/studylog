@@ -120,9 +120,15 @@ const StudyHistory = () => {
     (sum, day) => sum + day.totalMinutes,
     0
   );
+  // Calculate average hours per day over the previous 6 days (exclude current day)
+  const daysForAverage = studyData.length > 1 ? studyData.slice(1, 7) : [];
+  const totalMinutesForAverage = daysForAverage.reduce(
+    (sum, day) => sum + day.totalMinutes,
+    0
+  );
   const averageHoursPerDay =
-    studyData.length > 0
-      ? (totalMinutes / 60 / studyData.length).toFixed(1)
+    daysForAverage.length > 0
+      ? (totalMinutesForAverage / 60 / daysForAverage.length).toFixed(1)
       : "0.0";
   const averageSessionMinutes =
     totalSessions > 0 ? Math.floor(totalMinutes / totalSessions) : 0;
@@ -334,9 +340,7 @@ const StudyHistory = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{averageHoursPerDay}h</div>
-            <p className="text-xs text-muted-foreground">
-              Over the last 7 days
-            </p>
+            <p className="text-xs text-muted-foreground">Recent days</p>
           </CardContent>
         </Card>
 
