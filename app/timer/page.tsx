@@ -89,7 +89,7 @@ export default function StudyLog() {
       currentSession.current = data.message;
 
       // Refresh total study time after completing a pomodoro
-      await getTotalTime();
+      // await getTotalTime();
     } catch (error) {
       toast.error("Failed to update pomodoros. Please try again.");
       throw new Error("Failed to update pomodoros");
@@ -247,10 +247,6 @@ export default function StudyLog() {
     if (isActive && !currentSession.current) {
       createSession();
     }
-
-    return () => {
-      currentSession.current = null;
-    };
   }, [isActive, isBreak, isLongBreak]);
 
   if (isLoading) {
