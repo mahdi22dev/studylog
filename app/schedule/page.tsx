@@ -70,6 +70,31 @@ export default function SchedulePage() {
     }
   };
 
+  // Clear all schedule entries locally (user must click Save to persist)
+  const clearSchedule = () => {
+    if (
+      !confirm(
+        "Clear all schedule entries? This will only clear locally; click Save to persist."
+      )
+    )
+      return;
+
+    setScheduleData((prev) => {
+      const next: ScheduleData = {};
+      Object.keys(prev).forEach((period) => {
+        next[period] = {};
+        Object.keys(prev[period]).forEach((day) => {
+          next[period][day] = "";
+        });
+      });
+      return next;
+    });
+
+    toast.success(
+      "Schedule cleared locally. Click Save to persist the empty schedule."
+    );
+  };
+
   const handleCellChange = (period: string, day: string, value: string) => {
     setScheduleData((prev) => ({
       ...prev,
@@ -139,15 +164,25 @@ export default function SchedulePage() {
                 </p>
               </div>
             </div>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              size="lg"
-              className="gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isSaving ? "Saving..." : "Save Schedule"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                size="lg"
+                className="gap-2"
+              >
+                <Save className="h-4 w-4" />
+                {isSaving ? "Saving..." : "Save Schedule"}
+              </Button>
+              <Button
+                onClick={clearSchedule}
+                variant="outline"
+                size="lg"
+                className="gap-2"
+              >
+                Clear Schedule
+              </Button>
+            </div>
           </div>
         </div>
 
