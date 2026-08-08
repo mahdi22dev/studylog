@@ -2,11 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Home, Timer, FileText, Calendar } from "lucide-react";
+import { Home, Timer, FileText, Calendar, Shield } from "lucide-react";
 
 export function Navigation() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data.isAdmin ?? false))
+      .catch(() => setIsAdmin(false));
+  }, []);
 
   const links = [
     {
@@ -29,6 +38,15 @@ export function Navigation() {
       label: "Schedule",
       icon: Calendar,
     },
+    ...(isAdmin
+      ? [
+          {
+            href: "/admin",
+            label: "Admin",
+            icon: Shield,
+          },
+        ]
+      : []),
   ];
 
   return (
