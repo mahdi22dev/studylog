@@ -1,29 +1,23 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { ClerkProvider, SignedOut } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import { ThemeChanger } from "@/components/use-themes";
-import Link from "next/link";
-import { UserButtonModel } from "@/components/user-button";
 import { GlobalProvider } from "@/contexts/globalProvider";
-import { Navigation } from "@/components/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Study Log",
+  title: "Focurio | Intelligent Immersion",
   description:
     "Transform your learning journey with focused study sessions and intelligent progress tracking",
 };
@@ -38,33 +32,11 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable}`}
+        className={`${inter.variable} ${sora.variable}`}
       >
         <Toaster richColors />
         <body className="antialiased">
-          <GlobalProvider>
-            <header className="flex justify-between items-center p-4 gap-4 h-16 border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
-              <div className="flex items-center gap-6">
-                <Logo />
-                <Navigation />
-              </div>
-              <div className="flex justify-end gap-4">
-                <ThemeChanger />
-                <UserButtonModel />
-                <SignedOut>
-                  <div className="flex justify-between gap-4">
-                    <Link href="/sign-in">
-                      <Button variant="outline">Sign In</Button>
-                    </Link>
-                    <Link href="/sign-up">
-                      <Button variant="default">Sign Up</Button>
-                    </Link>
-                  </div>
-                </SignedOut>
-              </div>
-            </header>
-            {children}
-          </GlobalProvider>
+          <GlobalProvider>{children}</GlobalProvider>
         </body>
       </html>
     </ClerkProvider>

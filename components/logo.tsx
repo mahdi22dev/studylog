@@ -1,15 +1,17 @@
-import { BookOpenIcon } from "lucide-react";
+import { Brain } from "lucide-react";
 import Link from "next/link";
 
 export function Logo() {
   return (
     <Link
       href="/"
-      className="flex items-center space-x-2 hover:opacity-80 transition"
+      className="flex items-center gap-2 hover:opacity-80 transition-opacity"
     >
-      <BookOpenIcon className="w-6 h-6 text-study-primary" />
-      <span className="font-semibold text-xl text-study-text-primary tracking-tight">
-        Study<span className="text-study-primary">Log</span>
+      <div className="p-1 rounded-lg bg-[#6c47ff]/10 border border-[#6c47ff]/20 flex items-center justify-center">
+        <Brain className="w-5 h-5 text-[#c9beff] fill-[#c9beff]/20" />
+      </div>
+      <span className="font-heading text-xl font-bold tracking-tight text-[#c9beff]">
+        Focurio
       </span>
     </Link>
   );

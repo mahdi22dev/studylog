@@ -21,6 +21,7 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        heading: ["var(--font-sora)", "var(--font-inter)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
