@@ -21,7 +21,9 @@ export function Navigation() {
     // Sync initial hash if present
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "");
-      if (hash) setActiveSection(hash);
+      if (hash) {
+        setActiveSection(hash === "blog-preview" ? "blog" : hash);
+      }
     }
 
     if (pathname !== "/") {
@@ -29,7 +31,7 @@ export function Navigation() {
       return;
     }
 
-    const sections = ["how-it-works", "features", "pricing"];
+    const sections = ["how-it-works", "features", "pricing", "blog-preview"];
     const observerOptions = {
       root: null,
       rootMargin: "-20% 0px -40% 0px",
@@ -39,7 +41,8 @@ export function Navigation() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
+          const id = entry.target.id;
+          setActiveSection(id === "blog-preview" ? "blog" : id);
         }
       });
     }, observerOptions);
@@ -73,19 +76,19 @@ export function Navigation() {
     },
     {
       id: "blog",
-      href: "https://blog.focurio.com",
+      href: "/blog",
       label: "Blog",
-      external: true,
+      external: false,
     },
   ];
 
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    link: (typeof links)[0],
+    link: (typeof links)[0]
   ) => {
     if (link.external) return;
 
-    if (pathname === "/") {
+    if (pathname === "/" && link.id !== "blog") {
       e.preventDefault();
       const el = document.getElementById(link.id);
       if (el) {
@@ -99,25 +102,25 @@ export function Navigation() {
   return (
     <nav className="flex items-center gap-6">
       {links.map((link) => {
-        const isActive = pathname === "/" && activeSection === link.id;
+        const isActive =
+          link.id === "blog"
+            ? pathname === "/blog" || (pathname === "/" && activeSection === "blog")
+            : pathname === "/" && activeSection === link.id;
 
         return (
-          <a
+          <Link
             key={link.id}
             href={link.href}
             onClick={(e) => handleNavClick(e, link)}
-            {...(link.external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
             className={cn(
               "text-sm font-semibold tracking-wide border-b-2 py-0.5 transition-all duration-300 ease-in-out",
               isActive
-                ? "text-[#c9beff] border-[#6c47ff]"
-                : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec] hover:border-[#6c47ff]/40",
+                ? "text-[#c9beff] font-bold border-[#6c47ff]"
+                : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec] hover:border-[#6c47ff]/40"
             )}
           >
             {link.label}
-          </a>
+          </Link>
         );
       })}
 
@@ -128,7 +131,7 @@ export function Navigation() {
             "text-sm font-semibold tracking-wide border-b-2 py-0.5 transition-all duration-300 ease-in-out",
             pathname === "/admin"
               ? "text-[#c9beff] font-bold border-[#6c47ff]"
-              : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec]",
+              : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec]"
           )}
         >
           Admin

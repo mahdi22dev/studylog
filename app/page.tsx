@@ -5,6 +5,8 @@ import { Hero } from "@/components/home/hero";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { Features } from "@/components/home/features";
 import { Pricing } from "@/components/home/pricing";
+import { BlogPreview } from "@/components/home/blog-preview";
+import { Faq } from "@/components/home/faq";
 import { Footer } from "@/components/home/footer";
 
 export default function HomePage() {
@@ -26,6 +28,8 @@ export default function HomePage() {
         <HowItWorks />
         <Features />
         <Pricing />
+        <BlogPreview />
+        <Faq />
       </main>
 
       {/* Footer */}

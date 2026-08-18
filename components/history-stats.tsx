@@ -37,7 +37,7 @@ const StudyHistory = () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       setIsLoading(true);
       const response = await fetch(
-        `api/avarge?timezone=${encodeURIComponent(timezone)}`
+        `/api/avarge?timezone=${encodeURIComponent(timezone)}`,
       );
 
       if (!response.ok) {
@@ -80,7 +80,7 @@ const StudyHistory = () => {
         const date = new Date(dateKey);
         const totalMinutes = sessions.reduce(
           (sum, session) => sum + (session.durationMin || 0),
-          0
+          0,
         );
         const sessionCount = sessions.length;
         const averageSessionMinutes =
@@ -103,7 +103,7 @@ const StudyHistory = () => {
     } catch (error) {
       console.error("Error fetching average sessions:", error);
       toast.error(
-        "Network error while fetching study sessions. Check your connection and try again."
+        "Network error while fetching study sessions. Check your connection and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -118,13 +118,13 @@ const StudyHistory = () => {
   const totalSessions = studyData.reduce((sum, day) => sum + day.sessions, 0);
   const totalMinutes = studyData.reduce(
     (sum, day) => sum + day.totalMinutes,
-    0
+    0,
   );
   // Calculate average hours per day over the previous 6 days (exclude current day)
   const daysForAverage = studyData.length > 1 ? studyData.slice(1, 7) : [];
   const totalMinutesForAverage = daysForAverage.reduce(
     (sum, day) => sum + day.totalMinutes,
-    0
+    0,
   );
   const averageHoursPerDay =
     daysForAverage.length > 0
@@ -158,10 +158,10 @@ const StudyHistory = () => {
                 {isToday
                   ? "Today"
                   : isYesterday
-                  ? "Yesterday"
-                  : date.toLocaleDateString("en-US", {
-                      weekday: "long",
-                    })}
+                    ? "Yesterday"
+                    : date.toLocaleDateString("en-US", {
+                        weekday: "long",
+                      })}
               </span>
               <div className="text-xs text-muted-foreground">
                 {date.toLocaleDateString("en-US", {
@@ -256,7 +256,7 @@ const StudyHistory = () => {
       ),
       cell: ({ row }) => {
         const currentIndex = studyData.findIndex(
-          (day) => day.id === row.original.id
+          (day) => day.id === row.original.id,
         );
 
         // Last day in the list has no previous day to compare
