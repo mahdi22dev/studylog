@@ -23,9 +23,11 @@ export async function increament(sessionId: string) {
   }
 }
 
-export async function addNewTimerSession(params: StudySession) {
+export async function addNewTimerSession(
+  params: StudySession & { subject?: string | null }
+) {
   try {
-    const { userId, startTime, endTime } = params;
+    const { userId, startTime, endTime, subject } = params;
     const result = await prisma.studySession.create({
       data: {
         userId,
@@ -33,6 +35,7 @@ export async function addNewTimerSession(params: StudySession) {
         endTime,
         durationMin: 1,
         type: "WORK",
+        subject: subject || null,
       },
     });
     return result;
@@ -227,6 +230,22 @@ export async function resetStudyData(userId: string) {
   } catch (error) {
     console.log(`Error resetting study data: ${error}`);
     throw new Error(`Failed to reset study data: ${error}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getRecentSessions(userId: string, limit: number = 10) {
+  try {
+    const sessions = await prisma.studySession.findMany({
+      where: { userId },
+      orderBy: { startTime: "desc" },
+      take: limit,
+    });
+    return sessions;
+  } catch (error) {
+    console.error(`Error fetching recent sessions: ${error}`);
+    throw new Error(`Failed to fetch recent sessions: ${error}`);
   } finally {
     await prisma.$disconnect();
   }

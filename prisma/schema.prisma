@@ -24,6 +24,7 @@ model StudySession {
   durationMin Int       @default(0) // Can be updated per minute or on finish
 
   type      SessionType // 'WORK' | 'BREAK' | 'LONG_BREAK'
+  subject   String?     // Optional subject/topic label (e.g. "Algorithm Design")
   completed Boolean     @default(false) // Whether the session was fully finished
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt

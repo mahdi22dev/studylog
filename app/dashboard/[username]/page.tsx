@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import StudyLog from "@/app/timer/page";
+import DashboardContent from "@/components/dashboard/dashboard-content";
 
 export default async function DashboardUserPage({
   params,
@@ -24,9 +24,10 @@ export default async function DashboardUserPage({
   const { username } = await params;
   const decodedParam = decodeURIComponent(username);
 
-  // 3. Normalize & protect route: redirect /dashboard/me or mismatched URLs to clean handle /dashboard/[username]
+  // 3. Protect route: redirect mismatched username to canonical handle
   if (decodedParam !== userSlug) {
     redirect(`/dashboard/${encodeURIComponent(userSlug)}`);
   }
-  return <StudyLog />;
+
+  return <DashboardContent />;
 }

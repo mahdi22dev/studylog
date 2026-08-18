@@ -1,13 +1,6 @@
 "use client";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -18,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Target, Settings } from "lucide-react";
+import { Calendar, Target, Settings, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { formatTime } from "@/lib/utils";
@@ -57,49 +50,45 @@ export default function StudyStats({ totalMinutes }: StudyStatsProps) {
   };
 
   const weeklyGoalMinutes = weeklyGoal * 60;
-  const weeklyProgress = Math.min(
-    (totalMinutes / weeklyGoalMinutes) * 100,
-    100
-  );
-  const remainingMinutes = Math.max(0, weeklyGoalMinutes - totalMinutes);
-
-  // Calculate how many weekly goals have been completed lifetime
   const weeksCompleted = Math.floor(totalMinutes / weeklyGoalMinutes);
   const currentWeekProgress = totalMinutes % weeklyGoalMinutes;
-  const weeksPercentage = (
-    (currentWeekProgress / weeklyGoalMinutes) *
-    100
-  ).toFixed(0);
+  const weeksPercentage = Math.min(
+    100,
+    Math.round((currentWeekProgress / weeklyGoalMinutes) * 100)
+  );
 
   return (
     <div className="flex flex-col gap-6">
       {/* Weekly Goal Progress Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+      <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-sm font-semibold text-white/70 font-sora">
             Weekly Goal Progress
-          </CardTitle>
+          </h3>
           <Dialog open={isGoalDialogOpen} onOpenChange={setIsGoalDialogOpen}>
             <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 p-0"
+              <button
+                className="text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/[0.05]"
                 onClick={() => setTempGoal(weeklyGoal)}
               >
-                <Settings className="h-4 w-4 text-muted-foreground" />
-              </Button>
+                <Settings className="h-4 w-4" />
+              </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="bg-[#111827] border border-white/10 text-white rounded-2xl p-6 sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Set Weekly Goal</DialogTitle>
-                <DialogDescription>
-                  Set your target study hours for the week
+                <DialogTitle className="text-xl font-bold font-sora text-white flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-[#38dfab]" />
+                  Set Weekly Goal
+                </DialogTitle>
+                <DialogDescription className="text-xs text-white/40">
+                  Set your target study hours for each week
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="weekly-goal">Weekly Goal (hours)</Label>
+                  <Label htmlFor="weekly-goal" className="text-xs text-white/60">
+                    Weekly Goal (hours)
+                  </Label>
                   <Input
                     id="weekly-goal"
                     type="number"
@@ -107,99 +96,101 @@ export default function StudyStats({ totalMinutes }: StudyStatsProps) {
                     max="168"
                     value={tempGoal}
                     onChange={(e) => setTempGoal(Number(e.target.value) || 0)}
-                    placeholder="Enter hours"
+                    className="bg-[#1d1f27] border-white/10 text-white rounded-xl focus:border-[#38dfab]"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Current goal: {weeklyGoal} hours/week
+                <p className="text-xs text-white/40">
+                  Current target: {weeklyGoal} hours/week
                 </p>
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2">
                   <Button
                     variant="outline"
                     onClick={() => setIsGoalDialogOpen(false)}
-                    className="flex-1"
+                    className="w-1/2 bg-transparent border-white/10 text-white/60 hover:text-white rounded-full"
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleSaveGoal} className="flex-1">
+                  <Button
+                    onClick={handleSaveGoal}
+                    className="w-1/2 bg-[#38dfab] hover:bg-[#2fc495] text-black font-semibold rounded-full"
+                  >
                     Save Goal
                   </Button>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="text-2xl font-bold">{formatTime(totalMinutes)}</div>
-          <p className="text-xs text-muted-foreground">
-            Lifetime total study hours
-          </p>
-          <div className="space-y-3 pt-3 border-t">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Weekly Goals Completed
-                </span>
-                <span className="text-sm font-bold">{weeksCompleted}</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {formatTime(weeklyGoalMinutes)} per week target
-              </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <div className="text-3xl font-extrabold text-white font-sora tracking-tight">
+              {formatTime(totalMinutes)}
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Current Progress
-                </span>
-                <span className="text-sm font-bold">{weeksPercentage}%</span>
+            <p className="text-xs text-white/40 mt-1">Lifetime total study hours</p>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-white/5">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-white/60 font-medium">
+                Weekly Goals Completed
+              </span>
+              <span className="text-sm font-bold text-white font-sora">
+                {weeksCompleted}
+              </span>
+            </div>
+            <div className="text-xs text-white/40">
+              {weeklyGoal}h 0m per week target
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-white/60 font-medium">Current Progress</span>
+                <span className="font-bold text-white">{weeksPercentage}%</span>
               </div>
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 h-full transition-all duration-300"
+                  className="bg-[#38dfab] h-full transition-all duration-500 rounded-full"
                   style={{ width: `${weeksPercentage}%` }}
-                ></div>
+                />
               </div>
-              <p className="text-xs text-muted-foreground">
-                {formatTime(currentWeekProgress)} /{" "}
-                {formatTime(weeklyGoalMinutes)}
+              <p className="text-xs text-white/40">
+                {formatTime(currentWeekProgress)} / {weeklyGoal}h 0m
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Study Tracker Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-bold">Study Tracker</CardTitle>
-          <CardDescription>Days streak & Pomodoros completed</CardDescription>
-        </CardHeader>
+      <div className="bg-[#111827] border border-white/5 rounded-2xl p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-bold text-white font-sora">Study Tracker</h3>
+          <p className="text-xs text-white/40 mt-0.5">
+            Days streak & Pomodoros completed
+          </p>
+        </div>
 
-        <CardContent>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="text-center space-y-2">
-              <div className="p-3 bg-muted rounded-lg w-fit mx-auto">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="text-2xl font-bold">0</div>
-              <div className="text-xs text-muted-foreground font-medium">
-                Days streak
-              </div>
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <div className="text-center space-y-2">
+            <div className="p-3 bg-[#1d1f27] rounded-xl w-fit mx-auto border border-white/5">
+              <Calendar className="h-5 w-5 text-white/60" />
             </div>
-            <div className="text-center space-y-2">
-              <div className="p-3 bg-muted rounded-lg w-fit mx-auto">
-                <Target className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="text-2xl font-bold">
-                {Math.floor(totalMinutes / 25)}
-              </div>
-              <div className="text-xs text-muted-foreground font-medium">
-                Pomodoros
-              </div>
-            </div>
+            <div className="text-2xl font-bold text-white font-sora">0</div>
+            <div className="text-xs text-white/40 font-medium">Days streak</div>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="text-center space-y-2">
+            <div className="p-3 bg-[#1d1f27] rounded-xl w-fit mx-auto border border-white/5">
+              <Target className="h-5 w-5 text-white/60" />
+            </div>
+            <div className="text-2xl font-bold text-white font-sora">
+              {Math.floor(totalMinutes / 25)}
+            </div>
+            <div className="text-xs text-white/40 font-medium">Pomodoros</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

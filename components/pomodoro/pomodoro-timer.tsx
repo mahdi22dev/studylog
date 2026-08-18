@@ -9,16 +9,7 @@ import {
   Dispatch,
 } from "react";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import {
   Play,
   Pause,
@@ -28,9 +19,9 @@ import {
   Fullscreen,
   VolumeX,
   Volume2,
-  LucideFullscreen,
   Minimize2,
   Calendar,
+  BookOpen,
 } from "lucide-react";
 import { clearInterval, setInterval } from "worker-timers";
 import { useSettingsDialog } from "@/contexts/settingsDialogContext";
@@ -70,19 +61,17 @@ export default function PomodoroTimer({
   completedPomodoro,
 }: PomodoroTimerProps) {
   const [settings, setSettings] = useState<TimerSettings>(() => {
+    const defaults: TimerSettings = {
+      workDuration: 25,
+      breakDuration: 5,
+      longBreakDuration: 15,
+      sessionsUntilLongBreak: 4,
+      setAudioDisabled: false,
+      skipBreaks: false,
+    };
+    if (typeof window === "undefined") return defaults;
     const saved = localStorage.getItem("pomodoroSettings");
-    if (saved) {
-      return JSON.parse(saved) as TimerSettings;
-    } else {
-      return {
-        workDuration: 25,
-        breakDuration: 5,
-        longBreakDuration: 15,
-        sessionsUntilLongBreak: 4,
-        setAudioDisabled: false,
-        skipBreaks: false,
-      };
-    }
+    return saved ? (JSON.parse(saved) as TimerSettings) : defaults;
   });
 
   const [timeLeft, setTimeLeft] = useState(settings.workDuration * 60);
@@ -95,31 +84,12 @@ export default function PomodoroTimer({
   const boxRef = useRef<HTMLDivElement>(null);
   const [sessionName, setSessionName] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("currentSessionName") || "Study Session";
+      return localStorage.getItem("currentSessionName") || "Physics";
     }
-    return "Study Session";
+    return "Physics";
   });
   const [isEditingName, setIsEditingName] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const [currentQuote, setCurrentQuote] = useState(
-    "Focus deeply on your studies without distractions"
-  );
-
-  // Fetch motivational quote from API
-  const fetchQuote = async () => {
-    try {
-      const response = await fetch("/api/quote");
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.quote) {
-          setCurrentQuote(data.quote);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch quote:", error);
-      // Keep default quote if fetch fails
-    }
-  };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -136,28 +106,30 @@ export default function PomodoroTimer({
       setTimeLeft(parsed.workDuration * 60);
     }
 
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("autostart") === "true") {
+        setIsActive(true);
+      }
+    }
+
     const handleFullscreenChange = () => {
       setIsFullscreen(document.fullscreenElement === boxRef.current);
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
 
-    // Fetch motivational quote on mount
-    fetchQuote();
-
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
-  }, []);
+  }, [setIsActive]);
 
-  // Save session name to localStorage
   useEffect(() => {
     if (sessionName) {
       localStorage.setItem("currentSessionName", sessionName);
     }
   }, [sessionName]);
 
-  // Focus input when editing starts
   useEffect(() => {
     if (isEditingName && nameInputRef.current) {
       nameInputRef.current.focus();
@@ -165,7 +137,6 @@ export default function PomodoroTimer({
     }
   }, [isEditingName]);
 
-  // Save settings to localStorage when they change
   useEffect(() => {
     if (!firstMount.current) {
       firstMount.current = true;
@@ -176,30 +147,23 @@ export default function PomodoroTimer({
 
   useEffect(() => {
     if (minutesToAdd > 0) {
-      console.log(`Adding ${minutesToAdd} minutes to study time`);
       onStudyTimeUpdate(minutesToAdd);
       setMinutesToAdd(0);
     }
   }, [minutesToAdd, onStudyTimeUpdate]);
 
-  // Main timer logic
   useEffect(() => {
     if (isActive && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
-          // Only count study time (not break time)
           if (!isBreak && !isLongBreak && prev > 0) {
             const currentMinute = Math.floor(prev / 60);
             const newMinute = Math.floor(newTime / 60);
-
-            // Check if we just completed a full minute
             if (currentMinute > newMinute && newTime >= 0) {
-              // Schedule minute addition for next render cycle
               setMinutesToAdd(1);
             }
           }
-
           return Math.max(0, newTime);
         });
       }, 1000);
@@ -224,32 +188,22 @@ export default function PomodoroTimer({
     });
     sound.play();
   };
-  // Handle timer completion
+
   useEffect(() => {
     if (timeLeft === 0 && isActive) {
       if (!settings.setAudioDisabled) {
         pomodorCompletedNoti();
       }
-      // Timer completed
       if (!isBreak && !isLongBreak) {
-        // Work session completed
         const newCompletedCount = completedPomodoros + 1;
         setCompletedPomodoros(newCompletedCount);
         completedPomodoro();
-        console.log(
-          `Session completed! Adding ${settings.workDuration} minutes`
-        );
 
-        // Check if breaks should be skipped
         if (settings.skipBreaks) {
-          // Skip break, start new work session immediately
           setIsBreak(false);
           setIsLongBreak(false);
           setTimeLeft(settings.workDuration * 60);
-          // Keep timer running when skipping breaks
-          // setIsActive remains true, so no need to set it
         } else {
-          // Check if it's time for a long break
           if (newCompletedCount % settings.sessionsUntilLongBreak === 0) {
             setIsLongBreak(true);
             setTimeLeft(settings.longBreakDuration * 60);
@@ -257,18 +211,16 @@ export default function PomodoroTimer({
             setIsBreak(true);
             setTimeLeft(settings.breakDuration * 60);
           }
-          // Stop timer so user can manually start the break
           setIsActive(false);
         }
       } else {
-        // Break completed - start new work session
         setIsBreak(false);
         setIsLongBreak(false);
         setTimeLeft(settings.workDuration * 60);
         setIsActive(false);
       }
     }
-  }, [timeLeft, isActive, isBreak, isLongBreak, completedPomodoros, settings]);
+  }, [timeLeft, isActive, isBreak, isLongBreak, completedPomodoros, settings, completedPomodoro, setIsActive, setIsBreak, setIsLongBreak]);
 
   const resetTimer = useCallback(() => {
     setIsActive(false);
@@ -276,30 +228,18 @@ export default function PomodoroTimer({
     setIsLongBreak(false);
     setTimeLeft(settings.workDuration * 60);
     setMinutesToAdd(0);
-    setCompletedPomodoros(0); // Reset completed sessions count for new timer session
+    setCompletedPomodoros(0);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-  }, [settings.workDuration]);
+  }, [settings.workDuration, setIsActive, setIsBreak, setIsLongBreak]);
 
-  const formatTime = (seconds: number) => {
+  const formatDisplayTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")}`;
-  };
-
-  const getProgress = () => {
-    let totalTime: number;
-    if (isLongBreak) {
-      totalTime = settings.longBreakDuration * 60;
-    } else if (isBreak) {
-      totalTime = settings.breakDuration * 60;
-    } else {
-      totalTime = settings.workDuration * 60;
-    }
-    return ((totalTime - timeLeft) / totalTime) * 100;
   };
 
   const getCurrentMode = () => {
@@ -310,7 +250,7 @@ export default function PomodoroTimer({
 
   const toggleTimer = useCallback(() => {
     setIsActive(!isActive);
-  }, [isActive]);
+  }, [isActive, setIsActive]);
 
   const handleSettingsChange = <K extends keyof TimerSettings>(
     key: K,
@@ -319,7 +259,6 @@ export default function PomodoroTimer({
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
 
-    // Reset timer if not active
     if (!isActive) {
       setIsBreak(false);
       setIsLongBreak(false);
@@ -327,230 +266,191 @@ export default function PomodoroTimer({
     }
   };
 
+  let maxDurationSeconds = settings.workDuration * 60;
+  if (isLongBreak) maxDurationSeconds = settings.longBreakDuration * 60;
+  else if (isBreak) maxDurationSeconds = settings.breakDuration * 60;
+
+  const strokeOffset =
+    283 - (283 * (maxDurationSeconds - timeLeft)) / maxDurationSeconds;
+
   return (
-    <Card
+    <div
       className={cn(
-        "w-full",
-        isFullscreen && "flex justify-center items-center flex-col"
+        "w-full bg-[#111827] border border-white/5 rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-[0_0_32px_rgba(108,71,255,0.15)]",
+        isFullscreen && "flex justify-center items-center flex-col bg-[#05070A]"
       )}
       ref={boxRef}
     >
-      <CardHeader className="text-center pb-2">
-        <div className="flex items-center justify-between mb-4 w-full">
-          {/* Left and Center Group */}
-          <div className="flex items-center gap-3 mx-auto">
-            <div className="p-3 bg-muted rounded-xl">
-              <Timer className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <CardTitle className="text-3xl font-bold">Pomodoro Timer</CardTitle>
-            <TimerSettings
-              isOpen={isOpen}
-              setIsActive={setIsActive}
-              setIsOpen={setIsOpen}
-              settings={settings}
-              setSettings={setSettings}
-              setTimeLeft={setTimeLeft}
-              setIsBreak={setIsBreak}
-              setIsLongBreak={setIsLongBreak}
-              handleSettingsChange={handleSettingsChange}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/schedule"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">View Schedule</span>
-            </Link>
-            <button onClick={toggleFullscreen}>
-              {isFullscreen ? (
-                <Minimize2 className="w-5 h-5" />
-              ) : (
-                <Fullscreen className="w-5 h-5" />
-              )}
-            </button>
-            <button
-              onClick={() =>
-                handleSettingsChange(
-                  "setAudioDisabled",
-                  !settings.setAudioDisabled
-                )
-              }
-            >
-              {settings.setAudioDisabled ? (
-                <VolumeX className="w-5 h-5" />
-              ) : (
-                <Volume2 className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
+      {/* Background Radial Glow */}
+      <div className="absolute inset-0 bg-[#6c47ff]/10 blur-3xl rounded-full pointer-events-none" />
 
-        {/* Session Name - Only show during focus time */}
-        <div className="flex items-center justify-center gap-2 mt-6 mb-4">
-          {isLongBreak ? (
-            <Badge
-              variant="default"
-              className="flex items-center gap-2 px-4 py-2"
-            >
-              <Coffee className="h-4 w-4" />
-              Long Break Time
-            </Badge>
-          ) : isBreak ? (
-            <Badge
-              variant="default"
-              className="flex items-center gap-2 px-4 py-2"
-            >
-              <Coffee className="h-4 w-4" />
-              Break Time
-            </Badge>
+      {/* Top Header Pill with Settings */}
+      <div className="flex items-center gap-2 mb-6 bg-[#1d1f27] py-1.5 px-4 rounded-full border border-white/5 z-10">
+        <Timer className="h-4 w-4 text-[#6c47ff]" />
+        <span className="text-xs font-semibold text-white">Pomodoro Timer</span>
+        <TimerSettings
+          isOpen={isOpen}
+          setIsActive={setIsActive}
+          setIsOpen={setIsOpen}
+          settings={settings}
+          setSettings={setSettings}
+          setTimeLeft={setTimeLeft}
+          setIsBreak={setIsBreak}
+          setIsLongBreak={setIsLongBreak}
+          handleSettingsChange={handleSettingsChange}
+        />
+        <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2">
+          <button onClick={toggleFullscreen} className="text-white/40 hover:text-white transition-colors">
+            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Fullscreen className="w-3.5 h-3.5" />}
+          </button>
+          <button
+            onClick={() => handleSettingsChange("setAudioDisabled", !settings.setAudioDisabled)}
+            className="text-white/40 hover:text-white transition-colors"
+          >
+            {settings.setAudioDisabled ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mode Badge */}
+      <div className="mb-4 inline-flex items-center gap-2 bg-[#6c47ff]/20 text-[#6c47ff] border border-[#6c47ff]/30 py-1 px-4 rounded-full text-xs font-semibold z-10">
+        {isLongBreak ? (
+          <>
+            <Coffee className="h-3.5 w-3.5" />
+            Long Break
+          </>
+        ) : isBreak ? (
+          <>
+            <Coffee className="h-3.5 w-3.5" />
+            Break Time
+          </>
+        ) : (
+          <>
+            <Play className="h-3.5 w-3.5 fill-current" />
+            Deep Focus
+          </>
+        )}
+      </div>
+
+      {/* Session Title Subject */}
+      {!isBreak && !isLongBreak && (
+        <div className="flex items-center justify-center gap-2 mb-6 z-10">
+          <BookOpen className="h-4 w-4 text-white/40" />
+          {isEditingName ? (
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={sessionName}
+              onChange={(e) => setSessionName(e.target.value)}
+              onBlur={() => setIsEditingName(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") setIsEditingName(false);
+              }}
+              className="text-sm font-semibold text-center bg-[#0D1117] border border-[#6c47ff]/50 rounded-lg px-3 py-1 text-white focus:outline-none"
+              maxLength={40}
+            />
           ) : (
-            <Badge
-              variant="default"
-              className="flex items-center gap-2 px-4 py-2"
+            <button
+              onClick={() => setIsEditingName(true)}
+              className="text-sm font-semibold text-white/70 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-white/[0.05]"
             >
-              <Play className="h-4 w-4" />
-              Focus Time
-            </Badge>
+              {sessionName}
+            </button>
           )}
         </div>
+      )}
 
-        {!isBreak && !isLongBreak && (
-          <div className="flex items-center justify-center gap-2 mb-4">
-            {!isEditingName && (
-              <p className="text-lg font-medium text-center text-primary">
-                📝 Session Title :
-              </p>
-            )}
+      {/* Duration Selector */}
+      {!isActive && !isBreak && !isLongBreak && (
+        <div className="flex gap-2 mb-8 z-10">
+          {[25, 30, 60].map((duration) => (
+            <button
+              key={duration}
+              onClick={() => {
+                handleSettingsChange("workDuration", duration);
+                setTimeLeft(duration * 60);
+              }}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-xs font-medium transition-all border",
+                settings.workDuration === duration
+                  ? "bg-[#6c47ff]/20 text-[#6c47ff] border-[#6c47ff]/40 shadow-[0_0_12px_rgba(108,71,255,0.3)]"
+                  : "bg-transparent text-white/40 border-white/10 hover:bg-white/5 hover:text-white/70"
+              )}
+            >
+              {duration}m
+            </button>
+          ))}
+        </div>
+      )}
 
-            {isEditingName ? (
-              <input
-                ref={nameInputRef}
-                type="text"
-                value={sessionName}
-                onChange={(e) => setSessionName(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setIsEditingName(false);
-                  }
-                }}
-                className="text-lg font-medium text-center bg-transparent border-b-2 border-primary focus:outline-none px-2 py-1"
-                maxLength={50}
-              />
-            ) : (
-              <button
-                onClick={() => setIsEditingName(true)}
-                className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-muted"
-              >
-                {sessionName}
-              </button>
-            )}
-          </div>
-        )}
+      {/* Circular Progress Timer */}
+      <div className="relative flex justify-center items-center w-64 h-64 mb-8 z-10">
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" fill="none" r="45" stroke="#1d1f27" strokeWidth="4" />
+          <circle
+            className="transition-all duration-1000 drop-shadow-[0_0_15px_rgba(108,71,255,0.6)]"
+            cx="50"
+            cy="50"
+            fill="none"
+            r="45"
+            stroke="#6c47ff"
+            strokeDasharray="283"
+            strokeDashoffset={strokeOffset}
+            strokeLinecap="round"
+            strokeWidth="4"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center font-sora text-6xl font-extrabold text-white tracking-tighter">
+          {formatDisplayTime(timeLeft)}
+        </div>
+      </div>
 
-        {/* Duration Selector - Only show when timer is not active and not in break */}
-        {!isActive && !isBreak && !isLongBreak && (
-          <div className="flex items-center justify-center gap-3 mt-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              Quick Duration:
-            </p>
-            <div className="flex gap-2">
-              {[25, 30, 60].map((duration) => (
-                <button
-                  key={duration}
-                  onClick={() => {
-                    handleSettingsChange("workDuration", duration);
-                    setTimeLeft(duration * 60);
-                  }}
-                  className={cn(
-                    "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors",
-                    settings.workDuration === duration
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-muted/80 text-foreground"
-                  )}
-                >
-                  {duration}m
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </CardHeader>
+      {/* Controls */}
+      <div className="flex items-center gap-4 z-10">
+        <Button
+          onClick={toggleTimer}
+          className="bg-[#cebdff] hover:bg-[#c9beff] text-[#1b0063] font-semibold text-sm py-3 px-8 rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(108,71,255,0.4)] transition-colors border-0"
+        >
+          {isActive ? (
+            <>
+              <Pause className="h-4 w-4 fill-current" />
+              Pause Focus
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4 fill-current" />
+              Start Focus
+            </>
+          )}
+        </Button>
 
-      <CardContent className="space-y-8">
+        <Button
+          onClick={resetTimer}
+          variant="outline"
+          className="bg-transparent border border-white/10 text-white/60 hover:text-white font-semibold text-sm py-3 px-6 rounded-full flex items-center gap-2 transition-colors hover:bg-white/[0.05]"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Reset
+        </Button>
+      </div>
+
+      {/* Footer session counter details */}
+      <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/5 w-full mt-8 z-10">
         <div className="text-center">
-          <div className="relative inline-block">
-            <div className="text-7xl font-mono font-bold mb-6 tracking-wider">
-              {formatTime(timeLeft)}
-            </div>
-          </div>
-          <div className="max-w-md mx-auto">
-            <Progress value={getProgress()} />
-          </div>
+          <div className="text-xl font-bold text-white font-sora">{completedPomodoros}</div>
+          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Completed</div>
         </div>
-
-        <div className="flex justify-center gap-4">
-          <Button
-            onClick={toggleTimer}
-            size="lg"
-            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold"
-          >
-            {isActive ? (
-              <>
-                <Pause className="h-5 w-5" />
-                Pause
-              </>
-            ) : (
-              <>
-                <Play className="h-5 w-5" />
-                Start
-              </>
-            )}
-          </Button>
-
-          <Button
-            onClick={resetTimer}
-            variant="outline"
-            size="lg"
-            className="flex items-center gap-3 px-8 py-4 text-lg font-semibold"
-          >
-            <RotateCcw className="h-5 w-5" />
-            Reset
-          </Button>
+        <div className="text-center">
+          <div className="text-xl font-bold text-[#6c47ff] font-sora">{getCurrentMode()}</div>
+          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Mode</div>
         </div>
-
-        <div className="grid grid-cols-3 gap-6 pt-6 border-t">
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-1">{completedPomodoros}</div>
-            <div className="text-sm text-muted-foreground font-medium">
-              Completed
-            </div>
+        <div className="text-center">
+          <div className="text-xl font-bold text-white font-sora">
+            {Math.floor(completedPomodoros / settings.sessionsUntilLongBreak)}
           </div>
-          <div className="text-center">
-            <div className="text-sm text-muted-foreground font-medium">
-              Current Mode
-            </div>
-            <div className="text-3xl font-bold mb-1">{getCurrentMode()}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-1">
-              {Math.floor(completedPomodoros / settings.sessionsUntilLongBreak)}
-            </div>
-            <div className="text-sm text-muted-foreground font-medium">
-              Cycles
-            </div>
-          </div>
+          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Cycles</div>
         </div>
-
-        <div className="text-center text-sm text-muted-foreground font-medium rounded-lg p-3">
-          {settings.workDuration}m work • {settings.breakDuration}m break •{" "}
-          {settings.longBreakDuration}m long break
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -10,20 +10,20 @@ export async function POST(request: Request) {
     if (!userId) {
       return new Response("Unauthorized", { status: 401 });
     }
-    console.log("User ID:", userId);
-    const data = (await request.json()) as StudySession;
-    console.log("Received data:", data);
+    const data = (await request.json()) as StudySession & {
+      subject?: string | null;
+    };
     if (!data) {
-      console.log("Data is undefined or null");
       return NextResponse.json(
         { message: "No data provided" },
         { status: 400 }
       );
     }
 
-    const session: StudySession = {
+    const session = {
       ...data,
       userId: userId,
+      subject: data.subject || null,
     };
     const query = await addNewTimerSession(session);
     if (!query) {
