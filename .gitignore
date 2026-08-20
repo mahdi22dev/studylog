@@ -27,3 +27,6 @@ yarn-error.log*
 next-env.d.ts
 tasks.txt
 test.js
+
+# local agent/editor MCP config (may contain secrets)
+.agents/
