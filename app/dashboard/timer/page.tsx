@@ -36,29 +36,56 @@ function formatTime(minutes: number): string {
 }
 
 function computeStreak(sessions: Session[]): number {
-  if (sessions.length === 0) return 0;
-  const workDays = new Set<string>();
-  for (const s of sessions) {
-    if (s.type === "WORK") {
-      const d = new Date(s.startTime);
-      workDays.add(d.toISOString().slice(0, 10));
-    }
+  if (!sessions || sessions.length === 0) return 0;
+
+  const workSessions = sessions.filter(
+    (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
+  );
+  if (workSessions.length === 0) return 0;
+
+  const activeDates = new Set<string>();
+  for (const s of workSessions) {
+    const d = new Date(s.startTime);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    activeDates.add(`${year}-${month}-${day}`);
+  }
+
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = new Date();
+  const todayStr = formatLocalDate(today);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = formatLocalDate(yesterday);
+
+  let startDate = today;
+  if (!activeDates.has(todayStr) && activeDates.has(yesterdayStr)) {
+    startDate = yesterday;
+  } else if (!activeDates.has(todayStr) && !activeDates.has(yesterdayStr)) {
+    return 0;
   }
 
   let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const current = new Date(startDate);
 
   for (let i = 0; i < 365; i++) {
-    const check = new Date(today);
-    check.setDate(today.getDate() - i);
-    const key = check.toISOString().slice(0, 10);
-    if (workDays.has(key)) {
+    const key = formatLocalDate(current);
+    if (activeDates.has(key)) {
       streak++;
+      current.setDate(current.getDate() - 1);
     } else {
       break;
     }
   }
+
   return streak;
 }
 
@@ -76,15 +103,32 @@ export default function DashboardTimerPage() {
   const [isLongBreak, setIsLongBreak] = useState(false);
   const currentSession = useRef<Session | null>(null);
 
-  const streak = useMemo(() => computeStreak(weeklySessions), [weeklySessions]);
+  const allSessionsCombined = useMemo(() => {
+    const map = new Map<string, Session>();
+    weeklySessions?.forEach((s) => map.set(s.id, s));
+    todaySessions?.forEach((s) => map.set(s.id, s));
+    recentSessions?.forEach((s) => map.set(s.id, s));
+    return Array.from(map.values());
+  }, [weeklySessions, todaySessions, recentSessions]);
+
+  const streak = useMemo(() => computeStreak(allSessionsCombined), [allSessionsCombined]);
 
   // Real Subject Distribution calculation from DB sessions
   const subjectDistribution = useMemo(() => {
     const map = new Map<string, number>();
-    const workSessions = weeklySessions.filter((s) => s.type === "WORK");
+
+    // Combine all available sessions
+    const sessionMap = new Map<string, Session>();
+    weeklySessions?.forEach((s) => sessionMap.set(s.id, s));
+    recentSessions?.forEach((s) => sessionMap.set(s.id, s));
+
+    const allSessions = Array.from(sessionMap.values());
+    const workSessions = allSessions.filter(
+      (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
+    );
 
     for (const s of workSessions) {
-      const key = s.subject && s.subject.trim() !== "" ? s.subject : "Physics";
+      const key = s.subject && s.subject.trim() !== "" ? s.subject.trim() : "General Study";
       map.set(key, (map.get(key) || 0) + (s.durationMin || 0));
     }
 
@@ -92,20 +136,18 @@ export default function DashboardTimerPage() {
 
     if (totalMins === 0) {
       return {
-        totalHoursStr: "12h",
+        totalHoursStr: "0h",
         items: [
-          { name: "Physics", pct: 45, hoursStr: "5.4h", color: "#6c47ff" },
-          { name: "Calculus", pct: 30, hoursStr: "3.6h", color: "#38dfab" },
-          { name: "Literature", pct: 25, hoursStr: "3.0h", color: "#cebdff" },
+          { name: "No sessions logged", pct: 100, hoursStr: "0h", color: "#2d3342" },
         ],
       };
     }
 
-    const palette = ["#6c47ff", "#38dfab", "#cebdff", "#f59e0b", "#ef4444"];
+    const palette = ["#6c47ff", "#38dfab", "#cebdff", "#f59e0b", "#ef4444", "#3b82f6"];
     const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
 
-    const items = sorted.slice(0, 4).map(([name, mins], idx) => {
-      const pct = Math.round((mins / totalMins) * 100);
+    const items = sorted.map(([name, mins], idx) => {
+      const pct = Math.max(1, Math.round((mins / totalMins) * 100));
       const h = (mins / 60).toFixed(1);
       return {
         name,
@@ -115,13 +157,13 @@ export default function DashboardTimerPage() {
       };
     });
 
-    const totalH = (totalMins / 60).toFixed(0);
+    const totalH = (totalMins / 60).toFixed(1);
 
     return {
       totalHoursStr: `${totalH}h`,
       items,
     };
-  }, [weeklySessions]);
+  }, [weeklySessions, recentSessions]);
 
   const updateTotalStudyTime = (minutes: number) => {
     if (minutes <= 0) return;
@@ -150,7 +192,7 @@ export default function DashboardTimerPage() {
       setIsLoading(true);
       try {
         await Promise.all([
-          fetch("/api/recent_sessions?limit=20")
+          fetch("/api/recent_sessions?limit=1000")
             .then((r) => r.json())
             .then((d) => {
               if (d.sessions) setRecentSessions(d.sessions);
@@ -226,7 +268,7 @@ export default function DashboardTimerPage() {
                   <Clock className="h-4 w-4 text-white/40" />
                 </div>
                 <div className="text-3xl font-extrabold text-white font-sora">
-                  {isLoading ? "366h 36m" : formatTime(totalMinutes || 21996)}
+                  {isLoading ? "0m" : formatTime(totalMinutes)}
                 </div>
                 <div className="text-xs text-white/40">All time</div>
               </div>
@@ -238,7 +280,7 @@ export default function DashboardTimerPage() {
                   <TrendingUp className="h-4 w-4 text-[#6c47ff]" />
                 </div>
                 <div className="text-3xl font-extrabold text-[#6c47ff] font-sora">
-                  {isLoading ? "12m" : formatTime(todayMinutes || 12)}
+                  {isLoading ? "0m" : formatTime(todayMinutes)}
                 </div>
                 <div className="text-xs text-white/40">Today's progress</div>
               </div>
@@ -250,7 +292,7 @@ export default function DashboardTimerPage() {
                   <Flame className="h-4 w-4 text-[#38dfab] fill-[#38dfab]/20" />
                 </div>
                 <div className="text-3xl font-extrabold text-[#38dfab] font-sora">
-                  {isLoading ? "7 days" : `${streak || 7} days`}
+                  {isLoading ? "..." : `${streak} ${streak === 1 ? "day" : "days"}`}
                 </div>
                 <div className="text-xs text-white/40">Current streak</div>
               </div>
@@ -262,7 +304,7 @@ export default function DashboardTimerPage() {
                   <BookOpen className="h-4 w-4 text-white/40" />
                 </div>
                 <div className="text-3xl font-extrabold text-white font-sora">
-                  {isLoading ? "3" : String(sessionsCountToday || 3)}
+                  {isLoading ? "0" : String(sessionsCountToday)}
                 </div>
                 <div className="text-xs text-white/40">Work sessions</div>
               </div>
@@ -295,10 +337,15 @@ export default function DashboardTimerPage() {
               <div className="lg:col-span-5 flex flex-col gap-6">
                 {/* Subject Distribution */}
                 <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
-                  <h3 className="text-lg font-bold text-white font-sora mb-6 flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-[#38dfab]" />
-                    Subject Distribution
-                  </h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-white font-sora flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-[#38dfab]" />
+                      Subject Distribution
+                    </h3>
+                    <span className="text-[10px] font-semibold text-[#38dfab] bg-[#38dfab]/10 px-2.5 py-1 rounded-full border border-[#38dfab]/20">
+                      Recent & All-Time
+                    </span>
+                  </div>
 
                   {/* Donut Visualization */}
                   <div className="flex justify-center mb-8 relative">
@@ -343,7 +390,7 @@ export default function DashboardTimerPage() {
                       <span className="text-2xl font-extrabold text-white">
                         {subjectDistribution.totalHoursStr}
                       </span>
-                      <span className="text-xs text-white/40">This Week</span>
+                      <span className="text-xs text-white/40">All Time</span>
                     </div>
                   </div>
 

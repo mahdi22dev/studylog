@@ -5,7 +5,7 @@ import { useSignIn, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/home/navbar";
-import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2, Mail } from "lucide-react";
 
 export default function SignInPage() {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -24,6 +24,10 @@ export default function SignInPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [code, setCode] = useState("");
+  const [factorStage, setFactorStage] = useState<"first" | "second">("first");
+  const [factorStrategy, setFactorStrategy] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,14 +44,89 @@ export default function SignInPage() {
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         router.push("/dashboard/me");
+        return;
+      }
+
+      const firstFactors = (result.supportedFirstFactors ?? []) as any[];
+      const secondFactors = (result.supportedSecondFactors ?? []) as any[];
+
+      if (secondFactors.length > 0) {
+        // 2FA required
+        const pick =
+          secondFactors.find((f) => f.strategy === "totp") ||
+          secondFactors.find((f) => f.strategy === "backup_code") ||
+          secondFactors.find((f) => f.strategy === "email_code") ||
+          secondFactors[0];
+
+        const params: any = { strategy: pick.strategy };
+        if (pick.strategy === "email_code" && pick.emailAddressId) {
+          params.email_address_id = pick.emailAddressId;
+        }
+        await signIn.prepareSecondFactor(params);
+        setFactorStage("second");
+        setFactorStrategy(pick.strategy);
+      } else if (firstFactors.length > 0) {
+        // Email verification code as first factor (unverified email, new device)
+        const pick =
+          firstFactors.find((f) => f.strategy === "email_code") ||
+          firstFactors[0];
+        await signIn.prepareFirstFactor({ strategy: pick.strategy } as any);
+        setFactorStage("first");
+        setFactorStrategy(pick.strategy);
       } else {
         setError("Unable to sign in. Please check your credentials.");
+        return;
+      }
+
+      setCode("");
+      setVerifying(true);
+    } catch (err: any) {
+      const c = err.errors?.[0]?.code;
+      if (c === "verification_strategy_not_valid") {
+        setError(
+          "This account requires a verification code. Please try again or use Google sign-in."
+        );
+      } else {
+        setError(
+          err.errors?.[0]?.longMessage ||
+            err.errors?.[0]?.message ||
+            "Invalid email, username, or password"
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+    setError("");
+    setLoading(true);
+
+    try {
+      const result =
+        factorStage === "second"
+          ? await signIn.attemptSecondFactor({
+              code,
+              strategy: factorStrategy as any,
+            })
+          : await signIn.attemptFirstFactor({
+              code,
+              strategy: factorStrategy as any,
+            });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/dashboard/me");
+      } else {
+        setError("Verification incomplete. Please check the code.");
       }
     } catch (err: any) {
       setError(
         err.errors?.[0]?.longMessage ||
           err.errors?.[0]?.message ||
-          "Invalid email, username, or password"
+          "Invalid verification code"
       );
     } finally {
       setLoading(false);
@@ -83,7 +162,8 @@ export default function SignInPage() {
       </div>
 
       <main className="relative z-10 flex-grow flex items-center justify-center p-6 pt-28 pb-16">
-        <div className="w-full max-w-[440px] bg-[#111827]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
+        {!verifying ? (
+          <div className="w-full max-w-[440px] bg-[#111827]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="font-heading text-2xl font-bold text-white mb-2">
@@ -233,6 +313,71 @@ export default function SignInPage() {
             </p>
           </div>
         </div>
+      ) : (
+        /* Verification Code Step (email verification code or 2FA) */
+        <div className="w-full max-w-[440px] bg-[#111827]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
+          <div className="text-center">
+            <div className="w-12 h-12 rounded-full bg-[#6c47ff]/10 border border-[#6c47ff]/20 flex items-center justify-center mx-auto mb-4">
+              <Mail className="h-6 w-6 text-[#c9beff]" />
+            </div>
+            <h2 className="font-heading text-2xl font-bold text-white mb-2">
+              {factorStage === "second" ? "Two-factor verification" : "Verify your account"}
+            </h2>
+            <p className="text-sm text-[#c9c3d9] mb-6">
+              We sent a verification code to{" "}
+              <span className="font-semibold text-white">{identifier}</span>.
+              Enter it below to continue.
+            </p>
+
+            {error && (
+              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 text-left">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleVerify} className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Enter 6-digit code"
+                  className="w-full bg-[#0D121F] border border-white/10 rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-[#6c47ff] transition-colors h-14"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || code.length < 6}
+                className="w-full bg-[#6c47ff] hover:bg-[#5e35f1] text-white font-semibold text-sm py-3 rounded-full transition-all duration-300 h-12 shadow-lg shadow-[#6c47ff]/25 flex justify-center items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Verifying...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Verify & Sign In</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <button
+              type="button"
+              onClick={() => setVerifying(false)}
+              className="mt-5 text-xs text-[#c9c3d9] hover:text-white transition-colors"
+            >
+              Back to sign in
+            </button>
+          </div>
+        </div>
+      )}
       </main>
     </div>
   );

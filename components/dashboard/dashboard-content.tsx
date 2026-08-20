@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   TrendingUp,
   Minus,
@@ -12,6 +13,7 @@ import {
   Plus,
   Check,
   GripVertical,
+  Info,
 } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
@@ -37,29 +39,56 @@ function formatTime(minutes: number): string {
 }
 
 function computeStreak(sessions: Session[]): number {
-  if (sessions.length === 0) return 0;
-  const workDays = new Set<string>();
-  for (const s of sessions) {
-    if (s.type === "WORK") {
-      const d = new Date(s.startTime);
-      workDays.add(d.toISOString().slice(0, 10));
-    }
+  if (!sessions || sessions.length === 0) return 0;
+
+  const workSessions = sessions.filter(
+    (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
+  );
+  if (workSessions.length === 0) return 0;
+
+  const activeDates = new Set<string>();
+  for (const s of workSessions) {
+    const d = new Date(s.startTime);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    activeDates.add(`${year}-${month}-${day}`);
+  }
+
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const today = new Date();
+  const todayStr = formatLocalDate(today);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = formatLocalDate(yesterday);
+
+  let startDate = today;
+  if (!activeDates.has(todayStr) && activeDates.has(yesterdayStr)) {
+    startDate = yesterday;
+  } else if (!activeDates.has(todayStr) && !activeDates.has(yesterdayStr)) {
+    return 0;
   }
 
   let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const current = new Date(startDate);
 
   for (let i = 0; i < 365; i++) {
-    const check = new Date(today);
-    check.setDate(today.getDate() - i);
-    const key = check.toISOString().slice(0, 10);
-    if (workDays.has(key)) {
+    const key = formatLocalDate(current);
+    if (activeDates.has(key)) {
       streak++;
+      current.setDate(current.getDate() - 1);
     } else {
       break;
     }
   }
+
   return streak;
 }
 
@@ -95,7 +124,15 @@ export default function DashboardContent() {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
-  const streak = useMemo(() => computeStreak(weeklySessions), [weeklySessions]);
+  const allSessionsCombined = useMemo(() => {
+    const map = new Map<string, Session>();
+    weeklySessions?.forEach((s) => map.set(s.id, s));
+    todaySessions?.forEach((s) => map.set(s.id, s));
+    recentSessions?.forEach((s) => map.set(s.id, s));
+    return Array.from(map.values());
+  }, [weeklySessions, todaySessions, recentSessions]);
+
+  const streak = useMemo(() => computeStreak(allSessionsCombined), [allSessionsCombined]);
 
   // Real Focus Score calculation
   const focusScore = useMemo(() => {
@@ -108,10 +145,20 @@ export default function DashboardContent() {
   // Real Subject Distribution
   const subjectDistribution = useMemo(() => {
     const map = new Map<string, number>();
-    const workSessions = weeklySessions.filter((s) => s.type === "WORK");
+
+    // Combine all available session sources to ensure no data is missed
+    const sessionMap = new Map<string, Session>();
+    weeklySessions?.forEach((s) => sessionMap.set(s.id, s));
+    todaySessions?.forEach((s) => sessionMap.set(s.id, s));
+    recentSessions?.forEach((s) => sessionMap.set(s.id, s));
+
+    const allSessions = Array.from(sessionMap.values());
+    const workSessions = allSessions.filter(
+      (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
+    );
 
     for (const s of workSessions) {
-      const key = s.subject && s.subject.trim() !== "" ? s.subject : "Physics";
+      const key = s.subject && s.subject.trim() !== "" ? s.subject.trim() : "General Study";
       map.set(key, (map.get(key) || 0) + (s.durationMin || 0));
     }
 
@@ -119,20 +166,18 @@ export default function DashboardContent() {
 
     if (totalMins === 0) {
       return {
-        totalHoursStr: "12h",
+        totalHoursStr: "0h",
         items: [
-          { name: "Physics", pct: 45, hoursStr: "5.4h", color: "#6c47ff" },
-          { name: "Calculus", pct: 30, hoursStr: "3.6h", color: "#38dfab" },
-          { name: "Literature", pct: 25, hoursStr: "3.0h", color: "#cebdff" },
+          { name: "No sessions logged", pct: 100, hoursStr: "0h", color: "#2d3342" },
         ],
       };
     }
 
-    const palette = ["#6c47ff", "#38dfab", "#cebdff", "#f59e0b", "#ef4444"];
+    const palette = ["#6c47ff", "#38dfab", "#cebdff", "#f59e0b", "#ef4444", "#3b82f6"];
     const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
 
-    const items = sorted.slice(0, 4).map(([name, mins], idx) => {
-      const pct = Math.round((mins / totalMins) * 100);
+    const items = sorted.map(([name, mins], idx) => {
+      const pct = Math.max(1, Math.round((mins / totalMins) * 100));
       const h = (mins / 60).toFixed(1);
       return {
         name,
@@ -142,13 +187,13 @@ export default function DashboardContent() {
       };
     });
 
-    const totalH = (totalMins / 60).toFixed(0);
+    const totalH = (totalMins / 60).toFixed(1);
 
     return {
       totalHoursStr: `${totalH}h`,
       items,
     };
-  }, [weeklySessions]);
+  }, [weeklySessions, todaySessions, recentSessions]);
 
   // Real Heatmap (Study Intensity) for last 28 days
   const heatmapData = useMemo(() => {
@@ -196,13 +241,50 @@ export default function DashboardContent() {
   }, [tasks]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("upgraded") !== "1") return;
+
+    const toastId = toast.loading("Applying your Pro upgrade…", {
+      duration: Infinity,
+    });
+
+    let attempts = 0;
+    const maxAttempts = 15;
+    const interval = window.setInterval(async () => {
+      attempts += 1;
+      let isPremium = false;
+      try {
+        const res = await fetch("/api/billing/status");
+        const data = await res.json();
+        isPremium = data.isPremium === true;
+      } catch {
+        // keep polling, ignore transient errors
+      }
+
+      if (isPremium || attempts >= maxAttempts) {
+        window.clearInterval(interval);
+        if (isPremium) {
+          toast.success("You're on Pro. Welcome aboard!", { id: toastId });
+        } else {
+          toast.info(
+            "Upgrade received — Pro perks can take up to a minute to activate.",
+            { id: toastId }
+          );
+        }
+        window.location.href = "/dashboard/me";
+      }
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     async function fetchAll() {
       setIsLoading(true);
       try {
         await Promise.all([
-          fetch("/api/recent_sessions?limit=20")
+          fetch("/api/recent_sessions?limit=1000")
             .then((r) => r.json())
             .then((d) => {
               if (d.sessions) setRecentSessions(d.sessions);
@@ -288,6 +370,14 @@ export default function DashboardContent() {
         {/* Scrollable Canvas */}
         <main className="flex-1 pt-24 px-6 md:px-10 pb-10">
           <div className="max-w-6xl mx-auto space-y-8">
+            {/* In-development notice */}
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200/90">
+              <Info className="h-4 w-4 shrink-0 text-amber-400" />
+              <p className="text-xs font-medium">
+                Focurio is still in development — you may run into bugs or unfinished features.
+              </p>
+            </div>
+
             {/* Page Title */}
             <div>
               <h2 className="text-3xl font-extrabold text-white font-sora tracking-tight">
@@ -309,7 +399,7 @@ export default function DashboardContent() {
                   <TrendingUp className="text-[#38dfab] h-4 w-4" />
                 </div>
                 <div className="text-2xl font-bold text-white font-sora z-10">
-                  {isLoading ? "4h 20m" : formatTime(todayMinutes || 260)}
+                  {isLoading ? "0m" : formatTime(todayMinutes)}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
@@ -353,7 +443,7 @@ export default function DashboardContent() {
                   <Minus className="text-white/40 h-4 w-4" />
                 </div>
                 <div className="text-2xl font-bold text-white font-sora z-10">
-                  {isLoading ? "6" : String(sessionsCountToday || 6)}
+                  {isLoading ? "0" : String(sessionsCountToday)}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
@@ -375,7 +465,7 @@ export default function DashboardContent() {
                   <Flame className="text-[#6c47ff] h-4 w-4 fill-[#6c47ff]/20" />
                 </div>
                 <div className="text-2xl font-bold text-[#6c47ff] font-sora z-10">
-                  {isLoading ? "14 Days" : `${streak || 14} Days`}
+                  {isLoading ? "..." : `${streak} ${streak === 1 ? "Day" : "Days"}`}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
@@ -511,53 +601,70 @@ export default function DashboardContent() {
 
                 {/* Subject Distribution (Donut Chart) */}
                 <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex-1 flex flex-col justify-between">
-                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">
-                    Subject Distribution
-                  </h4>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                      Subject Distribution
+                    </h4>
+                    <span className="text-[10px] font-semibold text-[#6c47ff] bg-[#6c47ff]/10 px-2 py-0.5 rounded-full border border-[#6c47ff]/20">
+                      Recent & All-Time
+                    </span>
+                  </div>
                   <div className="flex items-center justify-between my-auto">
-                    <div className="relative w-24 h-24 shrink-0">
-                      <svg className="w-full h-full" viewBox="0 0 36 36">
-                        <path
-                          className="text-white/5"
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="4"
+                    <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                      <svg className="transform -rotate-90 w-full h-full" viewBox="0 0 160 160">
+                        <circle
+                          cx="80"
+                          cy="80"
+                          fill="transparent"
+                          r="70"
+                          stroke="#1d1f27"
+                          strokeWidth="18"
                         />
                         {subjectDistribution.items.map((sub, idx) => {
                           const prevPct = subjectDistribution.items
                             .slice(0, idx)
                             .reduce((acc, curr) => acc + curr.pct, 0);
                           return (
-                            <path
+                            <circle
                               key={sub.name}
-                              style={{ color: sub.color }}
-                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeDasharray={`${sub.pct}, 100`}
-                              strokeDashoffset={-prevPct}
-                              strokeWidth="4"
+                              cx="80"
+                              cy="80"
+                              fill="transparent"
+                              r="70"
+                              stroke={sub.color}
+                              strokeDasharray="439.8"
+                              strokeDashoffset={439.8 - (439.8 * sub.pct) / 100}
+                              strokeWidth="18"
+                              style={{
+                                transform: `rotate(${(prevPct / 100) * 360}deg)`,
+                                transformOrigin: "center",
+                              }}
                             />
                           );
                         })}
                       </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center font-sora pointer-events-none">
+                        <span className="text-xl font-extrabold text-white">
+                          {subjectDistribution.totalHoursStr}
+                        </span>
+                        <span className="text-[10px] text-white/40 uppercase font-semibold">All Time</span>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 flex-1 ml-6">
+                    <div className="flex flex-col gap-2 flex-1 ml-6 max-h-32 overflow-y-auto pr-1">
                       {subjectDistribution.items.map((sub) => (
                         <div
                           key={sub.name}
                           className="flex items-center justify-between text-xs"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
                             <div
-                              className="w-2.5 h-2.5 rounded-full"
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: sub.color }}
                             />
-                            <span className="text-white">{sub.name}</span>
+                            <span className="text-white truncate">{sub.name}</span>
                           </div>
-                          <span className="text-white/40 font-medium">
+                          <span className="text-white/40 font-medium shrink-0 ml-2">
                             {sub.pct}% ({sub.hoursStr})
                           </span>
                         </div>

@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/timer", label: "Timer", icon: Timer },
-  { href: "/notes", label: "Analytics", icon: BarChart3 },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/notes", label: "Notes", icon: FileText },
   { href: "/schedule", label: "Calendar", icon: Calendar },
 ];

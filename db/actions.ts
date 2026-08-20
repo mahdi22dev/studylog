@@ -235,7 +235,7 @@ export async function resetStudyData(userId: string) {
   }
 }
 
-export async function getRecentSessions(userId: string, limit: number = 10) {
+export async function getRecentSessions(userId: string, limit: number = 1000) {
   try {
     const sessions = await prisma.studySession.findMany({
       where: { userId },
@@ -253,15 +253,16 @@ export async function getRecentSessions(userId: string, limit: number = 10) {
 
 export async function getAvarage(
   userId: string,
-  timezone: { timezone: string }
+  timezone: { timezone: string },
+  days: number = 7
 ) {
   try {
     let startOfDay: Date;
     let endOfDay: Date;
 
-    // Fallback → use last 24h from now (rolling window)
+    // Rolling window of `days` back from now
     const now = new Date();
-    startOfDay = new Date(now.getTime() - 168 * 60 * 60 * 1000);
+    startOfDay = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
     endOfDay = now;
 
     console.log("No timezone provided, using rolling week window");
