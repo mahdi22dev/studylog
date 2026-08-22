@@ -63,19 +63,19 @@ export default function TimerSettingsModal({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <button
-          className="text-white/40 hover:text-[#6c47ff] transition-colors p-1 rounded-lg"
+          className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-lg"
           aria-label="Timer settings"
         >
           <Settings className="h-4 w-4" />
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-[#111827] border border-white/10 text-white rounded-2xl p-6 sm:max-w-md shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+      <DialogContent className="bg-popover border border-border text-popover-foreground rounded-2xl p-6 sm:max-w-md shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold font-sora text-white flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-[#6c47ff]" />
+          <DialogTitle className="text-xl font-bold font-sora text-popover-foreground flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
             Timer Preferences
           </DialogTitle>
-          <DialogDescription className="text-xs text-white/40">
+          <DialogDescription className="text-xs text-muted-foreground">
             Customize your Pomodoro focus & break intervals
           </DialogDescription>
         </DialogHeader>
@@ -85,7 +85,7 @@ export default function TimerSettingsModal({
             <div className="space-y-2">
               <Label
                 htmlFor="work-duration"
-                className="text-[11px] font-semibold uppercase tracking-wider text-white/50"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
               >
                 Work Duration (m)
               </Label>
@@ -101,14 +101,14 @@ export default function TimerSettingsModal({
                     Number.parseInt(e.target.value) || 25
                   )
                 }
-                className="bg-[#1d1f27] border-white/10 text-white rounded-xl focus:border-[#6c47ff] focus:ring-[#6c47ff]"
+                className="bg-muted border-border text-popover-foreground rounded-xl focus:border-primary focus:ring-primary"
               />
             </div>
 
             <div className="space-y-2">
               <Label
                 htmlFor="break-duration"
-                className="text-[11px] font-semibold uppercase tracking-wider text-white/50"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
               >
                 Short Break (m)
               </Label>
@@ -124,7 +124,7 @@ export default function TimerSettingsModal({
                     Number.parseInt(e.target.value) || 5
                   )
                 }
-                className="bg-[#1d1f27] border-white/10 text-white rounded-xl focus:border-[#6c47ff] focus:ring-[#6c47ff]"
+                className="bg-muted border-border text-popover-foreground rounded-xl focus:border-primary focus:ring-primary"
               />
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function TimerSettingsModal({
             <div className="space-y-2">
               <Label
                 htmlFor="long-break-duration"
-                className="text-[11px] font-semibold uppercase tracking-wider text-white/50"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
               >
                 Long Break (m)
               </Label>
@@ -149,14 +149,14 @@ export default function TimerSettingsModal({
                     Number.parseInt(e.target.value) || 15
                   )
                 }
-                className="bg-[#1d1f27] border-white/10 text-white rounded-xl focus:border-[#6c47ff] focus:ring-[#6c47ff]"
+                className="bg-muted border-border text-popover-foreground rounded-xl focus:border-primary focus:ring-primary"
               />
             </div>
 
             <div className="space-y-2">
               <Label
                 htmlFor="sessions-until-long-break"
-                className="text-[11px] font-semibold uppercase tracking-wider text-white/50"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
               >
                 Long Break Cycle
               </Label>
@@ -172,23 +172,23 @@ export default function TimerSettingsModal({
                     Number.parseInt(e.target.value) || 4
                   )
                 }
-                className="bg-[#1d1f27] border-white/10 text-white rounded-xl focus:border-[#6c47ff] focus:ring-[#6c47ff]"
+                className="bg-muted border-border text-popover-foreground rounded-xl focus:border-primary focus:ring-primary"
               />
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 bg-[#1d1f27] p-3 rounded-xl border border-white/5">
+          <div className="flex items-center space-x-3 bg-muted p-3 rounded-xl border border-border/50">
             <Checkbox
               id="skip-breaks"
               checked={settings.skipBreaks}
               onCheckedChange={(checked) =>
                 handleSettingsChange("skipBreaks", checked as boolean)
               }
-              className="border-white/20 data-[state=checked]:bg-[#6c47ff] data-[state=checked]:border-[#6c47ff]"
+              className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <Label
               htmlFor="skip-breaks"
-              className="text-xs font-medium text-white/80 cursor-pointer"
+              className="text-xs font-medium text-popover-foreground/80 cursor-pointer"
             >
               Auto-start next work session (skip break prompt)
             </Label>
@@ -196,7 +196,7 @@ export default function TimerSettingsModal({
 
           <div className="flex justify-between gap-3 pt-2">
             <Button
-              className="w-1/2 bg-transparent border border-white/10 text-white/60 hover:text-white rounded-full font-medium"
+              className="w-1/2 bg-transparent border border-border text-muted-foreground hover:text-popover-foreground rounded-full font-medium"
               variant="outline"
               onClick={() => {
                 const resetSettings = {
@@ -229,7 +229,7 @@ export default function TimerSettingsModal({
                 setIsActive(false);
                 setIsOpen(false);
               }}
-              className="w-1/2 bg-[#6c47ff] hover:bg-[#5e35f1] text-white rounded-full font-semibold shadow-[0_0_20px_rgba(108,71,255,0.3)]"
+              className="w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-semibold glow-primary"
             >
               Save Settings
             </Button>

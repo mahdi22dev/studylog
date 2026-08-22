@@ -22,30 +22,30 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "bg-[#0D1117] border border-white/5 rounded-2xl shadow-none",
+        "bg-card border border-border rounded-2xl shadow-none",
         className
       )}
     >
       <CardContent className="p-5 flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-white/40 uppercase tracking-wider">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {label}
           </span>
           {Icon && (
             <div
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-lg",
-                accentColor === "purple" && "bg-[#7C5CFF]/15",
-                accentColor === "green" && "bg-[#38dfab]/15",
-                accentColor === "default" && "bg-white/[0.06]"
+                accentColor === "purple" && "bg-primary/15",
+                accentColor === "green" && "bg-success/15",
+                accentColor === "default" && "bg-muted/50"
               )}
             >
               <Icon
                 className={cn(
                   "h-3.5 w-3.5",
-                  accentColor === "purple" && "text-[#7C5CFF]",
-                  accentColor === "green" && "text-[#38dfab]",
-                  accentColor === "default" && "text-white/50"
+                  accentColor === "purple" && "text-primary",
+                  accentColor === "green" && "text-success",
+                  accentColor === "default" && "text-muted-foreground"
                 )}
               />
             </div>
@@ -54,15 +54,15 @@ export function StatCard({
         <span
           className={cn(
             "text-2xl font-bold tracking-tight",
-            accentColor === "purple" && "text-[#7C5CFF]",
-            accentColor === "green" && "text-[#38dfab]",
-            accentColor === "default" && "text-white"
+            accentColor === "purple" && "text-primary",
+            accentColor === "green" && "text-success",
+            accentColor === "default" && "text-card-foreground"
           )}
         >
           {value}
         </span>
         {subtext && (
-          <span className="text-[11px] text-white/30 font-medium">
+          <span className="text-[11px] text-muted-foreground/70 font-medium">
             {subtext}
           </span>
         )}

@@ -5,7 +5,7 @@ export function BlogPreview() {
   const posts = [
     {
       category: "Deep Work",
-      categoryColor: "bg-[#272a32] text-[#c9beff]",
+      categoryColor: "bg-muted text-secondary",
       date: "Oct 12",
       readTime: "5 min read",
       title: "Why 25 minutes is the sweet spot for deep focus",
@@ -16,7 +16,7 @@ export function BlogPreview() {
     },
     {
       category: "Research",
-      categoryColor: "bg-[#38dfab]/20 text-[#38dfab]",
+      categoryColor: "bg-success/20 text-success",
       date: "Oct 08",
       readTime: "6 min read",
       title: "The spacing effect: why studying daily beats cramming",
@@ -27,7 +27,7 @@ export function BlogPreview() {
     },
     {
       category: "Student Life",
-      categoryColor: "bg-[#cebdff]/20 text-[#cebdff]",
+      categoryColor: "bg-secondary/20 text-secondary",
       date: "Oct 01",
       readTime: "4 min read",
       title: "How to build a study habit that actually sticks",
@@ -42,22 +42,22 @@ export function BlogPreview() {
     <section id="blog-preview" className="max-w-[1200px] mx-auto px-6 py-16">
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#272a32] border border-white/5 mb-4 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-[#c9beff]" />
-            <span className="text-xs font-bold text-[#c9beff] uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent border border-border/50 mb-4 shadow-sm">
+            <Sparkles className="h-3.5 w-3.5 text-secondary" />
+            <span className="text-xs font-bold text-secondary uppercase tracking-widest">
               Study Science Blog
             </span>
           </div>
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
             Latest Research & Insights
           </h2>
-          <p className="text-base text-[#c9c3d9] max-w-xl">
+          <p className="text-base text-muted-foreground max-w-xl">
             Explore the science behind focus, habit formation, and peak cognitive performance.
           </p>
         </div>
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 bg-[#1d1f27] hover:bg-[#272a32] text-[#c9beff] border border-white/10 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 group"
+          className="inline-flex items-center gap-2 bg-muted hover:bg-accent text-secondary border border-border px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 group"
         >
           View All Articles
           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -69,7 +69,7 @@ export function BlogPreview() {
           <Link
             key={i}
             href="/blog"
-            className="bg-[#1d1f27]/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden flex flex-col group hover:-translate-y-1.5 hover:border-[#6c47ff]/50 hover:shadow-2xl hover:shadow-[#6c47ff]/15 transition-all duration-300"
+            className="bg-muted/90 backdrop-blur-xl border border-border rounded-2xl overflow-hidden flex flex-col group hover:-translate-y-1.5 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/15 transition-all duration-300"
           >
             <div className="h-48 overflow-hidden relative">
               <img
@@ -85,16 +85,16 @@ export function BlogPreview() {
                 >
                   {post.category}
                 </span>
-                <span className="text-xs text-[#c9c3d9]">{post.date}</span>
+                <span className="text-xs text-muted-foreground">{post.date}</span>
               </div>
-              <h3 className="font-heading text-base font-bold text-white mb-2 group-hover:text-[#c9beff] transition-colors leading-snug">
+              <h3 className="font-heading text-base font-bold text-white mb-2 group-hover:text-secondary transition-colors leading-snug">
                 {post.title}
               </h3>
-              <p className="text-xs text-[#c9c3d9] leading-relaxed line-clamp-2 mb-4">
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
                 {post.excerpt}
               </p>
-              <div className="flex items-center justify-between text-xs text-[#c9c3d9] mt-auto pt-3 border-t border-white/5 font-medium">
-                <span className="group-hover:text-[#c9beff] transition-colors flex items-center gap-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto pt-3 border-t border-border/50 font-medium">
+                <span className="group-hover:text-secondary transition-colors flex items-center gap-1">
                   Read Article →
                 </span>
                 <span className="flex items-center gap-1">

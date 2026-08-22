@@ -163,7 +163,7 @@ export default function StudyHistory() {
 
         return (
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-[#1d1f27] border border-white/5 text-white/40">
+            <div className="p-2 rounded-lg bg-muted border border-border/50 text-muted-foreground">
               <Calendar className="h-4 w-4" />
             </div>
             <div>
@@ -174,7 +174,7 @@ export default function StudyHistory() {
                   ? "Yesterday"
                   : date.toLocaleDateString("en-US", { weekday: "long" })}
               </span>
-              <div className="text-xs text-white/40">
+              <div className="text-xs text-muted-foreground">
                 {date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -196,7 +196,7 @@ export default function StudyHistory() {
           <span className="text-xl font-bold text-white">
             {row.original.sessions}
           </span>
-          <span className="text-xs text-white/40 font-sans">sessions</span>
+          <span className="text-xs text-muted-foreground font-sans">sessions</span>
         </div>
       ),
     },
@@ -207,7 +207,7 @@ export default function StudyHistory() {
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2 text-white font-medium">
-          <Clock className="h-4 w-4 text-white/40" />
+          <Clock className="h-4 w-4 text-muted-foreground" />
           <span>{formatTime(row.original.totalMinutes)}</span>
         </div>
       ),
@@ -243,10 +243,10 @@ export default function StudyHistory() {
         return (
           <div className="flex items-center gap-2 font-medium text-xs">
             {isNeutral ? (
-              <span className="text-white/40">—</span>
+              <span className="text-muted-foreground">—</span>
             ) : (
               <span
-                className={isPositive ? "text-[#38dfab]" : "text-red-400"}
+                className={isPositive ? "text-success" : "text-red-400"}
               >
                 {isPositive ? "+" : ""}
                 {percentChange}%
@@ -267,7 +267,7 @@ export default function StudyHistory() {
         );
 
         if (currentIndex === studyData.length - 1) {
-          return <span className="text-xs text-white/40">—</span>;
+          return <span className="text-xs text-muted-foreground">—</span>;
         }
 
         const previousDay = studyData[currentIndex + 1];
@@ -287,18 +287,18 @@ export default function StudyHistory() {
         return (
           <div className="flex items-center gap-2 text-xs">
             {isNeutral ? (
-              <span className="text-white/40">—</span>
+              <span className="text-muted-foreground">—</span>
             ) : (
               <div className="flex items-center gap-1.5">
                 <span
                   className={`font-semibold ${
-                    isPositive ? "text-[#38dfab]" : "text-red-400"
+                    isPositive ? "text-success" : "text-red-400"
                   }`}
                 >
                   {isPositive ? "+" : ""}
                   {percentChange}%
                 </span>
-                <span className="text-white/40">
+                <span className="text-muted-foreground">
                   ({isPositive ? "+" : ""}
                   {formatTime(Math.abs(diff))})
                 </span>
@@ -312,8 +312,8 @@ export default function StudyHistory() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px] text-white/40">
-        <div className="w-8 h-8 border-2 border-[#6c47ff] border-t-transparent rounded-full animate-spin mb-3" />
+      <div className="flex flex-col items-center justify-center min-h-[300px] text-muted-foreground">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
         <p className="text-xs font-medium animate-pulse">
           Loading analytics history...
         </p>
@@ -326,64 +326,64 @@ export default function StudyHistory() {
       {/* Top Real Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Average Hours / Day */}
-        <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+        <div className="bg-popover border border-border/50 rounded-2xl p-6 relative overflow-hidden group">
           <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Average Hours/Day
             </span>
-            <Clock className="h-4 w-4 text-[#6c47ff]" />
+            <Clock className="h-4 w-4 text-primary" />
           </div>
           <div className="text-3xl font-extrabold text-white font-sora mb-1">
             {averageHoursPerDay}h
           </div>
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-muted-foreground">
             Recent {historyDays} days average
           </p>
         </div>
 
         {/* Average Session Length */}
-        <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+        <div className="bg-popover border border-border/50 rounded-2xl p-6 relative overflow-hidden group">
           <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Average Session Length
             </span>
-            <TrendingUp className="text-[#38dfab] h-4 w-4" />
+            <TrendingUp className="text-success h-4 w-4" />
           </div>
           <div className="text-3xl font-extrabold text-white font-sora mb-1">
             {formatTime(averageSessionMinutes)}
           </div>
-          <p className="text-xs text-white/40">Across {totalSessions} sessions</p>
+          <p className="text-xs text-muted-foreground">Across {totalSessions} sessions</p>
         </div>
 
         {/* Total Study Time (7 Days) */}
-        <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 relative overflow-hidden group">
+        <div className="bg-popover border border-border/50 rounded-2xl p-6 relative overflow-hidden group">
           <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               Total Study Time
             </span>
-            <Calendar className="h-4 w-4 text-[#cebdff]" />
+            <Calendar className="h-4 w-4 text-secondary" />
           </div>
-          <div className="text-3xl font-extrabold text-[#cebdff] font-sora mb-1">
+          <div className="text-3xl font-extrabold text-secondary font-sora mb-1">
             {formatTime(totalMinutes)}
           </div>
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-muted-foreground">
             Last {historyDays} days combined
           </p>
         </div>
       </div>
 
       {/* Main Table: Last 7 Days Real Data */}
-      <div className="bg-[#111827] border border-white/5 rounded-2xl overflow-hidden relative">
-        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+      <div className="bg-popover border border-border/50 rounded-2xl overflow-hidden relative">
+        <div className="p-6 border-b border-border/50 flex justify-between items-center">
           <div>
             <h3 className="text-lg font-bold text-white font-sora">
               Study History - Last {historyDays} Days
             </h3>
-            <p className="text-xs text-white/40 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Daily study sessions and progress trends
             </p>
           </div>
-          <span className="px-3 py-1 rounded-full bg-[#6c47ff]/15 text-[#6c47ff] border border-[#6c47ff]/30 text-xs font-semibold">
+          <span className="px-3 py-1 rounded-full bg-primary/15 text-primary border border-primary/30 text-xs font-semibold">
             {isPremium ? "Pro Plan: 30 Days" : "Free Plan: 7 Days"}
           </span>
         </div>
@@ -397,7 +397,7 @@ export default function StudyHistory() {
                     <TableHead
                       header={header}
                       key={header.id}
-                      className="text-xs text-white/40 font-semibold uppercase tracking-wider pb-3"
+                      className="text-xs text-muted-foreground font-semibold uppercase tracking-wider pb-3"
                     />
                   )}
                 </TableHeaderGroup>
@@ -408,7 +408,7 @@ export default function StudyHistory() {
                 <TableRow
                   key={row.id}
                   row={row}
-                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                  className="border-b border-border/50 hover:bg-white/[0.02] transition-colors"
                 >
                   {({ cell }) => (
                     <TableCell cell={cell} key={cell.id} className="py-4" />
@@ -421,7 +421,7 @@ export default function StudyHistory() {
 
         {/* Blurred Paywall Overlay / Upgrade Call to Action (free plan only) */}
         {!isPremium && (
-          <div className="relative border-t border-white/5 bg-gradient-to-b from-[#111827]/40 to-[#0d121f] p-8 text-center flex flex-col items-center justify-center overflow-hidden">
+          <div className="relative border-t border-border/50 bg-gradient-to-b from-[#111827]/40 to-[#0d121f] p-8 text-center flex flex-col items-center justify-center overflow-hidden">
             {/* Background Blurred Row Mockups */}
             <div className="absolute inset-0 filter blur-[6px] opacity-20 pointer-events-none flex flex-col gap-3 p-6 select-none">
               <div className="h-8 bg-white/20 rounded-lg w-full" />
@@ -430,8 +430,8 @@ export default function StudyHistory() {
             </div>
 
             <div className="relative z-10 max-w-md mx-auto space-y-4">
-              <div className="w-12 h-12 rounded-full bg-[#6c47ff]/20 border border-[#6c47ff]/40 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(108,71,255,0.4)]">
-                <Sparkles className="h-6 w-6 text-[#6c47ff]" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(108,71,255,0.4)]">
+                <Sparkles className="h-6 w-6 text-primary" />
               </div>
 
               <div>
@@ -446,7 +446,7 @@ export default function StudyHistory() {
               </div>
 
               <Button
-                className="bg-[#6c47ff] hover:bg-[#5e35f1] text-white font-semibold text-sm px-8 py-3 rounded-full shadow-[0_0_25px_rgba(108,71,255,0.4)] transition-all cursor-pointer"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold text-sm px-8 py-3 rounded-full shadow-[0_0_25px_rgba(108,71,255,0.4)] transition-all cursor-pointer"
                 onClick={() => setUpgradeOpen(true)}
               >
                 <Zap className="h-4 w-4 mr-2 fill-current" />

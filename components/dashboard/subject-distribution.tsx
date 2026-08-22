@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { PieChart } from "lucide-react";
 import type { SubjectDistributionItem } from "@/lib/types";
@@ -13,13 +13,13 @@ export function SubjectDistribution({
   totalHoursStr,
 }: SubjectDistributionProps) {
   return (
-    <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+    <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-white font-sora flex items-center gap-2">
-          <PieChart className="h-5 w-5 text-[#38dfab]" />
+        <h3 className="text-lg font-bold text-card-foreground font-sora flex items-center gap-2">
+          <PieChart className="h-5 w-5 text-success" />
           Subject Distribution
         </h3>
-        <span className="text-[10px] font-semibold text-[#38dfab] bg-[#38dfab]/10 px-2.5 py-1 rounded-full border border-[#38dfab]/20">
+        <span className="text-[10px] font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full border border-success/20">
           Recent & All-Time
         </span>
       </div>
@@ -36,7 +36,7 @@ export function SubjectDistribution({
             cy="80"
             fill="transparent"
             r="70"
-            stroke="#1d1f27"
+            stroke="hsl(var(--muted))"
             strokeWidth="20"
           />
           {items.map((sub, idx) => {
@@ -61,8 +61,8 @@ export function SubjectDistribution({
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center font-sora">
-          <span className="text-2xl font-extrabold text-white">{totalHoursStr}</span>
-          <span className="text-xs text-white/40">All Time</span>
+          <span className="text-2xl font-extrabold text-card-foreground">{totalHoursStr}</span>
+          <span className="text-xs text-muted-foreground">All Time</span>
         </div>
       </div>
 
@@ -74,9 +74,9 @@ export function SubjectDistribution({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: sub.color }}
               />
-              <span className="text-white">{sub.name}</span>
+              <span className="text-card-foreground">{sub.name}</span>
             </div>
-            <span className="text-white/40 font-medium">
+            <span className="text-muted-foreground font-medium">
               {sub.pct}% ({sub.hoursStr})
             </span>
           </div>
@@ -85,3 +85,4 @@ export function SubjectDistribution({
     </div>
   );
 }
+

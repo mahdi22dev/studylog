@@ -64,10 +64,10 @@ export function UpgradeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#111827] border border-white/10 text-white rounded-2xl p-6 sm:max-w-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+      <DialogContent className="bg-popover border border-border text-white rounded-2xl p-6 sm:max-w-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold font-sora text-white flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-[#6c47ff]" />
+            <Sparkles className="h-5 w-5 text-primary" />
             Upgrade to Pro
           </DialogTitle>
           <DialogDescription className="text-xs text-white/40">
@@ -77,18 +77,18 @@ export function UpgradeDialog({
 
         {/* Billing cycle toggle */}
         <div className="flex justify-center pt-1">
-          <div className="glass-card p-1 rounded-full flex items-center relative w-fit border border-white/10">
+          <div className="glass-card p-1 rounded-full flex items-center relative w-fit border border-border">
             <button
               onClick={() => setCycle("annual")}
               className={cn(
                 "relative z-10 text-sm font-semibold px-5 py-2 rounded-full transition-all duration-300",
                 cycle === "annual"
-                  ? "bg-[#6c47ff] text-white shadow-md"
+                  ? "bg-primary text-white shadow-md"
                   : "text-white/50 hover:text-white/80"
               )}
             >
               Annual{" "}
-              <span className="ml-1 text-[10px] text-[#38dfab] uppercase tracking-wider font-bold">
+              <span className="ml-1 text-[10px] text-success uppercase tracking-wider font-bold">
                 Save 33%
               </span>
             </button>
@@ -97,7 +97,7 @@ export function UpgradeDialog({
               className={cn(
                 "relative z-10 text-sm font-semibold px-5 py-2 rounded-full transition-all duration-300",
                 cycle === "monthly"
-                  ? "bg-[#6c47ff] text-white shadow-md"
+                  ? "bg-primary text-white shadow-md"
                   : "text-white/50 hover:text-white/80"
               )}
             >
@@ -108,7 +108,7 @@ export function UpgradeDialog({
 
         {/* Free vs Pro comparison */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-          <div className="bg-[#0D121F] border border-white/5 rounded-2xl p-5">
+          <div className="bg-input border border-border/50 rounded-2xl p-5">
             <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">
               Free
             </h3>
@@ -128,11 +128,11 @@ export function UpgradeDialog({
             </ul>
           </div>
 
-          <div className="bg-[#1d1f27] border border-[#6c47ff]/50 rounded-2xl p-5 relative shadow-[0_0_24px_rgba(108,71,255,0.15)]">
-            <span className="absolute -top-2.5 left-4 bg-[#c9beff] text-[#2f009b] text-[9px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full shadow-md">
+          <div className="bg-muted border border-primary/50 rounded-2xl p-5 relative shadow-[0_0_24px_rgba(108,71,255,0.15)]">
+            <span className="absolute -top-2.5 left-4 bg-secondary text-secondary-foreground text-[9px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full shadow-md">
               Most Popular
             </span>
-            <h3 className="text-xs font-bold text-[#c9beff] uppercase tracking-widest mb-4">
+            <h3 className="text-xs font-bold text-secondary uppercase tracking-widest mb-4">
               Pro
             </h3>
             <div className="flex items-baseline gap-1 mb-2">
@@ -144,7 +144,7 @@ export function UpgradeDialog({
             <ul className="space-y-2.5 mt-4">
               {proFeatures.map((f, i) => (
                 <li key={f} className="flex items-center gap-2.5">
-                  <Check className="h-4 w-4 text-[#38dfab] shrink-0" />
+                  <Check className="h-4 w-4 text-success shrink-0" />
                   <span
                     className={cn(
                       "text-xs",
@@ -163,7 +163,7 @@ export function UpgradeDialog({
         <button
           onClick={handleCheckout}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-[#6c47ff] hover:bg-[#5e35f1] disabled:opacity-60 text-white py-3 rounded-full text-sm font-semibold shadow-lg shadow-[#6c47ff]/25 transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white py-3 rounded-full text-sm font-semibold shadow-lg shadow-primary/25 transition-all"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Upgrade to Pro — {price}

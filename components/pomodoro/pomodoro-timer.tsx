@@ -276,18 +276,18 @@ export default function PomodoroTimer({
   return (
     <div
       className={cn(
-        "w-full bg-[#111827] border border-white/5 rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-[0_0_32px_rgba(108,71,255,0.15)]",
-        isFullscreen && "flex justify-center items-center flex-col bg-[#05070A]"
+        "w-full bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden glow-active",
+        isFullscreen && "flex justify-center items-center flex-col bg-background"
       )}
       ref={boxRef}
     >
       {/* Background Radial Glow */}
-      <div className="absolute inset-0 bg-[#6c47ff]/10 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
 
       {/* Top Header Pill with Settings */}
-      <div className="flex items-center gap-2 mb-6 bg-[#1d1f27] py-1.5 px-4 rounded-full border border-white/5 z-10">
-        <Timer className="h-4 w-4 text-[#6c47ff]" />
-        <span className="text-xs font-semibold text-white">Pomodoro Timer</span>
+      <div className="flex items-center gap-2 mb-6 bg-muted py-1.5 px-4 rounded-full border border-border z-10">
+        <Timer className="h-4 w-4 text-primary" />
+        <span className="text-xs font-semibold text-foreground">Pomodoro Timer</span>
         <TimerSettings
           isOpen={isOpen}
           setIsActive={setIsActive}
@@ -299,13 +299,13 @@ export default function PomodoroTimer({
           setIsLongBreak={setIsLongBreak}
           handleSettingsChange={handleSettingsChange}
         />
-        <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2">
-          <button onClick={toggleFullscreen} className="text-white/40 hover:text-white transition-colors">
+        <div className="flex items-center gap-1.5 ml-2 border-l border-border pl-2">
+          <button onClick={toggleFullscreen} className="text-muted-foreground hover:text-foreground transition-colors">
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Fullscreen className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={() => handleSettingsChange("setAudioDisabled", !settings.setAudioDisabled)}
-            className="text-white/40 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             {settings.setAudioDisabled ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
@@ -313,7 +313,7 @@ export default function PomodoroTimer({
       </div>
 
       {/* Mode Badge */}
-      <div className="mb-4 inline-flex items-center gap-2 bg-[#6c47ff]/20 text-[#6c47ff] border border-[#6c47ff]/30 py-1 px-4 rounded-full text-xs font-semibold z-10">
+      <div className="mb-4 inline-flex items-center gap-2 bg-primary/20 text-primary border border-primary/30 py-1 px-4 rounded-full text-xs font-semibold z-10">
         {isLongBreak ? (
           <>
             <Coffee className="h-3.5 w-3.5" />
@@ -335,7 +335,7 @@ export default function PomodoroTimer({
       {/* Session Title Subject */}
       {!isBreak && !isLongBreak && (
         <div className="flex items-center justify-center gap-2 mb-6 z-10">
-          <BookOpen className="h-4 w-4 text-white/40" />
+          <BookOpen className="h-4 w-4 text-muted-foreground" />
           {isEditingName ? (
             <input
               ref={nameInputRef}
@@ -346,13 +346,13 @@ export default function PomodoroTimer({
               onKeyDown={(e) => {
                 if (e.key === "Enter") setIsEditingName(false);
               }}
-              className="text-sm font-semibold text-center bg-[#0D1117] border border-[#6c47ff]/50 rounded-lg px-3 py-1 text-white focus:outline-none"
+              className="text-sm font-semibold text-center bg-background border border-primary/50 rounded-lg px-3 py-1 text-foreground focus:outline-none"
               maxLength={40}
             />
           ) : (
             <button
               onClick={() => setIsEditingName(true)}
-              className="text-sm font-semibold text-white/70 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-white/[0.05]"
+              className="text-sm font-semibold text-foreground/70 hover:text-foreground transition-colors px-2 py-0.5 rounded hover:bg-accent"
             >
               {sessionName}
             </button>
@@ -373,8 +373,8 @@ export default function PomodoroTimer({
               className={cn(
                 "px-4 py-1.5 rounded-full text-xs font-medium transition-all border",
                 settings.workDuration === duration
-                  ? "bg-[#6c47ff]/20 text-[#6c47ff] border-[#6c47ff]/40 shadow-[0_0_12px_rgba(108,71,255,0.3)]"
-                  : "bg-transparent text-white/40 border-white/10 hover:bg-white/5 hover:text-white/70"
+                  ? "bg-primary/20 text-primary border-primary/40 glow-active"
+                  : "bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-foreground"
               )}
             >
               {duration}m
@@ -386,21 +386,22 @@ export default function PomodoroTimer({
       {/* Circular Progress Timer */}
       <div className="relative flex justify-center items-center w-64 h-64 mb-8 z-10">
         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" fill="none" r="45" stroke="#1d1f27" strokeWidth="4" />
+          <circle cx="50" cy="50" fill="none" r="45" stroke="hsl(var(--muted))" strokeWidth="4" />
           <circle
-            className="transition-all duration-1000 drop-shadow-[0_0_15px_rgba(108,71,255,0.6)]"
+            className="transition-all duration-1000"
             cx="50"
             cy="50"
             fill="none"
             r="45"
-            stroke="#6c47ff"
+            stroke="hsl(var(--primary))"
             strokeDasharray="283"
             strokeDashoffset={strokeOffset}
             strokeLinecap="round"
             strokeWidth="4"
+            style={{ filter: "drop-shadow(0 0 15px hsl(var(--primary) / 0.6))" }}
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center font-sora text-6xl font-extrabold text-white tracking-tighter">
+        <div className="absolute inset-0 flex flex-col items-center justify-center font-sora text-6xl font-extrabold text-card-foreground tracking-tighter">
           {formatDisplayTime(timeLeft)}
         </div>
       </div>
@@ -409,7 +410,7 @@ export default function PomodoroTimer({
       <div className="flex items-center gap-4 z-10">
         <Button
           onClick={toggleTimer}
-          className="bg-[#cebdff] hover:bg-[#c9beff] text-[#1b0063] font-semibold text-sm py-3 px-8 rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(108,71,255,0.4)] transition-colors border-0"
+          className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-sm py-3 px-8 rounded-full flex items-center gap-2 glow-primary transition-colors border-0"
         >
           {isActive ? (
             <>
@@ -427,7 +428,7 @@ export default function PomodoroTimer({
         <Button
           onClick={resetTimer}
           variant="outline"
-          className="bg-transparent border border-white/10 text-white/60 hover:text-white font-semibold text-sm py-3 px-6 rounded-full flex items-center gap-2 transition-colors hover:bg-white/[0.05]"
+          className="bg-transparent border border-border text-muted-foreground hover:text-foreground font-semibold text-sm py-3 px-6 rounded-full flex items-center gap-2 transition-colors hover:bg-accent"
         >
           <RotateCcw className="h-4 w-4" />
           Reset
@@ -435,20 +436,20 @@ export default function PomodoroTimer({
       </div>
 
       {/* Footer session counter details */}
-      <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/5 w-full mt-8 z-10">
+      <div className="grid grid-cols-3 gap-6 pt-6 border-t border-border w-full mt-8 z-10">
         <div className="text-center">
-          <div className="text-xl font-bold text-white font-sora">{completedPomodoros}</div>
-          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Completed</div>
+          <div className="text-xl font-bold text-card-foreground font-sora">{completedPomodoros}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Completed</div>
         </div>
         <div className="text-center">
-          <div className="text-xl font-bold text-[#6c47ff] font-sora">{getCurrentMode()}</div>
-          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Mode</div>
+          <div className="text-xl font-bold text-primary font-sora">{getCurrentMode()}</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Mode</div>
         </div>
         <div className="text-center">
-          <div className="text-xl font-bold text-white font-sora">
+          <div className="text-xl font-bold text-card-foreground font-sora">
             {Math.floor(completedPomodoros / settings.sessionsUntilLongBreak)}
           </div>
-          <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Cycles</div>
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Cycles</div>
         </div>
       </div>
     </div>

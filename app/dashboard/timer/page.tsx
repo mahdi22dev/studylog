@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
@@ -52,7 +52,7 @@ export default function DashboardTimerPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#0A0D14] text-[#e1e2ec] font-sans">
+    <div className="flex min-h-screen bg-background text-foreground font-sans">
       <DashboardSidebar />
 
       <div className="flex-1 md:ml-64 flex flex-col relative min-h-screen">
@@ -61,7 +61,7 @@ export default function DashboardTimerPage() {
         <main className="flex-1 pt-24 px-6 md:px-10 pb-10">
           <div className="max-w-6xl mx-auto space-y-8">
             <div>
-              <h2 className="text-3xl font-extrabold text-white font-sora tracking-tight">
+              <h2 className="text-3xl font-extrabold text-foreground font-sora tracking-tight">
                 Pomodoro Timer
               </h2>
             </div>
@@ -105,3 +105,5 @@ export default function DashboardTimerPage() {
     </div>
   );
 }
+
+      <DashboardSidebar />

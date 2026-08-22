@@ -3,7 +3,7 @@ import { Logo } from "@/components/logo";
 
 export function Footer() {
   return (
-    <footer className="relative z-10 w-full py-12 md:py-16 bg-[#0b0e15] border-t border-white/5">
+    <footer className="relative z-10 w-full py-12 md:py-16 bg-background border-t border-border/50">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 px-6 max-w-[1200px] mx-auto">
         {/* Centered logo */}
         <div className="col-span-2 md:col-span-4 flex justify-center mb-4 md:mb-6">
@@ -17,25 +17,25 @@ export function Footer() {
           </h4>
           <a
             href="/#features"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Features
           </a>
           <a
             href="/#pricing"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Pricing
           </a>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Changelog
           </a>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Roadmap
           </a>
@@ -48,19 +48,19 @@ export function Footer() {
           </h4>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             About Us
           </a>
           <Link
             href="/blog"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Blog
           </Link>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Contact
           </a>
@@ -73,19 +73,19 @@ export function Footer() {
           </h4>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Privacy Policy
           </a>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Terms of Service
           </a>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Cookie Policy
           </a>
@@ -98,21 +98,21 @@ export function Footer() {
           </h4>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             Help Center
           </a>
           <a
             href="#"
-            className="text-sm text-[#c9c3d9] hover:text-[#38dfab] transition-colors"
+            className="text-sm text-muted-foreground hover:text-success transition-colors"
           >
             FAQs
           </a>
         </div>
 
         {/* Copyright */}
-        <div className="col-span-2 md:col-span-4 text-center mt-6 md:mt-8 pt-6 border-t border-white/5">
-          <p className="text-xs md:text-sm text-[#c9c3d9]">
+        <div className="col-span-2 md:col-span-4 text-center mt-6 md:mt-8 pt-6 border-t border-border/50">
+          <p className="text-xs md:text-sm text-muted-foreground">
             © {new Date().getFullYear()} Focurio. Intelligent Immersion for
             High-Performance Minds.
           </p>

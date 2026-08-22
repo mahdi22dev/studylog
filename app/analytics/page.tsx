@@ -6,7 +6,7 @@ import StudyHistory from "@/components/history-stats";
 
 export default function AnalyticsPage() {
   return (
-    <div className="flex min-h-screen bg-[#0A0D14] text-[#e1e2ec] font-sans">
+    <div className="flex min-h-screen bg-background text-foreground font-sans">
       {/* Sidebar */}
       <DashboardSidebar />
 

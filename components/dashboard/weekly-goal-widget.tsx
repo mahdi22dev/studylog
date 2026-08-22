@@ -45,37 +45,37 @@ export function WeeklyGoalWidget({ sessions, isLoading }: WeeklyGoalWidgetProps)
   const progressPct = Math.min(100, Math.round((weeklyMinutes / goalMinutes) * 100));
 
   return (
-    <Card className="bg-[#0D1117] border border-white/5 rounded-2xl shadow-none">
+    <Card className="bg-card border border-border rounded-2xl shadow-none">
       <CardHeader className="px-5 pt-5 pb-3 flex flex-row items-center gap-2 space-y-0">
-        <Target className="h-4 w-4 text-white/40" />
-        <CardTitle className="text-sm font-semibold text-white/80">
+        <Target className="h-4 w-4 text-muted-foreground" />
+        <CardTitle className="text-sm font-semibold text-card-foreground/80">
           Weekly Goal
         </CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 flex flex-col gap-3">
         {isLoading ? (
-          <div className="h-8 bg-white/5 rounded animate-pulse" />
+          <div className="h-8 bg-muted rounded animate-pulse" />
         ) : (
           <>
             <div className="flex items-end justify-between">
-              <span className="text-2xl font-bold text-white">
+              <span className="text-2xl font-bold text-card-foreground">
                 {formatHours(weeklyMinutes)}
               </span>
-              <span className="text-xs text-white/30 mb-1">
+              <span className="text-xs text-muted-foreground mb-1">
                 / {goalHours}h goal
               </span>
             </div>
             <Progress
               value={progressPct}
-              className="h-2 bg-white/[0.06] [&>div]:bg-[#7C5CFF] rounded-full"
+              className="h-2 bg-muted [&>div]:bg-primary rounded-full"
             />
             <div className="flex justify-between items-center">
-              <span className="text-[11px] text-white/30">
+              <span className="text-[11px] text-muted-foreground">
                 {progressPct}% complete
               </span>
               {progressPct >= 100 && (
-                <span className="text-[11px] text-[#38dfab] font-medium">
-                  🎉 Goal reached!
+                <span className="text-[11px] text-success font-medium">
+                  Goal reached!
                 </span>
               )}
             </div>

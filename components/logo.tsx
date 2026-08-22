@@ -7,8 +7,8 @@ export function Logo() {
       href="/"
       className="flex items-center gap-2 hover:opacity-80 transition-opacity"
     >
-      <Timer className="h-6 w-6 text-[#c9beff]" />
-      <span className="font-heading text-xl font-bold text-[#c9beff]">
+      <Timer className="h-6 w-6 text-secondary" />
+      <span className="font-heading text-xl font-bold text-secondary">
         Focurio
       </span>
     </Link>

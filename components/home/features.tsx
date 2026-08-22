@@ -61,16 +61,16 @@ export function Features() {
   return (
     <section id="features" className="max-w-[1200px] mx-auto px-6 py-16">
       <div className="flex flex-col items-center text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#272a32] border border-white/5 mb-4 shadow-sm">
-          <Sparkles className="h-3.5 w-3.5 text-[#c9beff]" />
-          <span className="text-xs font-bold text-[#c9beff] uppercase tracking-widest">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent border border-border/50 mb-4 shadow-sm">
+          <Sparkles className="h-3.5 w-3.5 text-secondary" />
+          <span className="text-xs font-bold text-secondary uppercase tracking-widest">
             Features
           </span>
         </div>
         <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
           Powerful Features
         </h2>
-        <p className="text-base text-[#c9c3d9] max-w-2xl mx-auto">
+        <p className="text-base text-muted-foreground max-w-2xl mx-auto">
           Everything you need to build effective study habits and track your
           learning progress.
         </p>
@@ -80,34 +80,34 @@ export function Features() {
         {features.map((feature, index) => (
           <div
             key={index}
-            className={`bg-[#1d1f27]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 transition-all duration-300 group relative overflow-hidden cursor-default hover:-translate-y-1.5 hover:border-[#6c47ff]/60 hover:bg-[#252834] hover:shadow-2xl hover:shadow-[#6c47ff]/20 ${
-              hoveredFeature === index ? "glow-active border-[#6c47ff]/60" : ""
+            className={`bg-muted/90 backdrop-blur-xl border border-border rounded-2xl p-6 transition-all duration-300 group relative overflow-hidden cursor-default hover:-translate-y-1.5 hover:border-primary/60 hover:bg-accent hover:shadow-2xl hover:shadow-primary/20 ${
+              hoveredFeature === index ? "glow-active border-primary/60" : ""
             }`}
             onMouseEnter={() => setHoveredFeature(index)}
             onMouseLeave={() => setHoveredFeature(null)}
           >
             {feature.pro && (
-              <div className="absolute top-4 right-4 bg-[#38dfab]/20 text-[#38dfab] px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+              <div className="absolute top-4 right-4 bg-success/20 text-success px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                 Pro
               </div>
             )}
             <div
               className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${
                 feature.pro
-                  ? "bg-[#272a32] group-hover:bg-[#38dfab]/20 group-hover:scale-110"
-                  : "bg-[#272a32] group-hover:bg-[#6c47ff]/25 group-hover:scale-110"
+                  ? "bg-accent group-hover:bg-success/20 group-hover:scale-110"
+                  : "bg-accent group-hover:bg-primary/25 group-hover:scale-110"
               }`}
             >
               <feature.icon
                 className={`h-5 w-5 transition-transform duration-300 ${
-                  feature.pro ? "text-[#38dfab]" : "text-[#c9beff]"
+                  feature.pro ? "text-success" : "text-secondary"
                 }`}
               />
             </div>
-            <h3 className="font-heading text-xl font-semibold tracking-[-0.01em] mb-2 text-white group-hover:text-[#c9beff] transition-colors">
+            <h3 className="font-heading text-xl font-semibold tracking-[-0.01em] mb-2 text-white group-hover:text-secondary transition-colors">
               {feature.title}
             </h3>
-            <p className="text-sm text-[#c9c3d9] leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {feature.description}
             </p>
           </div>

@@ -27,7 +27,7 @@ export const UserButtonModel = () => {
           <>
             <Link
               href="/dashboard/me"
-              className="bg-[#6c47ff] text-white px-8 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-[#6c47ff]/25 flex items-center gap-2.5 group"
+              className="bg-primary text-white px-8 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25 flex items-center gap-2.5 group"
             >
               Dashboard
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />

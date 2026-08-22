@@ -115,8 +115,8 @@ export function Navigation() {
             className={cn(
               "text-sm font-semibold tracking-wide border-b-2 py-0.5 transition-all duration-300 ease-in-out",
               isActive
-                ? "text-[#c9beff] font-bold border-[#6c47ff]"
-                : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec] hover:border-[#6c47ff]/40"
+                ? "text-secondary font-bold border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground hover:border-primary/40"
             )}
           >
             {link.label}
@@ -130,8 +130,8 @@ export function Navigation() {
           className={cn(
             "text-sm font-semibold tracking-wide border-b-2 py-0.5 transition-all duration-300 ease-in-out",
             pathname === "/admin"
-              ? "text-[#c9beff] font-bold border-[#6c47ff]"
-              : "text-[#c9c3d9] border-transparent hover:text-[#e1e2ec]"
+              ? "text-secondary font-bold border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
           )}
         >
           Admin

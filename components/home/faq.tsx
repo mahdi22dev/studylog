@@ -23,11 +23,11 @@ export function Faq() {
 
   return (
     <section id="faq" className="max-w-[1200px] mx-auto px-6 py-16">
-      <div className="max-w-4xl mx-auto bg-[rgba(108,71,255,0.03)] border border-[#6c47ff]/20 rounded-3xl p-8 md:p-10 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+      <div className="max-w-4xl mx-auto bg-primary/[0.03] border border-primary/20 rounded-3xl p-8 md:p-10 backdrop-blur-xl shadow-2xl relative overflow-hidden">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#6c47ff]/10 border border-[#6c47ff]/20 mb-3">
-            <HelpCircle className="h-3.5 w-3.5 text-[#c9beff]" />
-            <span className="text-xs font-bold text-[#c9beff] uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 mb-3">
+            <HelpCircle className="h-3.5 w-3.5 text-secondary" />
+            <span className="text-xs font-bold text-secondary uppercase tracking-widest">
               FAQ
             </span>
           </div>
@@ -39,19 +39,19 @@ export function Faq() {
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="bg-[#1d1f27]/90 border border-white/10 rounded-xl p-5 cursor-pointer hover:border-[#6c47ff]/40 transition-all"
+              className="bg-muted/90 border border-border rounded-xl p-5 cursor-pointer hover:border-primary/40 transition-all"
               onClick={() => setOpenFaq(openFaq === i ? null : i)}
             >
               <div className="flex justify-between items-center">
                 <h4 className="text-base font-semibold text-white">{faq.q}</h4>
                 <ChevronDown
-                  className={`h-5 w-5 text-[#c9c3d9] transition-transform duration-300 ${
-                    openFaq === i ? "rotate-180 text-[#c9beff]" : ""
+                  className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${
+                    openFaq === i ? "rotate-180 text-secondary" : ""
                   }`}
                 />
               </div>
               {openFaq === i && (
-                <p className="text-sm text-[#c9c3d9] mt-3 leading-relaxed border-t border-white/5 pt-3">
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed border-t border-border/50 pt-3">
                   {faq.a}
                 </p>
               )}

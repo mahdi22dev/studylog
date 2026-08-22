@@ -40,9 +40,8 @@ export default function DashboardContent() {
   } = useSessionsData();
 
   // Active Session Title from localStorage or default
-  const [currentSubjectName, setCurrentSubjectName] = useState(
-    "Physics Exam Review",
-  );
+  const [currentSubjectName, setCurrentSubjectName] =
+    useState("Normal session");
 
   // Tasks state with localStorage persistence
   const [tasks, setTasks] = useState<
@@ -60,19 +59,19 @@ export default function DashboardContent() {
       {
         id: "1",
         title: "Complete Chapter 4 Exercises",
-        subtitle: "Physics • Est. 45m",
+        subtitle: "Physics â€¢ Est. 45m",
         done: false,
       },
       {
         id: "2",
         title: "Review Calculus Notes",
-        subtitle: "Calculus • Est. 30m",
+        subtitle: "Calculus â€¢ Est. 30m",
         done: false,
       },
       {
         id: "3",
         title: "Read CS Paper",
-        subtitle: "Comp Sci • Est. 20m",
+        subtitle: "Comp Sci â€¢ Est. 20m",
         done: true,
       },
     ];
@@ -171,7 +170,7 @@ export default function DashboardContent() {
       {
         id: String(Date.now()),
         title: newTaskTitle.trim(),
-        subtitle: `${currentSubjectName} • Est. 25m`,
+        subtitle: `${currentSubjectName} â€¢ Est. 25m`,
         done: false,
       },
     ]);
@@ -180,7 +179,7 @@ export default function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0A0D14] text-[#e1e2ec] font-sans">
+    <div className="flex min-h-screen bg-background text-foreground font-sans">
       {/* Sidebar */}
       <DashboardSidebar />
 
@@ -196,17 +195,17 @@ export default function DashboardContent() {
             <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200/90">
               <Info className="h-4 w-4 shrink-0 text-amber-400" />
               <p className="text-xs font-medium">
-                Focurio is still in development — you may run into bugs or
+                Focurio is still in development â€” you may run into bugs or
                 unfinished features.
               </p>
             </div>
 
             {/* Page Title */}
             <div>
-              <h2 className="text-3xl font-extrabold text-white font-sora tracking-tight">
+              <h2 className="text-3xl font-extrabold text-foreground font-sora tracking-tight">
                 Overview
               </h2>
-              <p className="text-sm text-white/50 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Your productivity metrics for today.
               </p>
             </div>
@@ -214,19 +213,20 @@ export default function DashboardContent() {
             {/* Top Row: Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Metric 1: Deep Work */}
-              <div className="bg-[#111827] p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-[#6c47ff]/30 transition-all border border-white/5">
+              <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Deep Work
                   </span>
-                  <TrendingUp className="text-[#38dfab] h-4 w-4" />
+                  <TrendingUp className="text-success h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-white font-sora z-10">
+                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
                   {isLoading ? "0m" : formatTime(todayMinutes)}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
-                    className="w-full h-full stroke-[#38dfab] fill-none stroke-2"
+                    className="w-full h-full fill-none stroke-2"
+                    style={{ stroke: "hsl(var(--success))" }}
                     preserveAspectRatio="none"
                     viewBox="0 0 100 30"
                   >
@@ -236,19 +236,20 @@ export default function DashboardContent() {
               </div>
 
               {/* Metric 2: Focus Score */}
-              <div className="bg-[#111827] p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-[#6c47ff]/30 transition-all border border-white/5">
+              <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Focus Score
                   </span>
-                  <TrendingUp className="text-[#38dfab] h-4 w-4" />
+                  <TrendingUp className="text-success h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-white font-sora z-10">
+                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
                   {focusScore}%
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
-                    className="w-full h-full stroke-[#38dfab] fill-none stroke-2"
+                    className="w-full h-full fill-none stroke-2"
+                    style={{ stroke: "hsl(var(--success))" }}
                     preserveAspectRatio="none"
                     viewBox="0 0 100 30"
                   >
@@ -258,19 +259,20 @@ export default function DashboardContent() {
               </div>
 
               {/* Metric 3: Sessions */}
-              <div className="bg-[#111827] p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-[#6c47ff]/30 transition-all border border-white/5">
+              <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Sessions
                   </span>
-                  <Minus className="text-white/40 h-4 w-4" />
+                  <Minus className="text-muted-foreground h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-white font-sora z-10">
+                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
                   {isLoading ? "0" : String(sessionsCountToday)}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
-                    className="w-full h-full stroke-white/30 fill-none stroke-2"
+                    className="w-full h-full fill-none stroke-2"
+                    style={{ stroke: "hsl(var(--muted-foreground))" }}
                     preserveAspectRatio="none"
                     viewBox="0 0 100 30"
                   >
@@ -280,21 +282,22 @@ export default function DashboardContent() {
               </div>
 
               {/* Metric 4: Streak */}
-              <div className="bg-[#111827] p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-[#6c47ff]/30 transition-all border border-white/5 shadow-[0_0_25px_rgba(108,71,255,0.15)]">
+              <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border glow-primary">
                 <div className="flex justify-between items-start z-10">
-                  <span className="text-xs font-semibold text-[#6c47ff] uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wider">
                     Streak
                   </span>
-                  <Flame className="text-[#6c47ff] h-4 w-4 fill-[#6c47ff]/20" />
+                  <Flame className="text-primary h-4 w-4 fill-primary/20" />
                 </div>
-                <div className="text-2xl font-bold text-[#6c47ff] font-sora z-10">
+                <div className="text-2xl font-bold text-primary font-sora z-10">
                   {isLoading
                     ? "..."
                     : `${streak} ${streak === 1 ? "Day" : "Days"}`}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
-                    className="w-full h-full stroke-[#6c47ff] fill-none stroke-2"
+                    className="w-full h-full fill-none stroke-2"
+                    style={{ stroke: "hsl(var(--primary))" }}
                     preserveAspectRatio="none"
                     viewBox="0 0 100 30"
                   >
@@ -308,15 +311,15 @@ export default function DashboardContent() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column: Active Timer */}
               <div className="lg:col-span-7 flex flex-col">
-                <div className="bg-[#111827] border border-white/5 rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden h-full min-h-[420px]">
+                <div className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden h-full min-h-[420px]">
                   {/* Background Glow */}
-                  <div className="absolute inset-0 bg-[#6c47ff]/5 blur-3xl rounded-full pointer-events-none" />
+                  <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
-                  <h3 className="text-xl font-semibold text-white mb-2 relative z-10 font-sora">
+                  <h3 className="text-xl font-semibold text-card-foreground mb-2 relative z-10 font-sora">
                     {currentSubjectName}
                   </h3>
-                  <div className="inline-flex items-center gap-2 bg-[#6c47ff]/20 text-[#6c47ff] px-3.5 py-1 rounded-full text-xs font-semibold mb-8 relative z-10 border border-[#6c47ff]/30">
-                    <span className="w-2 h-2 rounded-full bg-[#6c47ff] animate-pulse" />
+                  <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-3.5 py-1 rounded-full text-xs font-semibold mb-8 relative z-10 border border-primary/30">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     Deep Work
                   </div>
 
@@ -327,7 +330,7 @@ export default function DashboardContent() {
                       viewBox="0 0 100 100"
                     >
                       <circle
-                        className="text-white/5"
+                        className="text-border"
                         cx="50"
                         cy="50"
                         fill="none"
@@ -336,7 +339,7 @@ export default function DashboardContent() {
                         strokeWidth="3"
                       />
                       <circle
-                        className="text-[#6c47ff] drop-shadow-[0_0_12px_rgba(108,71,255,0.6)]"
+                        className="text-primary"
                         cx="50"
                         cy="50"
                         fill="none"
@@ -346,13 +349,17 @@ export default function DashboardContent() {
                         strokeDashoffset="85"
                         strokeLinecap="round"
                         strokeWidth="4"
+                        style={{
+                          filter:
+                            "drop-shadow(0 0 12px hsl(var(--primary) / 0.6))",
+                        }}
                       />
                     </svg>
                     <div className="absolute flex items-baseline justify-center font-sora">
-                      <span className="text-6xl font-extrabold text-white tracking-tight">
+                      <span className="text-6xl font-extrabold text-card-foreground tracking-tight">
                         25
                       </span>
-                      <span className="text-3xl font-semibold text-white/50 ml-1">
+                      <span className="text-3xl font-semibold text-muted-foreground ml-1">
                         :00
                       </span>
                     </div>
@@ -362,7 +369,7 @@ export default function DashboardContent() {
                   <div className="flex items-center gap-4 relative z-10">
                     <button
                       onClick={handleStartFocus}
-                      className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.05] transition-colors"
+                      className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                       title="Reset Timer"
                     >
                       <RotateCcw className="h-4 w-4" />
@@ -370,7 +377,7 @@ export default function DashboardContent() {
 
                     <button
                       onClick={handleStartFocus}
-                      className="px-8 py-3 rounded-full bg-[#6c47ff] text-white text-sm font-semibold hover:bg-[#5e35f1] transition-all flex items-center gap-2 shadow-[0_0_25px_rgba(108,71,255,0.4)]"
+                      className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all flex items-center gap-2 glow-primary-lg"
                     >
                       <Play className="h-4 w-4 fill-current" />
                       Start Focus
@@ -378,7 +385,7 @@ export default function DashboardContent() {
 
                     <button
                       onClick={handleStartFocus}
-                      className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.05] transition-colors"
+                      className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                       title="Stop Timer"
                     >
                       <Square className="h-4 w-4 fill-current" />
@@ -390,19 +397,19 @@ export default function DashboardContent() {
               {/* Right Column: Heat Map & Donut Chart */}
               <div className="lg:col-span-5 flex flex-col gap-6">
                 {/* Study Intensity (Heatmap) */}
-                <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex-1 flex flex-col justify-between">
-                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">
+                <div className="bg-card border border-border rounded-2xl p-6 flex-1 flex flex-col justify-between">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
                     Study Intensity
                   </h4>
                   <div className="grid grid-cols-7 gap-1.5 my-auto">
                     {heatmapData.map((val, idx) => {
                       const colors = [
-                        "bg-white/[0.04]",
-                        "bg-[#6c47ff]/20",
-                        "bg-[#6c47ff]/40",
-                        "bg-[#6c47ff]/60",
-                        "bg-[#6c47ff]/80",
-                        "bg-[#6c47ff]",
+                        "bg-muted",
+                        "bg-primary/20",
+                        "bg-primary/40",
+                        "bg-primary/60",
+                        "bg-primary/80",
+                        "bg-primary",
                       ];
                       return (
                         <div
@@ -412,25 +419,25 @@ export default function DashboardContent() {
                       );
                     })}
                   </div>
-                  <div className="flex justify-between items-center mt-4 text-xs text-white/40">
+                  <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
                     <span>Less</span>
                     <div className="flex gap-1">
-                      <div className="w-3 h-3 rounded-sm bg-white/[0.04]" />
-                      <div className="w-3 h-3 rounded-sm bg-[#6c47ff]/40" />
-                      <div className="w-3 h-3 rounded-sm bg-[#6c47ff]/80" />
-                      <div className="w-3 h-3 rounded-sm bg-[#6c47ff]" />
+                      <div className="w-3 h-3 rounded-sm bg-muted" />
+                      <div className="w-3 h-3 rounded-sm bg-primary/40" />
+                      <div className="w-3 h-3 rounded-sm bg-primary/80" />
+                      <div className="w-3 h-3 rounded-sm bg-primary" />
                     </div>
                     <span>More</span>
                   </div>
                 </div>
 
                 {/* Subject Distribution (Donut Chart) */}
-                <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex-1 flex flex-col justify-between">
+                <div className="bg-card border border-border rounded-2xl p-6 flex-1 flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Subject Distribution
                     </h4>
-                    <span className="text-[10px] font-semibold text-[#6c47ff] bg-[#6c47ff]/10 px-2 py-0.5 rounded-full border border-[#6c47ff]/20">
+                    <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
                       Recent & All-Time
                     </span>
                   </div>
@@ -445,7 +452,7 @@ export default function DashboardContent() {
                           cy="80"
                           fill="transparent"
                           r="70"
-                          stroke="#1d1f27"
+                          stroke="hsl(var(--muted))"
                           strokeWidth="18"
                         />
                         {subjectDistribution.items.map((sub, idx) => {
@@ -472,10 +479,10 @@ export default function DashboardContent() {
                         })}
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center font-sora pointer-events-none">
-                        <span className="text-xl font-extrabold text-white">
+                        <span className="text-xl font-extrabold text-card-foreground">
                           {subjectDistribution.totalHoursStr}
                         </span>
-                        <span className="text-[10px] text-white/40 uppercase font-semibold">
+                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">
                           All Time
                         </span>
                       </div>
@@ -492,11 +499,11 @@ export default function DashboardContent() {
                               className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: sub.color }}
                             />
-                            <span className="text-white truncate">
+                            <span className="text-card-foreground truncate">
                               {sub.name}
                             </span>
                           </div>
-                          <span className="text-white/40 font-medium shrink-0 ml-2">
+                          <span className="text-muted-foreground font-medium shrink-0 ml-2">
                             {sub.pct}% ({sub.hoursStr})
                           </span>
                         </div>
@@ -510,14 +517,14 @@ export default function DashboardContent() {
             {/* Bottom Row: Tasks & Line Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Up Next / Tasks Card */}
-              <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex flex-col">
+              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-lg font-bold text-white font-sora">
+                  <h4 className="text-lg font-bold text-card-foreground font-sora">
                     Up Next
                   </h4>
                   <button
                     onClick={() => setIsAddingTask(!isAddingTask)}
-                    className="text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/[0.05]"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-accent"
                   >
                     <Plus className="h-5 w-5" />
                   </button>
@@ -531,11 +538,11 @@ export default function DashboardContent() {
                       value={newTaskTitle}
                       onChange={(e) => setNewTaskTitle(e.target.value)}
                       autoFocus
-                      className="flex-1 bg-[#1d1f27] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#6c47ff]"
+                      className="flex-1 bg-input border border-border rounded-xl px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring"
                     />
                     <button
                       type="submit"
-                      className="bg-[#6c47ff] hover:bg-[#5e35f1] text-white px-3 py-1.5 rounded-xl text-xs font-semibold"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded-xl text-xs font-semibold"
                     >
                       Add
                     </button>
@@ -549,42 +556,44 @@ export default function DashboardContent() {
                       onClick={() => toggleTask(task.id)}
                       className={`p-3.5 rounded-xl flex items-center gap-3 border transition-colors cursor-pointer ${
                         task.done
-                          ? "bg-[#1d1f27]/50 border-transparent opacity-60"
-                          : "bg-[#1d1f27] border-white/5 hover:border-white/10"
+                          ? "bg-muted/50 border-transparent opacity-60"
+                          : "bg-accent border-border hover:border-primary/30"
                       }`}
                     >
                       <div
                         className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
                           task.done
-                            ? "bg-[#38dfab]/20 border-[#38dfab] text-[#38dfab]"
-                            : "border-white/30 hover:border-[#6c47ff]"
+                            ? "bg-success/20 border-success text-success"
+                            : "border-border hover:border-primary"
                         }`}
                       >
                         {task.done && <Check className="h-3 w-3 stroke-[3]" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p
-                          className={`text-sm text-white truncate ${
-                            task.done ? "line-through text-white/50" : ""
+                          className={`text-sm text-card-foreground truncate ${
+                            task.done
+                              ? "line-through text-muted-foreground"
+                              : ""
                           }`}
                         >
                           {task.title}
                         </p>
                         {task.subtitle && (
-                          <p className="text-xs text-white/40 truncate">
+                          <p className="text-xs text-muted-foreground truncate">
                             {task.subtitle}
                           </p>
                         )}
                       </div>
-                      <GripVertical className="h-4 w-4 text-white/20 shrink-0" />
+                      <GripVertical className="h-4 w-4 text-muted-foreground/50 shrink-0" />
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Performance Trends (14 Days) Line Chart */}
-              <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex flex-col relative overflow-hidden">
-                <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-6">
+              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col relative overflow-hidden">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
                   Performance Trends (14 Days)
                 </h4>
                 <div className="flex-1 relative w-full h-48 mt-auto">
@@ -603,12 +612,12 @@ export default function DashboardContent() {
                       >
                         <stop
                           offset="0%"
-                          stopColor="#38dfab"
+                          stopColor="hsl(var(--success))"
                           stopOpacity="0.3"
                         />
                         <stop
                           offset="100%"
-                          stopColor="#38dfab"
+                          stopColor="hsl(var(--success))"
                           stopOpacity="0"
                         />
                       </linearGradient>
@@ -620,7 +629,7 @@ export default function DashboardContent() {
                     <path
                       d="M0 100 C 50 80, 100 120, 150 90 C 200 60, 250 110, 300 50 C 350 -10, 400 30, 400 30"
                       fill="none"
-                      stroke="#38dfab"
+                      stroke="hsl(var(--success))"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="3"
@@ -628,30 +637,30 @@ export default function DashboardContent() {
                     <circle
                       cx="150"
                       cy="90"
-                      fill="#111827"
+                      fill="hsl(var(--card))"
                       r="4"
-                      stroke="#38dfab"
+                      stroke="hsl(var(--success))"
                       strokeWidth="2"
                     />
                     <circle
                       cx="300"
                       cy="50"
-                      fill="#111827"
+                      fill="hsl(var(--card))"
                       r="4"
-                      stroke="#38dfab"
+                      stroke="hsl(var(--success))"
                       strokeWidth="2"
                     />
                     <circle
                       cx="400"
                       cy="30"
-                      fill="#111827"
+                      fill="hsl(var(--card))"
                       r="4"
-                      stroke="#38dfab"
+                      stroke="hsl(var(--success))"
                       strokeWidth="2"
                     />
                   </svg>
                 </div>
-                <div className="flex justify-between items-center mt-3 text-xs text-white/40 px-2">
+                <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground px-2">
                   <span>Mar 1</span>
                   <span>Mar 7</span>
                   <span>Mar 14</span>

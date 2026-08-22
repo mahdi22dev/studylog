@@ -9,7 +9,7 @@ import { Navigation } from "@/components/navigation";
 export function Navbar() {
   const { isSignedIn } = useAuth();
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#0A0D14]/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
+    <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all duration-300">
       <div className="flex justify-between items-center px-6 py-4 max-w-[1200px] mx-auto">
         {/* Brand */}
         <Logo />
@@ -30,7 +30,7 @@ export function Navbar() {
             </Link>
             <Link
               href="/sign-up"
-              className="bg-[#6c47ff] text-white px-6 py-2 rounded-full text-sm font-semibold tracking-wide hover:opacity-85 transition-all duration-300 ease-in-out"
+              className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold tracking-wide hover:opacity-85 transition-all duration-300 ease-in-out"
             >
               Get Started
             </Link>

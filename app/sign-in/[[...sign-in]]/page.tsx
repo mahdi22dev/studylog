@@ -152,24 +152,24 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0D14] text-[#e1e2ec] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
       <Navbar />
 
       {/* Atmospheric background glows */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#6c47ff]/[0.07] rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#38dfab]/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/[0.07] rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-success/[0.04] rounded-full blur-[120px]" />
       </div>
 
       <main className="relative z-10 flex-grow flex items-center justify-center p-6 pt-28 pb-16">
         {!verifying ? (
-          <div className="w-full max-w-[440px] bg-[#111827]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
+          <div className="w-full max-w-[440px] bg-popover/80 backdrop-blur-xl border border-border rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="font-heading text-2xl font-bold text-white mb-2">
               Welcome back
             </h1>
-            <p className="text-sm text-[#c9c3d9]">
+            <p className="text-sm text-muted-foreground">
               Sign in to your Focurio account to continue.
             </p>
           </div>
@@ -179,11 +179,11 @@ export default function SignInPage() {
             type="button"
             disabled={googleLoading || loading}
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full border border-white/10 bg-[#191b23] hover:bg-[#272a32] transition-colors text-sm font-semibold text-white mb-6 cursor-pointer disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full border border-border bg-muted hover:bg-accent transition-colors text-sm font-semibold text-white mb-6 cursor-pointer disabled:opacity-50"
           >
             {googleLoading ? (
               <>
-                <Loader2 className="h-5 w-5 animate-spin text-[#c9beff]" />
+                <Loader2 className="h-5 w-5 animate-spin text-secondary" />
                 <span>Connecting to Google...</span>
               </>
             ) : (
@@ -214,7 +214,7 @@ export default function SignInPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="h-px bg-white/10 flex-1" />
-            <span className="text-xs text-[#c9c3d9] uppercase tracking-wider font-semibold">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
               or
             </span>
             <div className="h-px bg-white/10 flex-1" />
@@ -232,7 +232,7 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
-                className="block text-xs font-semibold text-[#e1e2ec] mb-1.5 uppercase tracking-wider"
+                className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider"
                 htmlFor="identifier"
               >
                 Email or Username
@@ -244,14 +244,14 @@ export default function SignInPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Enter your email or username"
-                className="w-full bg-[#0D121F] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-[#6c47ff] transition-colors h-12"
+                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-12"
               />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label
-                  className="block text-xs font-semibold text-[#e1e2ec] uppercase tracking-wider"
+                  className="block text-xs font-semibold text-foreground uppercase tracking-wider"
                   htmlFor="password"
                 >
                   Password
@@ -265,12 +265,12 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full bg-[#0D121F] border border-white/10 rounded-xl pl-4 pr-11 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-[#6c47ff] transition-colors h-12"
+                  className="w-full bg-input border border-border rounded-xl pl-4 pr-11 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 text-[#c9c3d9] hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-3 text-muted-foreground hover:text-white transition-colors cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -284,7 +284,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading || !isLoaded || googleLoading}
-              className="w-full bg-[#6c47ff] hover:bg-[#5e35f1] text-white font-semibold text-sm py-3 rounded-full transition-all duration-300 h-12 shadow-lg shadow-[#6c47ff]/25 flex justify-center items-center gap-2 cursor-pointer mt-6 disabled:opacity-50"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm py-3 rounded-full transition-all duration-300 h-12 shadow-lg shadow-primary/25 flex justify-center items-center gap-2 cursor-pointer mt-6 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -301,12 +301,12 @@ export default function SignInPage() {
           </form>
 
           {/* Footer link */}
-          <div className="mt-8 text-center pt-4 border-t border-white/10">
-            <p className="text-sm text-[#c9c3d9]">
+          <div className="mt-8 text-center pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/sign-up"
-                className="text-[#c9beff] font-semibold hover:underline ml-1"
+                className="text-secondary font-semibold hover:underline ml-1"
               >
                 Sign up
               </Link>
@@ -315,15 +315,15 @@ export default function SignInPage() {
         </div>
       ) : (
         /* Verification Code Step (email verification code or 2FA) */
-        <div className="w-full max-w-[440px] bg-[#111827]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
+        <div className="w-full max-w-[440px] bg-popover/80 backdrop-blur-xl border border-border rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
           <div className="text-center">
-            <div className="w-12 h-12 rounded-full bg-[#6c47ff]/10 border border-[#6c47ff]/20 flex items-center justify-center mx-auto mb-4">
-              <Mail className="h-6 w-6 text-[#c9beff]" />
+            <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
+              <Mail className="h-6 w-6 text-secondary" />
             </div>
             <h2 className="font-heading text-2xl font-bold text-white mb-2">
               {factorStage === "second" ? "Two-factor verification" : "Verify your account"}
             </h2>
-            <p className="text-sm text-[#c9c3d9] mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               We sent a verification code to{" "}
               <span className="font-semibold text-white">{identifier}</span>.
               Enter it below to continue.
@@ -345,14 +345,14 @@ export default function SignInPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="Enter 6-digit code"
-                  className="w-full bg-[#0D121F] border border-white/10 rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-[#6c47ff] transition-colors h-14"
+                  className="w-full bg-input border border-border rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-14"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading || code.length < 6}
-                className="w-full bg-[#6c47ff] hover:bg-[#5e35f1] text-white font-semibold text-sm py-3 rounded-full transition-all duration-300 h-12 shadow-lg shadow-[#6c47ff]/25 flex justify-center items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm py-3 rounded-full transition-all duration-300 h-12 shadow-lg shadow-primary/25 flex justify-center items-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -371,7 +371,7 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => setVerifying(false)}
-              className="mt-5 text-xs text-[#c9c3d9] hover:text-white transition-colors"
+              className="mt-5 text-xs text-muted-foreground hover:text-white transition-colors"
             >
               Back to sign in
             </button>

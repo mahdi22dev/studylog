@@ -22,6 +22,7 @@ const config = {
       fontFamily: {
         sans: ["var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         heading: ["var(--font-sora)", "var(--font-inter)", "sans-serif"],
+        sora: ["var(--font-sora)", "var(--font-inter)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,6 +57,10 @@ const config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
         },
         // Custom study tracker colors
         study: {
