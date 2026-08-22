@@ -17,183 +17,96 @@ import {
 } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
-
-type Session = {
-  id: string;
-  userId: string;
-  startTime: string | Date;
-  endTime: string | Date | null;
-  durationMin: number;
-  type: string;
-  subject?: string | null;
-  completed: boolean;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-};
-
-function formatTime(minutes: number): string {
-  if (minutes < 60) return `${minutes}m`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
-}
-
-function computeStreak(sessions: Session[]): number {
-  if (!sessions || sessions.length === 0) return 0;
-
-  const workSessions = sessions.filter(
-    (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
-  );
-  if (workSessions.length === 0) return 0;
-
-  const activeDates = new Set<string>();
-  for (const s of workSessions) {
-    const d = new Date(s.startTime);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    activeDates.add(`${year}-${month}-${day}`);
-  }
-
-  const formatLocalDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const today = new Date();
-  const todayStr = formatLocalDate(today);
-
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const yesterdayStr = formatLocalDate(yesterday);
-
-  let startDate = today;
-  if (!activeDates.has(todayStr) && activeDates.has(yesterdayStr)) {
-    startDate = yesterday;
-  } else if (!activeDates.has(todayStr) && !activeDates.has(yesterdayStr)) {
-    return 0;
-  }
-
-  let streak = 0;
-  const current = new Date(startDate);
-
-  for (let i = 0; i < 365; i++) {
-    const key = formatLocalDate(current);
-    if (activeDates.has(key)) {
-      streak++;
-      current.setDate(current.getDate() - 1);
-    } else {
-      break;
-    }
-  }
-
-  return streak;
-}
+import { useSessionsData } from "@/hooks/use-sessions-data";
+import {
+  computeStreak,
+  computeSubjectDistribution,
+  formatMinutes,
+  formatTime,
+  mergeSessions,
+} from "@/lib/utils";
 
 export default function DashboardContent() {
   const router = useRouter();
 
-  const [recentSessions, setRecentSessions] = useState<Session[]>([]);
-  const [todaySessions, setTodaySessions] = useState<Session[]>([]);
-  const [weeklySessions, setWeeklySessions] = useState<Session[]>([]);
-  const [totalMinutes, setTotalMinutes] = useState(0);
-  const [todayMinutes, setTodayMinutes] = useState(0);
-  const [sessionsCountToday, setSessionsCountToday] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    recentSessions,
+    todaySessions,
+    weeklySessions,
+    totalMinutes,
+    todayMinutes,
+    sessionsCountToday,
+    isLoading,
+  } = useSessionsData();
 
   // Active Session Title from localStorage or default
-  const [currentSubjectName, setCurrentSubjectName] = useState("Physics Exam Review");
+  const [currentSubjectName, setCurrentSubjectName] = useState(
+    "Physics Exam Review",
+  );
 
   // Tasks state with localStorage persistence
-  const [tasks, setTasks] = useState<{ id: string; title: string; subtitle?: string; done: boolean }[]>(() => {
+  const [tasks, setTasks] = useState<
+    { id: string; title: string; subtitle?: string; done: boolean }[]
+  >(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("dashboardTasks");
       if (saved) {
-        try { return JSON.parse(saved); } catch {}
+        try {
+          return JSON.parse(saved);
+        } catch {}
       }
     }
     return [
-      { id: "1", title: "Complete Chapter 4 Exercises", subtitle: "Physics • Est. 45m", done: false },
-      { id: "2", title: "Review Calculus Notes", subtitle: "Calculus • Est. 30m", done: false },
-      { id: "3", title: "Read CS Paper", subtitle: "Comp Sci • Est. 20m", done: true },
+      {
+        id: "1",
+        title: "Complete Chapter 4 Exercises",
+        subtitle: "Physics • Est. 45m",
+        done: false,
+      },
+      {
+        id: "2",
+        title: "Review Calculus Notes",
+        subtitle: "Calculus • Est. 30m",
+        done: false,
+      },
+      {
+        id: "3",
+        title: "Read CS Paper",
+        subtitle: "Comp Sci • Est. 20m",
+        done: true,
+      },
     ];
   });
 
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
 
-  const allSessionsCombined = useMemo(() => {
-    const map = new Map<string, Session>();
-    weeklySessions?.forEach((s) => map.set(s.id, s));
-    todaySessions?.forEach((s) => map.set(s.id, s));
-    recentSessions?.forEach((s) => map.set(s.id, s));
-    return Array.from(map.values());
-  }, [weeklySessions, todaySessions, recentSessions]);
+  const allSessionsCombined = useMemo(
+    () => mergeSessions(weeklySessions, todaySessions, recentSessions),
+    [weeklySessions, todaySessions, recentSessions],
+  );
 
-  const streak = useMemo(() => computeStreak(allSessionsCombined), [allSessionsCombined]);
+  const streak = useMemo(
+    () => computeStreak(allSessionsCombined),
+    [allSessionsCombined],
+  );
 
   // Real Focus Score calculation
   const focusScore = useMemo(() => {
     const workSessionsToday = todaySessions.filter((s) => s.type === "WORK");
     if (workSessionsToday.length === 0) return 92; // default visual baseline
     const completed = workSessionsToday.filter((s) => s.completed).length;
-    return Math.min(100, Math.round((completed / workSessionsToday.length) * 100));
+    return Math.min(
+      100,
+      Math.round((completed / workSessionsToday.length) * 100),
+    );
   }, [todaySessions]);
 
   // Real Subject Distribution
-  const subjectDistribution = useMemo(() => {
-    const map = new Map<string, number>();
-
-    // Combine all available session sources to ensure no data is missed
-    const sessionMap = new Map<string, Session>();
-    weeklySessions?.forEach((s) => sessionMap.set(s.id, s));
-    todaySessions?.forEach((s) => sessionMap.set(s.id, s));
-    recentSessions?.forEach((s) => sessionMap.set(s.id, s));
-
-    const allSessions = Array.from(sessionMap.values());
-    const workSessions = allSessions.filter(
-      (s) => s.type !== "BREAK" && s.type !== "LONG_BREAK"
-    );
-
-    for (const s of workSessions) {
-      const key = s.subject && s.subject.trim() !== "" ? s.subject.trim() : "General Study";
-      map.set(key, (map.get(key) || 0) + (s.durationMin || 0));
-    }
-
-    const totalMins = Array.from(map.values()).reduce((a, b) => a + b, 0);
-
-    if (totalMins === 0) {
-      return {
-        totalHoursStr: "0h",
-        items: [
-          { name: "No sessions logged", pct: 100, hoursStr: "0h", color: "#2d3342" },
-        ],
-      };
-    }
-
-    const palette = ["#6c47ff", "#38dfab", "#cebdff", "#f59e0b", "#ef4444", "#3b82f6"];
-    const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-
-    const items = sorted.map(([name, mins], idx) => {
-      const pct = Math.max(1, Math.round((mins / totalMins) * 100));
-      const h = (mins / 60).toFixed(1);
-      return {
-        name,
-        pct,
-        hoursStr: `${h}h`,
-        color: palette[idx % palette.length],
-      };
-    });
-
-    const totalH = (totalMins / 60).toFixed(1);
-
-    return {
-      totalHoursStr: `${totalH}h`,
-      items,
-    };
-  }, [weeklySessions, todaySessions, recentSessions]);
+  const subjectDistribution = useMemo(
+    () => computeSubjectDistribution(allSessionsCombined),
+    [allSessionsCombined],
+  );
 
   // Real Heatmap (Study Intensity) for last 28 days
   const heatmapData = useMemo(() => {
@@ -240,104 +153,13 @@ export default function DashboardContent() {
     }
   }, [tasks]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("upgraded") !== "1") return;
-
-    const toastId = toast.loading("Applying your Pro upgrade…", {
-      duration: Infinity,
-    });
-
-    let attempts = 0;
-    const maxAttempts = 15;
-    const interval = window.setInterval(async () => {
-      attempts += 1;
-      let isPremium = false;
-      try {
-        const res = await fetch("/api/billing/status");
-        const data = await res.json();
-        isPremium = data.isPremium === true;
-      } catch {
-        // keep polling, ignore transient errors
-      }
-
-      if (isPremium || attempts >= maxAttempts) {
-        window.clearInterval(interval);
-        if (isPremium) {
-          toast.success("You're on Pro. Welcome aboard!", { id: toastId });
-        } else {
-          toast.info(
-            "Upgrade received — Pro perks can take up to a minute to activate.",
-            { id: toastId }
-          );
-        }
-        window.location.href = "/dashboard/me";
-      }
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    async function fetchAll() {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          fetch("/api/recent_sessions?limit=1000")
-            .then((r) => r.json())
-            .then((d) => {
-              if (d.sessions) setRecentSessions(d.sessions);
-            })
-            .catch(console.error),
-
-          fetch(`/api/sessions_period?period=today&timezone=${encodeURIComponent(tz)}`)
-            .then((r) => r.json())
-            .then((d) => {
-              if (d.success && d.data) {
-                setTodaySessions(d.data.sessions || []);
-                setTodayMinutes(d.data.totalMinutes || 0);
-                const workCount = (d.data.sessions || []).filter(
-                  (s: Session) => s.type === "WORK"
-                ).length;
-                setSessionsCountToday(workCount);
-              }
-            })
-            .catch(console.error),
-
-          fetch("/api/get_time")
-            .then((r) => r.json())
-            .then((d) => {
-              if (typeof d.totalMinutes === "number") {
-                setTotalMinutes(d.totalMinutes);
-              }
-            })
-            .catch(console.error),
-
-          fetch(`/api/avarge?timezone=${encodeURIComponent(tz)}`)
-            .then((r) => r.json())
-            .then((d) => {
-              if (Array.isArray(d)) setWeeklySessions(d);
-              else if (d.message && Array.isArray(d.message))
-                setWeeklySessions(d.message);
-            })
-            .catch(console.error),
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchAll();
-  }, []);
-
   const handleStartFocus = () => {
     router.push("/dashboard/timer?autostart=true");
   };
 
   const toggleTask = (id: string) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
     );
   };
 
@@ -374,7 +196,8 @@ export default function DashboardContent() {
             <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200/90">
               <Info className="h-4 w-4 shrink-0 text-amber-400" />
               <p className="text-xs font-medium">
-                Focurio is still in development — you may run into bugs or unfinished features.
+                Focurio is still in development — you may run into bugs or
+                unfinished features.
               </p>
             </div>
 
@@ -465,7 +288,9 @@ export default function DashboardContent() {
                   <Flame className="text-[#6c47ff] h-4 w-4 fill-[#6c47ff]/20" />
                 </div>
                 <div className="text-2xl font-bold text-[#6c47ff] font-sora z-10">
-                  {isLoading ? "..." : `${streak} ${streak === 1 ? "Day" : "Days"}`}
+                  {isLoading
+                    ? "..."
+                    : `${streak} ${streak === 1 ? "Day" : "Days"}`}
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
@@ -611,7 +436,10 @@ export default function DashboardContent() {
                   </div>
                   <div className="flex items-center justify-between my-auto">
                     <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
-                      <svg className="transform -rotate-90 w-full h-full" viewBox="0 0 160 160">
+                      <svg
+                        className="transform -rotate-90 w-full h-full"
+                        viewBox="0 0 160 160"
+                      >
                         <circle
                           cx="80"
                           cy="80"
@@ -647,7 +475,9 @@ export default function DashboardContent() {
                         <span className="text-xl font-extrabold text-white">
                           {subjectDistribution.totalHoursStr}
                         </span>
-                        <span className="text-[10px] text-white/40 uppercase font-semibold">All Time</span>
+                        <span className="text-[10px] text-white/40 uppercase font-semibold">
+                          All Time
+                        </span>
                       </div>
                     </div>
 
@@ -662,7 +492,9 @@ export default function DashboardContent() {
                               className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: sub.color }}
                             />
-                            <span className="text-white truncate">{sub.name}</span>
+                            <span className="text-white truncate">
+                              {sub.name}
+                            </span>
                           </div>
                           <span className="text-white/40 font-medium shrink-0 ml-2">
                             {sub.pct}% ({sub.hoursStr})
@@ -762,9 +594,23 @@ export default function DashboardContent() {
                     viewBox="0 0 400 150"
                   >
                     <defs>
-                      <linearGradient id="trendGrad" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#38dfab" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#38dfab" stopOpacity="0" />
+                      <linearGradient
+                        id="trendGrad"
+                        x1="0"
+                        x2="0"
+                        y1="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#38dfab"
+                          stopOpacity="0.3"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#38dfab"
+                          stopOpacity="0"
+                        />
                       </linearGradient>
                     </defs>
                     <path
