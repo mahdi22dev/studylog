@@ -31,7 +31,7 @@ export function Faq() {
               FAQ
             </span>
           </div>
-          <h3 className="font-heading text-2xl md:text-3xl font-bold text-white">
+          <h3 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
             Frequently Asked Questions
           </h3>
         </div>
@@ -43,7 +43,7 @@ export function Faq() {
               onClick={() => setOpenFaq(openFaq === i ? null : i)}
             >
               <div className="flex justify-between items-center">
-                <h4 className="text-base font-semibold text-white">{faq.q}</h4>
+                <h4 className="text-base font-semibold text-foreground">{faq.q}</h4>
                 <ChevronDown
                   className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${
                     openFaq === i ? "rotate-180 text-secondary" : ""

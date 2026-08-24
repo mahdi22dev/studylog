@@ -2,20 +2,26 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 import {
   TrendingUp,
   Minus,
   Flame,
-  RotateCcw,
-  Play,
-  Square,
   Plus,
   Check,
   GripVertical,
   Info,
+  BarChart3,
+  BookOpen,
+  Calculator,
+  Library,
+  Crown,
+  ArrowRight,
+  Clock,
+  ChevronRight,
+  Zap,
 } from "lucide-react";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { useSessionsData } from "@/hooks/use-sessions-data";
 import {
@@ -25,9 +31,13 @@ import {
   formatTime,
   mergeSessions,
 } from "@/lib/utils";
+import { GENERAL_STUDY } from "@/lib/constants";
 
 export default function DashboardContent() {
   const router = useRouter();
+  const { user } = useUser();
+  const role = (user?.publicMetadata as { role?: string } | null)?.role;
+  const isPremium = role === "premium" || role === "admin";
 
   const {
     recentSessions,
@@ -39,11 +49,9 @@ export default function DashboardContent() {
     isLoading,
   } = useSessionsData();
 
-  // Active Session Title from localStorage or default
   const [currentSubjectName, setCurrentSubjectName] =
     useState("Normal session");
 
-  // Tasks state with localStorage persistence
   const [tasks, setTasks] = useState<
     { id: string; title: string; subtitle?: string; done: boolean }[]
   >(() => {
@@ -59,19 +67,19 @@ export default function DashboardContent() {
       {
         id: "1",
         title: "Complete Chapter 4 Exercises",
-        subtitle: "Physics â€¢ Est. 45m",
+        subtitle: "Physics • Est. 45m",
         done: false,
       },
       {
         id: "2",
         title: "Review Calculus Notes",
-        subtitle: "Calculus â€¢ Est. 30m",
+        subtitle: "Calculus • Est. 30m",
         done: false,
       },
       {
         id: "3",
         title: "Read CS Paper",
-        subtitle: "Comp Sci â€¢ Est. 20m",
+        subtitle: "Comp Sci • Est. 20m",
         done: true,
       },
     ];
@@ -90,10 +98,9 @@ export default function DashboardContent() {
     [allSessionsCombined],
   );
 
-  // Real Focus Score calculation
   const focusScore = useMemo(() => {
     const workSessionsToday = todaySessions.filter((s) => s.type === "WORK");
-    if (workSessionsToday.length === 0) return 92; // default visual baseline
+    if (workSessionsToday.length === 0) return 92;
     const completed = workSessionsToday.filter((s) => s.completed).length;
     return Math.min(
       100,
@@ -101,13 +108,11 @@ export default function DashboardContent() {
     );
   }, [todaySessions]);
 
-  // Real Subject Distribution
   const subjectDistribution = useMemo(
     () => computeSubjectDistribution(allSessionsCombined),
     [allSessionsCombined],
   );
 
-  // Real Heatmap (Study Intensity) for last 28 days
   const heatmapData = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of weeklySessions) {
@@ -116,28 +121,164 @@ export default function DashboardContent() {
         map.set(d, (map.get(d) || 0) + (s.durationMin || 0));
       }
     }
-
     const tiles = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     for (let i = 27; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       const mins = map.get(key) || 0;
-
       let level = 0;
       if (mins > 0 && mins < 30) level = 1;
       else if (mins >= 30 && mins < 60) level = 2;
       else if (mins >= 60 && mins < 120) level = 3;
       else if (mins >= 120 && mins < 180) level = 4;
       else if (mins >= 180) level = 5;
-
       tiles.push(level);
     }
     return tiles;
   }, [weeklySessions]);
+
+  // ── Focus Intensity weekly data ──
+  const focusIntensity = useMemo(() => {
+    const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
+    const now = new Date();
+    const todayIdx = now.getDay(); // 0 Sun
+    // start of this week (Sunday)
+    const startOfWeek = new Date(now);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(now.getDate() - todayIdx);
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfWeek.getDate() - 7);
+
+    const toKey = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    const dailyMap = new Map<string, number>();
+    for (const s of allSessionsCombined) {
+      if (s.type === "WORK" || s.type === "WORK".toLowerCase()) {
+        // also count any work session
+      }
+      if (s.type !== "WORK" && s.type !== "BREAK" && s.type !== "LONG_BREAK") {
+        // still count if no type? filter only WORK ideally
+        if (s.type !== "WORK") continue;
+      }
+      // Strict: only WORK
+      if (s.type !== "WORK") continue;
+      const d = new Date(s.startTime);
+      const k = toKey(d);
+      dailyMap.set(k, (dailyMap.get(k) || 0) + (s.durationMin || 0));
+    }
+    // fallback: if we filtered too strictly and have no data, count all non-break
+    if (dailyMap.size === 0) {
+      for (const s of allSessionsCombined) {
+        if (s.type === "BREAK" || s.type === "LONG_BREAK") continue;
+        const d = new Date(s.startTime);
+        const k = toKey(d);
+        dailyMap.set(k, (dailyMap.get(k) || 0) + (s.durationMin || 0));
+      }
+    }
+
+    const thisWeekDaily: number[] = [];
+    const lastWeekDaily: number[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
+      thisWeekDaily.push(dailyMap.get(toKey(d)) || 0);
+      const ld = new Date(startOfLastWeek);
+      ld.setDate(startOfLastWeek.getDate() + i);
+      lastWeekDaily.push(dailyMap.get(toKey(ld)) || 0);
+    }
+
+    const thisWeekTotal = thisWeekDaily.reduce((a, b) => a + b, 0);
+    const lastWeekTotal = lastWeekDaily.reduce((a, b) => a + b, 0);
+
+    let pctChange = 0;
+    if (lastWeekTotal === 0) {
+      pctChange = thisWeekTotal > 0 ? 100 : 0;
+    } else {
+      pctChange = Math.round(
+        ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100,
+      );
+    }
+
+    const maxMins = Math.max(...thisWeekDaily, 30);
+
+    return {
+      dayLabels,
+      thisWeekDaily,
+      todayIdx,
+      thisWeekTotal,
+      lastWeekTotal,
+      pctChange,
+      maxMins,
+    };
+  }, [allSessionsCombined]);
+
+  // ── Recent Subjects (unique by subject, most recent first) ──
+  const recentSubjects = useMemo(() => {
+    const map = new Map<string, (typeof recentSessions)[number]>();
+    const sorted = [...recentSessions].sort(
+      (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
+    );
+    for (const s of sorted) {
+      const subj = (s.subject && s.subject.trim()) || GENERAL_STUDY;
+      if (!map.has(subj)) map.set(subj, s);
+      if (map.size >= 3) break;
+    }
+    return Array.from(map.entries()).map(([subject, session]) => {
+      const lower = subject.toLowerCase();
+      let icon: typeof BookOpen = BookOpen;
+      let iconBg = "bg-muted";
+      let iconColor = "text-muted-foreground";
+      if (lower.includes("phys")) {
+        icon = BookOpen;
+        iconBg = "bg-secondary/15";
+        iconColor = "text-secondary";
+      } else if (lower.includes("calc") || lower.includes("math")) {
+        icon = Calculator;
+        iconBg = "bg-primary/10";
+        iconColor = "text-primary";
+      } else if (lower.includes("liter") || lower.includes("history") || lower.includes("english")) {
+        icon = Library;
+        iconBg = "bg-success/10";
+        iconColor = "text-success";
+      } else if (lower.includes("code") || lower.includes("cs") || lower.includes("comp")) {
+        icon = Zap;
+        iconBg = "bg-secondary/15";
+        iconColor = "text-secondary";
+      }
+
+      // status heuristic
+      let status: "Active" | "Paused" | "Completed" = "Completed";
+      let statusClass = "bg-success/15 text-success border-success/20";
+      if (!session.completed) {
+        status = "Active";
+        statusClass = "bg-primary/10 text-primary border-primary/20";
+      } else if ((session.durationMin || 0) < 25) {
+        // short completed could be paused? keep Completed for simplicity
+        status = "Completed";
+      }
+
+      // randomize a tag for demo if none
+      const tags: string[] = [];
+      if (subject.toLowerCase().includes("phys")) tags.push("Deep Focus", "Morning");
+      else if (subject.toLowerCase().includes("calc")) tags.push("Problem Set");
+      else tags.push("Reading");
+
+      return {
+        subject,
+        durationMin: session.durationMin || 25,
+        icon,
+        iconBg,
+        iconColor,
+        status,
+        statusClass,
+        tags,
+      };
+    });
+  }, [recentSessions]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -170,7 +311,7 @@ export default function DashboardContent() {
       {
         id: String(Date.now()),
         title: newTaskTitle.trim(),
-        subtitle: `${currentSubjectName} â€¢ Est. 25m`,
+        subtitle: `${currentSubjectName} • Est. 25m`,
         done: false,
       },
     ]);
@@ -180,27 +321,19 @@ export default function DashboardContent() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-sans">
-      {/* Sidebar */}
-      <DashboardSidebar />
-
-      {/* Main Content Wrapper */}
-      <div className="flex-1 md:ml-64 flex flex-col relative min-h-screen">
-        {/* TopAppBar */}
+      <div className="flex-1 flex flex-col relative min-h-screen">
         <DashboardTopbar />
 
-        {/* Scrollable Canvas */}
-        <main className="flex-1 pt-24 px-6 md:px-10 pb-10">
-          <div className="max-w-6xl mx-auto space-y-8">
-            {/* In-development notice */}
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200/90">
-              <Info className="h-4 w-4 shrink-0 text-amber-400" />
-              <p className="text-xs font-medium">
-                Focurio is still in development â€” you may run into bugs or
+        <main className="flex-1 pt-20 px-6 md:px-10 pb-10">
+          <div className="max-w-[1440px] mx-auto space-y-8">
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-card border border-border">
+              <Info className="h-4 w-4 shrink-0 text-primary" />
+              <p className="text-xs font-medium text-muted-foreground">
+                Focurio is still in development — you may run into bugs or
                 unfinished features.
               </p>
             </div>
 
-            {/* Page Title */}
             <div>
               <h2 className="text-3xl font-extrabold text-foreground font-sora tracking-tight">
                 Overview
@@ -212,7 +345,6 @@ export default function DashboardContent() {
 
             {/* Top Row: Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Metric 1: Deep Work */}
               <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -235,7 +367,6 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              {/* Metric 2: Focus Score */}
               <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -258,7 +389,6 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              {/* Metric 3: Sessions */}
               <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border">
                 <div className="flex justify-between items-start z-10">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -281,7 +411,6 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              {/* Metric 4: Streak */}
               <div className="bg-card p-6 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-primary/30 transition-all border border-border glow-primary">
                 <div className="flex justify-between items-start z-10">
                   <span className="text-xs font-semibold text-primary uppercase tracking-wider">
@@ -307,216 +436,369 @@ export default function DashboardContent() {
               </div>
             </div>
 
-            {/* Middle Row: Active Timer Widget & Distribution */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Active Timer */}
-              <div className="lg:col-span-7 flex flex-col">
-                <div className="bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden h-full min-h-[420px]">
-                  {/* Background Glow */}
-                  <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
-
-                  <h3 className="text-xl font-semibold text-card-foreground mb-2 relative z-10 font-sora">
-                    {currentSubjectName}
-                  </h3>
-                  <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-3.5 py-1 rounded-full text-xs font-semibold mb-8 relative z-10 border border-primary/30">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    Deep Work
-                  </div>
-
-                  {/* Circular Timer Display */}
-                  <div className="relative w-64 h-64 mb-8 flex items-center justify-center z-10">
-                    <svg
-                      className="w-full h-full transform -rotate-90"
-                      viewBox="0 0 100 100"
-                    >
-                      <circle
-                        className="text-border"
-                        cx="50"
-                        cy="50"
-                        fill="none"
-                        r="45"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                      />
-                      <circle
-                        className="text-primary"
-                        cx="50"
-                        cy="50"
-                        fill="none"
-                        r="45"
-                        stroke="currentColor"
-                        strokeDasharray="283"
-                        strokeDashoffset="85"
-                        strokeLinecap="round"
-                        strokeWidth="4"
-                        style={{
-                          filter:
-                            "drop-shadow(0 0 12px hsl(var(--primary) / 0.6))",
-                        }}
-                      />
-                    </svg>
-                    <div className="absolute flex items-baseline justify-center font-sora">
-                      <span className="text-6xl font-extrabold text-card-foreground tracking-tight">
-                        25
-                      </span>
-                      <span className="text-3xl font-semibold text-muted-foreground ml-1">
-                        :00
-                      </span>
+            {/* ── Bento Grid (Stitch) ── */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-min">
+              {/* Focus Intensity — 8 cols */}
+              <div className="md:col-span-8 bg-card border border-border rounded-xl p-8 flex flex-col gap-6 min-h-[400px]">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-primary">
+                        <BarChart3 className="h-5 w-5" />
+                      </div>
+                      <h2 className="font-sora text-lg font-semibold text-foreground">
+                        Focus Intensity
+                      </h2>
                     </div>
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                      Track changes in focus time and access detailed data on
+                      each study session
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 bg-muted px-4 py-2 rounded-full text-sm font-medium text-foreground border border-border">
+                    Week
+                    <ChevronRight className="h-4 w-4 rotate-90 text-muted-foreground" />
+                  </div>
+                </div>
+
+                <div className="flex-grow flex items-end justify-between relative mt-2 pb-12">
+                  <div className="absolute left-0 bottom-12">
+                    <div className="font-sora text-[48px] font-extrabold tracking-tight text-foreground leading-none mb-1">
+                      {focusIntensity.pctChange > 0 ? `+${focusIntensity.pctChange}%` : `${focusIntensity.pctChange}%`}
+                    </div>
+                    <p className="text-sm text-muted-foreground max-w-[140px] leading-snug">
+                      This week&apos;s focus is {focusIntensity.pctChange >= 0 ? "higher" : "lower"} than last week&apos;s
+                    </p>
                   </div>
 
-                  {/* Controls */}
-                  <div className="flex items-center gap-4 relative z-10">
-                    <button
-                      onClick={handleStartFocus}
-                      className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                      title="Reset Timer"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </button>
-
-                    <button
-                      onClick={handleStartFocus}
-                      className="px-8 py-3 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all flex items-center gap-2 glow-primary-lg"
-                    >
-                      <Play className="h-4 w-4 fill-current" />
-                      Start Focus
-                    </button>
-
-                    <button
-                      onClick={handleStartFocus}
-                      className="w-12 h-12 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                      title="Stop Timer"
-                    >
-                      <Square className="h-4 w-4 fill-current" />
-                    </button>
+                  <div className="w-full h-48 flex items-end justify-end gap-2 md:gap-3 pr-2">
+                    {focusIntensity.dayLabels.map((label, idx) => {
+                      const mins = focusIntensity.thisWeekDaily[idx] ?? 0;
+                      const isToday = idx === focusIntensity.todayIdx;
+                      const hPct = focusIntensity.maxMins > 0
+                        ? Math.max(12, (mins / focusIntensity.maxMins) * 85)
+                        : 12;
+                      return (
+                        <div
+                          key={idx}
+                          className="flex flex-col items-center gap-2 group h-full justify-end w-10 md:w-12 relative"
+                        >
+                          {isToday && mins > 0 && (
+                            <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-popover border border-border text-foreground text-xs font-semibold px-2.5 py-1 rounded-lg whitespace-nowrap shadow-md">
+                              {formatMinutes(mins)}
+                            </div>
+                          )}
+                          {isToday && (
+                            <div className="w-12 h-full bg-primary/10 rounded-t-full absolute bottom-10 left-1/2 -translate-x-1/2 pointer-events-none" />
+                          )}
+                          <div
+                            className={`w-2 rounded-full transition-colors relative ${isToday ? "bg-primary" : "bg-muted group-hover:bg-primary/60"}`}
+                            style={{ height: `${hPct}%` }}
+                          >
+                            <div
+                              className={`absolute -top-3 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary ${isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"} transition-opacity`}
+                            />
+                          </div>
+                          <span
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${isToday ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground"}`}
+                          >
+                            {label}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Heat Map & Donut Chart */}
-              <div className="lg:col-span-5 flex flex-col gap-6">
-                {/* Study Intensity (Heatmap) */}
-                <div className="bg-card border border-border rounded-2xl p-6 flex-1 flex flex-col justify-between">
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                    Study Intensity
-                  </h4>
-                  <div className="grid grid-cols-7 gap-1.5 my-auto">
-                    {heatmapData.map((val, idx) => {
-                      const colors = [
-                        "bg-muted",
-                        "bg-primary/20",
-                        "bg-primary/40",
-                        "bg-primary/60",
-                        "bg-primary/80",
-                        "bg-primary",
-                      ];
-                      return (
-                        <div
-                          key={idx}
-                          className={`h-7 w-full rounded-sm ${colors[val]} transition-colors`}
-                        />
-                      );
-                    })}
-                  </div>
-                  <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
-                    <span>Less</span>
-                    <div className="flex gap-1">
-                      <div className="w-3 h-3 rounded-sm bg-muted" />
-                      <div className="w-3 h-3 rounded-sm bg-primary/40" />
-                      <div className="w-3 h-3 rounded-sm bg-primary/80" />
-                      <div className="w-3 h-3 rounded-sm bg-primary" />
+              {/* Your Recent Subjects — 4 cols */}
+              <div className="md:col-span-4 bg-card border border-border rounded-xl p-6 flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-sora text-base font-semibold text-foreground">
+                    Your Recent Subjects
+                  </h3>
+                  <Link
+                    href="/notes"
+                    className="text-muted-foreground hover:text-primary text-xs font-medium border-b border-border pb-0.5 transition-colors"
+                  >
+                    See all
+                  </Link>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="p-4 rounded-lg bg-muted border border-border animate-pulse h-[88px]"
+                      />
+                    ))
+                  ) : recentSubjects.length === 0 ? (
+                    <div className="p-6 rounded-lg bg-muted border border-border text-center">
+                      <p className="text-sm text-muted-foreground">
+                        No sessions yet. Start a focus session to see subjects here.
+                      </p>
+                      <button
+                        onClick={handleStartFocus}
+                        className="mt-3 text-xs font-semibold text-primary hover:underline"
+                      >
+                        Start Focus →
+                      </button>
                     </div>
-                    <span>More</span>
+                  ) : (
+                    recentSubjects.map((item) => (
+                      <div
+                        key={item.subject}
+                        className="p-4 rounded-lg bg-muted border border-border hover:bg-accent transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center ${item.iconBg} ${item.iconColor}`}
+                            >
+                              <item.icon className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-semibold text-foreground">
+                                {item.subject}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {item.durationMin}m session
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium border ${item.statusClass}`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        {item.tags.length > 0 && (
+                          <div className="flex gap-2">
+                            {item.tags.map((t) => (
+                              <span
+                                key={t}
+                                className="bg-card px-3 py-1 rounded-full text-[11px] font-medium text-muted-foreground border border-border"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Unlock Premium / Pro Momentum — 6 cols (was 4, expanded since Study Buddies skipped) */}
+              {isPremium ? (
+                <div className="md:col-span-6 bg-card border border-primary/30 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[260px] glow-active">
+                  <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
+                    <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle at 80% 100%, hsl(var(--primary)) 0%, transparent 55%)` }} />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="inline-flex items-center gap-1.5 bg-success/15 text-success px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border border-success/20 mb-3">
+                      <Crown className="h-3 w-3" />
+                      Pro Active
+                    </div>
+                    <h3 className="font-sora text-lg font-bold text-foreground mb-1">
+                      Your momentum is strong
+                    </h3>
+                    <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
+                      Unlimited history, advanced analytics & streak insights — all unlocked.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3 mt-5">
+                      <div className="bg-muted rounded-xl p-3 text-center border border-border">
+                        <div className="text-lg font-extrabold text-primary font-sora">{streak}</div>
+                        <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Day streak</div>
+                      </div>
+                      <div className="bg-muted rounded-xl p-3 text-center border border-border">
+                        <div className="text-lg font-extrabold text-foreground font-sora">{subjectDistribution.totalHoursStr}</div>
+                        <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Total focus</div>
+                      </div>
+                      <div className="bg-muted rounded-xl p-3 text-center border border-border">
+                        <div className="text-lg font-extrabold text-success font-sora">{todaySessions.filter((s) => s.type === "WORK").length}</div>
+                        <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Today</div>
+                      </div>
+                    </div>
+                  </div>
+                  <Link
+                    href="/analytics"
+                    className="relative z-10 mt-6 w-full bg-primary text-primary-foreground text-sm font-semibold py-3 px-4 rounded-full flex items-center justify-between hover:bg-primary/90 transition-colors glow-primary"
+                  >
+                    View advanced analytics
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="md:col-span-6 bg-card border border-border rounded-xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[260px]">
+                  <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle at 100% 100%, hsl(var(--primary)) 0%, transparent 60%)` }} />
+                    <svg className="absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none" viewBox="0 0 100 100">
+                      <pattern height="10" id="dots-premium" patternUnits="userSpaceOnUse" width="10">
+                        <circle cx="2" cy="2" fill="hsl(var(--primary))" r="1" />
+                      </pattern>
+                      <rect fill="url(#dots-premium)" height="100%" width="100%" />
+                    </svg>
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="font-sora text-lg font-semibold text-foreground mb-2">
+                      Unlock Premium Features
+                    </h3>
+                    <p className="text-sm text-muted-foreground max-w-[240px] leading-relaxed">
+                      Get access to exclusive benefits and expand your focus capabilities
+                    </p>
+                  </div>
+                  <Link
+                    href="/#pricing"
+                    className="relative z-10 w-full mt-6 bg-primary text-primary-foreground text-sm font-semibold py-3 px-4 rounded-full flex items-center justify-between hover:bg-primary/90 transition-colors glow-primary"
+                  >
+                    Upgrade now
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+
+              {/* Subject Distribution — 6 cols */}
+              <div className="md:col-span-6 bg-card border border-border rounded-xl p-6 flex flex-col min-h-[260px]">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-sora text-base font-semibold text-foreground">
+                    Subject Distribution
+                  </h3>
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                    <span className="text-sm leading-none">⋮</span>
                   </div>
                 </div>
 
-                {/* Subject Distribution (Donut Chart) */}
-                <div className="bg-card border border-border rounded-2xl p-6 flex-1 flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Subject Distribution
-                    </h4>
-                    <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
-                      Recent & All-Time
-                    </span>
+                {subjectDistribution.items.length === 0 || subjectDistribution.totalHoursStr === "0h" ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-24 h-24 rounded-full border-4 border-muted flex items-center justify-center mb-3">
+                      <Clock className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">No distribution yet</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Start studying to see breakdown</p>
                   </div>
-                  <div className="flex items-center justify-between my-auto">
-                    <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
-                      <svg
-                        className="transform -rotate-90 w-full h-full"
-                        viewBox="0 0 160 160"
-                      >
-                        <circle
-                          cx="80"
-                          cy="80"
-                          fill="transparent"
-                          r="70"
-                          stroke="hsl(var(--muted))"
-                          strokeWidth="18"
-                        />
-                        {subjectDistribution.items.map((sub, idx) => {
-                          const prevPct = subjectDistribution.items
-                            .slice(0, idx)
-                            .reduce((acc, curr) => acc + curr.pct, 0);
-                          return (
-                            <circle
-                              key={sub.name}
-                              cx="80"
-                              cy="80"
-                              fill="transparent"
-                              r="70"
-                              stroke={sub.color}
-                              strokeDasharray="439.8"
-                              strokeDashoffset={439.8 - (439.8 * sub.pct) / 100}
-                              strokeWidth="18"
-                              style={{
-                                transform: `rotate(${(prevPct / 100) * 360}deg)`,
-                                transformOrigin: "center",
-                              }}
-                            />
-                          );
-                        })}
+                ) : (
+                  <>
+                    <div className="flex-1 flex items-center justify-center relative py-2">
+                      <svg className="w-36 h-36 -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="hsl(var(--muted))" strokeWidth="3.2" />
+                        {(() => {
+                          let offset = 0;
+                          return subjectDistribution.items.slice(0, 5).map((item) => {
+                            const dash = `${item.pct} ${100 - item.pct}`;
+                            const el = (
+                              <circle
+                                key={item.name}
+                                cx="18"
+                                cy="18"
+                                fill="transparent"
+                                r="15.915"
+                                stroke={item.color}
+                                strokeWidth="3.2"
+                                strokeDasharray={dash}
+                                strokeDashoffset={String(-offset)}
+                                strokeLinecap="round"
+                              />
+                            );
+                            offset += item.pct;
+                            return el;
+                          });
+                        })()}
                       </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center font-sora pointer-events-none">
-                        <span className="text-xl font-extrabold text-card-foreground">
-                          {subjectDistribution.totalHoursStr}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="font-sora text-lg font-extrabold text-foreground">
+                          100%
                         </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold">
-                          All Time
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Total
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 flex-1 ml-6 max-h-32 overflow-y-auto pr-1">
-                      {subjectDistribution.items.map((sub) => (
-                        <div
-                          key={sub.name}
-                          className="flex items-center justify-between text-xs"
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div
-                              className="w-2.5 h-2.5 rounded-full shrink-0"
-                              style={{ backgroundColor: sub.color }}
-                            />
-                            <span className="text-card-foreground truncate">
-                              {sub.name}
-                            </span>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {subjectDistribution.items.slice(0, 3).map((item) => (
+                        <div key={item.name} className="flex flex-col items-center text-center">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                            <span className="text-xs font-medium text-foreground truncate max-w-[60px]">{item.name}</span>
                           </div>
-                          <span className="text-muted-foreground font-medium shrink-0 ml-2">
-                            {sub.pct}% ({sub.hoursStr})
-                          </span>
+                          <span className="text-sm font-semibold text-muted-foreground">{item.pct}%</span>
                         </div>
                       ))}
                     </div>
+                    {subjectDistribution.items.length > 3 && (
+                      <p className="text-center text-xs text-muted-foreground mt-2">
+                        +{subjectDistribution.items.length - 3} more subjects
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Study Intensity & Progress */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                  Study Intensity
+                </h4>
+                <div className="grid grid-cols-7 gap-1.5 my-auto">
+                  {heatmapData.map((val, idx) => {
+                    const colors = [
+                      "bg-muted",
+                      "bg-primary/20",
+                      "bg-primary/40",
+                      "bg-primary/60",
+                      "bg-primary/80",
+                      "bg-primary",
+                    ];
+                    return (
+                      <div
+                        key={idx}
+                        className={`h-7 w-full rounded-sm ${colors[val]} transition-colors`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
+                  <span>Less</span>
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 rounded-sm bg-muted" />
+                    <div className="w-3 h-3 rounded-sm bg-primary/40" />
+                    <div className="w-3 h-3 rounded-sm bg-primary/80" />
+                    <div className="w-3 h-3 rounded-sm bg-primary" />
                   </div>
+                  <span>More</span>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-center">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  Today&apos;s Progress
+                </h4>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-extrabold text-foreground font-sora">
+                    {isLoading ? "—" : formatMinutes(todayMinutes)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    / {isLoading ? "—" : formatMinutes(totalMinutes)} total
+                  </span>
+                </div>
+                <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{
+                      width: `${Math.min(100, totalMinutes > 0 ? (todayMinutes / Math.max(totalMinutes, 1)) * 100 : 0)}%`,
+                    }}
+                  />
                 </div>
               </div>
             </div>
 
             {/* Bottom Row: Tasks & Line Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Up Next / Tasks Card */}
               <div className="bg-card border border-border rounded-2xl p-6 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-lg font-bold text-card-foreground font-sora">
@@ -591,7 +873,6 @@ export default function DashboardContent() {
                 </div>
               </div>
 
-              {/* Performance Trends (14 Days) Line Chart */}
               <div className="bg-card border border-border rounded-2xl p-6 flex flex-col relative overflow-hidden">
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
                   Performance Trends (14 Days)

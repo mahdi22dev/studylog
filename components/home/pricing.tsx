@@ -55,7 +55,7 @@ export function Pricing() {
             onClick={() => setBillingCycle("annual")}
             className={`relative z-10 text-sm font-semibold px-6 py-2.5 rounded-full transition-all duration-300 ${
               billingCycle === "annual"
-                ? "bg-primary text-white shadow-md"
+                ? "bg-primary text-primary-foreground shadow-md"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -68,7 +68,7 @@ export function Pricing() {
             onClick={() => setBillingCycle("monthly")}
             className={`relative z-10 text-sm font-semibold px-6 py-2.5 rounded-full transition-all duration-300 ${
               billingCycle === "monthly"
-                ? "bg-primary text-white shadow-md"
+                ? "bg-primary text-primary-foreground shadow-md"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -143,7 +143,7 @@ export function Pricing() {
           </p>
           <Link
             href="/sign-up"
-            className="w-full text-center text-sm font-semibold bg-primary text-white py-3 rounded-full hover:bg-primary/90 transition-all shadow-md mb-8"
+            className="w-full text-center text-sm font-semibold bg-primary text-primary-foreground py-3 rounded-full hover:bg-primary/90 transition-all shadow-md mb-8"
           >
             {billingCycle === "annual"
               ? "Start Pro — $40/year"
@@ -175,7 +175,7 @@ export function Pricing() {
       <div className="max-w-4xl mx-auto">
         <div className="glass-card rounded-2xl p-10 text-center relative overflow-hidden glow-active border border-primary/30 bg-gradient-to-r from-primary/10 via-muted to-success/10">
           <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center">
-            <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold tracking-tight mb-3 text-foreground">
               Ready to study with intention?
             </h2>
             <p className="text-base text-muted-foreground mb-8">
@@ -183,7 +183,7 @@ export function Pricing() {
             </p>
             <Link
               href="/sign-up"
-              className="bg-primary text-white px-9 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25"
+              className="bg-primary text-primary-foreground px-9 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25"
             >
               Get Started Now — It&apos;s Free
             </Link>

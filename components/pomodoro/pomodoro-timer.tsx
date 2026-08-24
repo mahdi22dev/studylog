@@ -281,9 +281,6 @@ export default function PomodoroTimer({
       )}
       ref={boxRef}
     >
-      {/* Background Radial Glow */}
-      <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
-
       {/* Top Header Pill with Settings */}
       <div className="flex items-center gap-2 mb-6 bg-muted py-1.5 px-4 rounded-full border border-border z-10">
         <Timer className="h-4 w-4 text-primary" />
@@ -386,7 +383,7 @@ export default function PomodoroTimer({
       {/* Circular Progress Timer */}
       <div className="relative flex justify-center items-center w-64 h-64 mb-8 z-10">
         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" fill="none" r="45" stroke="hsl(var(--muted))" strokeWidth="4" />
+          <circle cx="50" cy="50" fill="none" r="45" stroke="hsl(var(--secondary) / 0.2)" strokeWidth="4" />
           <circle
             className="transition-all duration-1000"
             cx="50"

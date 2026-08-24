@@ -421,7 +421,7 @@ export default function StudyHistory() {
 
         {/* Blurred Paywall Overlay / Upgrade Call to Action (free plan only) */}
         {!isPremium && (
-          <div className="relative border-t border-border/50 bg-gradient-to-b from-[#111827]/40 to-[#0d121f] p-8 text-center flex flex-col items-center justify-center overflow-hidden">
+          <div className="relative border-t border-border/50 bg-gradient-to-b from-popover/40 to-muted p-8 text-center flex flex-col items-center justify-center overflow-hidden">
             {/* Background Blurred Row Mockups */}
             <div className="absolute inset-0 filter blur-[6px] opacity-20 pointer-events-none flex flex-col gap-3 p-6 select-none">
               <div className="h-8 bg-white/20 rounded-lg w-full" />

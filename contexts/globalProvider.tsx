@@ -6,7 +6,7 @@ import { SettingsDialogProvider } from "./settingsDialogContext";
 export function GlobalProvider({ children }: { children: React.ReactNode }) {
   return (
     <SettingsDialogProvider>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider defaultTheme="dark">{children}</ThemeProvider>
     </SettingsDialogProvider>
   );
 }

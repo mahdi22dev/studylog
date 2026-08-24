@@ -10,7 +10,7 @@ export function HowItWorks() {
             How It Works
           </span>
         </div>
-        <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
+        <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-4">
           The Focurio Method
         </h2>
         <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -27,7 +27,7 @@ export function HowItWorks() {
           <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6 border border-border group-hover:border-primary transition-colors shadow-inner">
             <Play className="h-7 w-7 text-secondary fill-secondary/30" />
           </div>
-          <h3 className="font-heading text-xl font-bold mb-3 text-white">
+          <h3 className="font-heading text-xl font-bold mb-3 text-foreground">
             Start a session
           </h3>
           <p className="text-muted-foreground text-base leading-relaxed">
@@ -43,7 +43,7 @@ export function HowItWorks() {
           <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6 border border-border group-hover:border-success transition-colors shadow-inner">
             <Brain className="h-7 w-7 text-success" />
           </div>
-          <h3 className="font-heading text-xl font-bold mb-3 text-white">
+          <h3 className="font-heading text-xl font-bold mb-3 text-foreground">
             Stay in flow
           </h3>
           <p className="text-muted-foreground text-base leading-relaxed">
@@ -59,7 +59,7 @@ export function HowItWorks() {
           <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6 border border-border group-hover:border-secondary transition-colors shadow-inner">
             <Coffee className="h-7 w-7 text-secondary" />
           </div>
-          <h3 className="font-heading text-xl font-bold mb-3 text-white">
+          <h3 className="font-heading text-xl font-bold mb-3 text-foreground">
             Take a real break
           </h3>
           <p className="text-muted-foreground text-base leading-relaxed">
@@ -75,7 +75,7 @@ export function HowItWorks() {
           <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-6 border border-border group-hover:border-success transition-colors shadow-inner">
             <BarChart3 className="h-7 w-7 text-success" />
           </div>
-          <h3 className="font-heading text-xl font-bold mb-3 text-white">
+          <h3 className="font-heading text-xl font-bold mb-3 text-foreground">
             Review your week
           </h3>
           <p className="text-muted-foreground text-base leading-relaxed">

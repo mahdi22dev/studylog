@@ -67,7 +67,7 @@ export function Features() {
             Features
           </span>
         </div>
-        <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
+        <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-4">
           Powerful Features
         </h2>
         <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -104,7 +104,7 @@ export function Features() {
                 }`}
               />
             </div>
-            <h3 className="font-heading text-xl font-semibold tracking-[-0.01em] mb-2 text-white group-hover:text-secondary transition-colors">
+            <h3 className="font-heading text-xl font-semibold tracking-[-0.01em] mb-2 text-foreground group-hover:text-secondary transition-colors">
               {feature.title}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">

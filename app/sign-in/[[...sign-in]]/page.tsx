@@ -244,7 +244,7 @@ export default function SignInPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Enter your email or username"
-                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-12"
+                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
               />
             </div>
 
@@ -265,7 +265,7 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full bg-input border border-border rounded-xl pl-4 pr-11 py-3 text-sm text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-12"
+                  className="w-full bg-input border border-border rounded-xl pl-4 pr-11 py-3 text-sm text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
                 />
                 <button
                   type="button"
@@ -345,7 +345,7 @@ export default function SignInPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="Enter 6-digit code"
-                  className="w-full bg-input border border-border rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-[#c9c3d9]/40 focus:outline-none focus:border-primary transition-colors h-14"
+                  className="w-full bg-input border border-border rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-14"
                 />
               </div>
 

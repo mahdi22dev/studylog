@@ -102,86 +102,104 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    /* ── Light Theme (extracted from screenshot) ── */
+
+    --background: 223 33% 92%;          /* #e2e8f0 blue-grey */
+    --foreground: 222 47% 11%;          /* #1e293b dark slate */
+
+    --card: 0 0% 100%;                  /* #ffffff */
+    --card-foreground: 222 47% 11%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 25 95% 45%;              /* #ea580c orange */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 91% 60%;           /* #3b82f6 blue */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 14% 96%;              /* #f1f5f9 */
+    --muted-foreground: 215 16% 47%;    /* #64748b */
+
+    --accent: 220 14% 90%;             /* #e2e8f0 chips */
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;           /* #dc2626 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;              /* #e2e8f0 */
     --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.65rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    /* Success / trend green */
-    --success: 160 84% 39%;
+    --ring: 25 95% 45%;
+    --radius: 0.5rem;
+
+    --chart-1: 25 95% 45%;              /* orange */
+    --chart-2: 217 91% 60%;             /* blue */
+    --chart-3: 142 71% 45%;             /* green */
+    --chart-4: 0 84% 60%;               /* red */
+    --chart-5: 215 16% 47%;             /* grey */
+
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
+
+    --sidebar-ring: 25 95% 45%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 25 95% 45%;
+    --sidebar-background: 220 14% 96%;
+    --sidebar-foreground: 222 47% 11%;
   }
 
   [data-theme="dark"] {
-    /* Dark Neutral Canvas — dark backgrounds, purple accent, green success */
+    /* ── Dark Theme (matching screenshot palette) ── */
 
-    /* Background: near-black (#0A0D14) */
-    --background: 220 33% 6%;
-    --foreground: 220 18% 91%;
+    --background: 222 47% 11%;          /* #1e293b dark slate */
+    --foreground: 210 40% 98%;          /* #f8fafc */
 
-    /* Card: dark slate (#0D1117) */
-    --card: 213 34% 7%;
-    --card-foreground: 220 18% 91%;
+    --card: 217 33% 17%;                /* #262f3f */
+    --card-foreground: 210 40% 98%;
 
-    /* Popover: slightly elevated (#111827) */
-    --popover: 224 25% 11%;
-    --popover-foreground: 220 18% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Primary: brand purple (#6c47ff) */
-    --primary: 252 100% 64%;
+    --primary: 25 95% 53%;              /* #ea580c brighter for dark bg */
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: soft lavender for labels / badges (#cebdff) */
-    --secondary: 257 55% 87%;
-    --secondary-foreground: 240 30% 14%;
+    --secondary: 217 91% 65%;           /* #60a5fa lighter blue for dark */
+    --secondary-foreground: 0 0% 100%;
 
-    /* Muted: subdued surfaces (#1d1f27) */
-    --muted: 225 17% 13%;
-    --muted-foreground: 225 10% 66%;
+    --muted: 217 33% 17%;              /* #262f3f */
+    --muted-foreground: 215 16% 57%;    /* #94a3b8 */
 
-    /* Accent: hover state surfaces (#272a32) */
-    --accent: 225 15% 18%;
-    --accent-foreground: 220 18% 91%;
+    --accent: 217 33% 22%;             /* hover */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Border: subtle neutral divider */
-    --border: 220 15% 16%;
-    --input: 224 25% 11%;
-    --ring: 252 100% 64%;
+    --border: 217 33% 22%;
+    --input: 217 33% 17%;
+    --ring: 25 95% 53%;
 
-    /* Chart colours */
-    --chart-1: 252 100% 64%;   /* purple */
-    --chart-2: 161 72% 55%;    /* mint / success */
-    --chart-3: 257 55% 87%;    /* lavender */
-    --chart-4: 213 34% 12%;    /* dark slate */
-    --chart-5: 225 15% 18%;    /* charcoal */
+    --chart-1: 25 95% 53%;
+    --chart-2: 217 91% 65%;
+    --chart-3: 142 71% 50%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 215 16% 57%;
 
-    /* Success / trend green (#38dfab) */
-    --success: 161 72% 55%;
+    --success: 142 71% 50%;
     --success-foreground: 0 0% 100%;
 
+    --sidebar-ring: 25 95% 53%;
+    --sidebar-border: 217 33% 22%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
   }
 }
 
