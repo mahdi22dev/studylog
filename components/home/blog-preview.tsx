@@ -48,7 +48,7 @@ export function BlogPreview() {
               Study Science Blog
             </span>
           </div>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-2">
             Latest Research & Insights
           </h2>
           <p className="text-base text-muted-foreground max-w-xl">
@@ -87,7 +87,7 @@ export function BlogPreview() {
                 </span>
                 <span className="text-xs text-muted-foreground">{post.date}</span>
               </div>
-              <h3 className="font-heading text-base font-bold text-white mb-2 group-hover:text-secondary transition-colors leading-snug">
+              <h3 className="font-heading text-base font-bold text-foreground mb-2 group-hover:text-secondary transition-colors leading-snug">
                 {post.title}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">

@@ -12,7 +12,7 @@ export function Footer() {
 
         {/* Product */}
         <div className="flex flex-col gap-2.5 items-start text-left">
-          <h4 className="text-sm font-semibold tracking-wide mb-1 text-white">
+          <h4 className="text-sm font-semibold tracking-wide mb-1 text-foreground">
             Product
           </h4>
           <a
@@ -43,7 +43,7 @@ export function Footer() {
 
         {/* Company */}
         <div className="flex flex-col gap-2.5 items-start text-left">
-          <h4 className="text-sm font-semibold tracking-wide mb-1 text-white">
+          <h4 className="text-sm font-semibold tracking-wide mb-1 text-foreground">
             Company
           </h4>
           <a
@@ -68,7 +68,7 @@ export function Footer() {
 
         {/* Legal */}
         <div className="flex flex-col gap-2.5 items-start text-left">
-          <h4 className="text-sm font-semibold tracking-wide mb-1 text-white">
+          <h4 className="text-sm font-semibold tracking-wide mb-1 text-foreground">
             Legal
           </h4>
           <a
@@ -93,7 +93,7 @@ export function Footer() {
 
         {/* Support */}
         <div className="flex flex-col gap-2.5 items-start text-left">
-          <h4 className="text-sm font-semibold tracking-wide mb-1 text-white">
+          <h4 className="text-sm font-semibold tracking-wide mb-1 text-foreground">
             Support
           </h4>
           <a

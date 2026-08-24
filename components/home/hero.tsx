@@ -50,7 +50,7 @@ export function Hero() {
       <div className="flex flex-wrap items-center justify-center gap-4 mb-14">
         <Link
           href="/dashboard/me"
-          className="bg-primary text-white px-8 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25 flex items-center gap-2.5 group"
+          className="bg-primary text-primary-foreground px-8 py-3.5 rounded-full text-base font-semibold tracking-wide hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/25 flex items-center gap-2.5 group"
         >
           Start Studying Now
           <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -58,7 +58,7 @@ export function Hero() {
         <a
           href="#how-it-works"
           onClick={scrollToHowItWorks}
-          className="glass-card text-foreground border border-border hover:border-border hover:bg-white/5 px-8 py-3.5 rounded-full text-base font-semibold tracking-wide transition-all duration-300 flex items-center gap-2"
+          className="glass-card text-foreground border border-border hover:border-border hover:bg-accent px-8 py-3.5 rounded-full text-base font-semibold tracking-wide transition-all duration-300 flex items-center gap-2"
         >
           See how it works
           <span className="text-secondary">↓</span>

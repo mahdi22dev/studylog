@@ -62,25 +62,14 @@ const config = {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        // Custom study tracker colors
-        study: {
-          background: "hsl(var(--study-background))",
-          "background-secondary": "hsl(var(--study-background-secondary))",
-          surface: "hsl(var(--study-surface))",
-          "surface-secondary": "hsl(var(--study-surface-secondary))",
-          text: "hsl(var(--study-text))",
-          "text-secondary": "hsl(var(--study-text-secondary))",
-          "text-muted": "hsl(var(--study-text-muted))",
-          border: "hsl(var(--study-border))",
-          "border-dashed": "hsl(var(--study-border-dashed))",
-          focus: "hsl(var(--study-focus))",
-          break: "hsl(var(--study-break))",
-        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "0.25rem",
+        DEFAULT: "0.5rem",
+        md: "0.75rem",
+        lg: "1rem",
+        xl: "1.5rem",
+        full: "9999px",
       },
       keyframes: {
         "accordion-down": {

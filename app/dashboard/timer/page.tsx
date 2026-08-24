@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useMemo } from "react";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import { TimerStats } from "@/components/dashboard/timer-stats";
 import { SubjectDistribution } from "@/components/dashboard/subject-distribution";
@@ -53,12 +52,10 @@ export default function DashboardTimerPage() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground font-sans">
-      <DashboardSidebar />
-
-      <div className="flex-1 md:ml-64 flex flex-col relative min-h-screen">
+      <div className="flex-1 flex flex-col relative min-h-screen">
         <DashboardTopbar />
 
-        <main className="flex-1 pt-24 px-6 md:px-10 pb-10">
+        <main className="flex-1 pt-20 px-6 md:px-10 pb-10">
           <div className="max-w-6xl mx-auto space-y-8">
             <div>
               <h2 className="text-3xl font-extrabold text-foreground font-sora tracking-tight">
@@ -105,5 +102,3 @@ export default function DashboardTimerPage() {
     </div>
   );
 }
-
-      <DashboardSidebar />
