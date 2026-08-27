@@ -29,6 +29,7 @@ import { useSettingsDialog } from "@/contexts/settingsDialogContext";
 import { Howl } from "howler";
 import TimerSettings from "./pomodoro-timer-dialog";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PomodoroTimerProps {
   onStudyTimeUpdate: (minutes: number) => void;
@@ -39,6 +40,7 @@ interface PomodoroTimerProps {
   isBreak: boolean;
   isLongBreak: boolean;
   completedPomodoro: () => void;
+  isLoading?: boolean;
 }
 
 interface TimerSettings {
@@ -59,6 +61,7 @@ export default function PomodoroTimer({
   isBreak,
   isLongBreak,
   completedPomodoro,
+  isLoading = false,
 }: PomodoroTimerProps) {
   const [settings, setSettings] = useState<TimerSettings>(() => {
     const defaults: TimerSettings = {
@@ -272,6 +275,40 @@ export default function PomodoroTimer({
 
   const strokeOffset =
     283 - (283 * (maxDurationSeconds - timeLeft)) / maxDurationSeconds;
+
+  if (isLoading) {
+    return (
+      <div className="w-full bg-card border border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <Skeleton className="h-7 w-36 rounded-full mb-6" />
+        <Skeleton className="h-6 w-28 rounded-full mb-4" />
+        <Skeleton className="h-4 w-24 rounded-full mb-6" />
+        <div className="flex gap-2 mb-8">
+          <Skeleton className="h-7 w-14 rounded-full" />
+          <Skeleton className="h-7 w-14 rounded-full" />
+          <Skeleton className="h-7 w-14 rounded-full" />
+        </div>
+        <Skeleton className="w-64 h-64 rounded-full mb-8" />
+        <div className="flex items-center gap-4 mb-8">
+          <Skeleton className="h-12 w-32 rounded-full" />
+          <Skeleton className="h-12 w-20 rounded-full" />
+        </div>
+        <div className="grid grid-cols-3 gap-6 pt-6 border-t border-border w-full">
+          <div className="flex flex-col items-center gap-2">
+            <Skeleton className="h-6 w-8 rounded" />
+            <Skeleton className="h-3 w-16 rounded" />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Skeleton className="h-6 w-12 rounded" />
+            <Skeleton className="h-3 w-10 rounded" />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Skeleton className="h-6 w-8 rounded" />
+            <Skeleton className="h-3 w-12 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

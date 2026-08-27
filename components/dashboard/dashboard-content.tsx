@@ -23,6 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSessionsData } from "@/hooks/use-sessions-data";
 import {
   computeStreak,
@@ -352,9 +353,13 @@ export default function DashboardContent() {
                   </span>
                   <TrendingUp className="text-success h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
-                  {isLoading ? "0m" : formatTime(todayMinutes)}
-                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-20 rounded-lg" />
+                ) : (
+                  <div className="text-2xl font-bold text-card-foreground font-sora z-10">
+                    {formatTime(todayMinutes)}
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
                     className="w-full h-full fill-none stroke-2"
@@ -374,9 +379,13 @@ export default function DashboardContent() {
                   </span>
                   <TrendingUp className="text-success h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
-                  {focusScore}%
-                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-14 rounded-lg" />
+                ) : (
+                  <div className="text-2xl font-bold text-card-foreground font-sora z-10">
+                    {focusScore}%
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
                     className="w-full h-full fill-none stroke-2"
@@ -396,9 +405,13 @@ export default function DashboardContent() {
                   </span>
                   <Minus className="text-muted-foreground h-4 w-4" />
                 </div>
-                <div className="text-2xl font-bold text-card-foreground font-sora z-10">
-                  {isLoading ? "0" : String(sessionsCountToday)}
-                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-10 rounded-lg" />
+                ) : (
+                  <div className="text-2xl font-bold text-card-foreground font-sora z-10">
+                    {String(sessionsCountToday)}
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
                     className="w-full h-full fill-none stroke-2"
@@ -418,11 +431,13 @@ export default function DashboardContent() {
                   </span>
                   <Flame className="text-primary h-4 w-4 fill-primary/20" />
                 </div>
-                <div className="text-2xl font-bold text-primary font-sora z-10">
-                  {isLoading
-                    ? "..."
-                    : `${streak} ${streak === 1 ? "Day" : "Days"}`}
-                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-24 rounded-lg" />
+                ) : (
+                  <div className="text-2xl font-bold text-primary font-sora z-10">
+                    {`${streak} ${streak === 1 ? "Day" : "Days"}`}
+                  </div>
+                )}
                 <div className="absolute bottom-0 left-0 w-full h-1/3 opacity-20 group-hover:opacity-40 transition-opacity">
                   <svg
                     className="w-full h-full fill-none stroke-2"
@@ -461,54 +476,75 @@ export default function DashboardContent() {
                   </div>
                 </div>
 
-                <div className="flex-grow flex items-end justify-between relative mt-2 pb-12">
-                  <div className="absolute left-0 bottom-12">
-                    <div className="font-sora text-[48px] font-extrabold tracking-tight text-foreground leading-none mb-1">
-                      {focusIntensity.pctChange > 0 ? `+${focusIntensity.pctChange}%` : `${focusIntensity.pctChange}%`}
+                {isLoading ? (
+                  <div className="flex-grow flex items-end justify-between relative mt-2 pb-12">
+                    <div className="absolute left-0 bottom-12 space-y-2">
+                      <Skeleton className="h-12 w-28 rounded-lg" />
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-4 w-28 rounded" />
                     </div>
-                    <p className="text-sm text-muted-foreground max-w-[140px] leading-snug">
-                      This week&apos;s focus is {focusIntensity.pctChange >= 0 ? "higher" : "lower"} than last week&apos;s
-                    </p>
-                  </div>
-
-                  <div className="w-full h-48 flex items-end justify-end gap-2 md:gap-3 pr-2">
-                    {focusIntensity.dayLabels.map((label, idx) => {
-                      const mins = focusIntensity.thisWeekDaily[idx] ?? 0;
-                      const isToday = idx === focusIntensity.todayIdx;
-                      const hPct = focusIntensity.maxMins > 0
-                        ? Math.max(12, (mins / focusIntensity.maxMins) * 85)
-                        : 12;
-                      return (
+                    <div className="w-full h-48 flex items-end justify-end gap-2 md:gap-3 pr-2">
+                      {Array.from({ length: 7 }).map((_, idx) => (
                         <div
                           key={idx}
-                          className="flex flex-col items-center gap-2 group h-full justify-end w-10 md:w-12 relative"
+                          className="flex flex-col items-center gap-2 h-full justify-end w-10 md:w-12"
                         >
-                          {isToday && mins > 0 && (
-                            <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-popover border border-border text-foreground text-xs font-semibold px-2.5 py-1 rounded-lg whitespace-nowrap shadow-md">
-                              {formatMinutes(mins)}
-                            </div>
-                          )}
-                          {isToday && (
-                            <div className="w-12 h-full bg-primary/10 rounded-t-full absolute bottom-10 left-1/2 -translate-x-1/2 pointer-events-none" />
-                          )}
-                          <div
-                            className={`w-2 rounded-full transition-colors relative ${isToday ? "bg-primary" : "bg-muted group-hover:bg-primary/60"}`}
-                            style={{ height: `${hPct}%` }}
-                          >
-                            <div
-                              className={`absolute -top-3 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary ${isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"} transition-opacity`}
-                            />
-                          </div>
-                          <span
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${isToday ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground"}`}
-                          >
-                            {label}
-                          </span>
+                          <Skeleton className="w-2 rounded-full" style={{ height: `${30 + idx * 7}%` }} />
+                          <Skeleton className="w-8 h-8 rounded-full" />
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex-grow flex items-end justify-between relative mt-2 pb-12">
+                    <div className="absolute left-0 bottom-12">
+                      <div className="font-sora text-[48px] font-extrabold tracking-tight text-foreground leading-none mb-1">
+                        {focusIntensity.pctChange > 0 ? `+${focusIntensity.pctChange}%` : `${focusIntensity.pctChange}%`}
+                      </div>
+                      <p className="text-sm text-muted-foreground max-w-[140px] leading-snug">
+                        This week&apos;s focus is {focusIntensity.pctChange >= 0 ? "higher" : "lower"} than last week&apos;s
+                      </p>
+                    </div>
+
+                    <div className="w-full h-48 flex items-end justify-end gap-2 md:gap-3 pr-2">
+                      {focusIntensity.dayLabels.map((label, idx) => {
+                        const mins = focusIntensity.thisWeekDaily[idx] ?? 0;
+                        const isToday = idx === focusIntensity.todayIdx;
+                        const hPct = focusIntensity.maxMins > 0
+                          ? Math.max(12, (mins / focusIntensity.maxMins) * 85)
+                          : 12;
+                        return (
+                          <div
+                            key={idx}
+                            className="flex flex-col items-center gap-2 group h-full justify-end w-10 md:w-12 relative"
+                          >
+                            {isToday && mins > 0 && (
+                              <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-popover border border-border text-foreground text-xs font-semibold px-2.5 py-1 rounded-lg whitespace-nowrap shadow-md">
+                                {formatMinutes(mins)}
+                              </div>
+                            )}
+                            {isToday && (
+                              <div className="w-12 h-full bg-primary/10 rounded-t-full absolute bottom-10 left-1/2 -translate-x-1/2 pointer-events-none" />
+                            )}
+                            <div
+                              className={`w-2 rounded-full transition-colors relative ${isToday ? "bg-primary" : "bg-muted group-hover:bg-primary/60"}`}
+                              style={{ height: `${hPct}%` }}
+                            >
+                              <div
+                                className={`absolute -top-3 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary ${isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"} transition-opacity`}
+                              />
+                            </div>
+                            <span
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 ${isToday ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground"}`}
+                            >
+                              {label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Your Recent Subjects — 4 cols */}
@@ -592,7 +628,24 @@ export default function DashboardContent() {
               </div>
 
               {/* Unlock Premium / Pro Momentum — 6 cols (was 4, expanded since Study Buddies skipped) */}
-              {isPremium ? (
+              {isLoading ? (
+                <div className="md:col-span-6 bg-card border border-border rounded-xl p-6 flex flex-col justify-between min-h-[260px]">
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                    <Skeleton className="h-6 w-48 rounded" />
+                    <Skeleton className="h-4 w-64 rounded" />
+                    <div className="grid grid-cols-3 gap-3 mt-5">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="bg-muted rounded-xl p-3 border border-border">
+                          <Skeleton className="h-6 w-10 mx-auto rounded mb-2" />
+                          <Skeleton className="h-3 w-16 mx-auto rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <Skeleton className="h-11 w-full rounded-full mt-6" />
+                </div>
+              ) : isPremium ? (
                 <div className="md:col-span-6 bg-card border border-primary/30 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[260px] glow-active">
                   <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
                     <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle at 80% 100%, hsl(var(--primary)) 0%, transparent 55%)` }} />
@@ -671,7 +724,19 @@ export default function DashboardContent() {
                   </div>
                 </div>
 
-                {subjectDistribution.items.length === 0 || subjectDistribution.totalHoursStr === "0h" ? (
+                {isLoading ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-4 gap-4">
+                    <Skeleton className="w-36 h-36 rounded-full" />
+                    <div className="grid grid-cols-3 gap-4 w-full mt-2">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2">
+                          <Skeleton className="h-3 w-16 rounded" />
+                          <Skeleton className="h-4 w-10 rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : subjectDistribution.items.length === 0 || subjectDistribution.totalHoursStr === "0h" ? (
                   <div className="flex-1 flex flex-col items-center justify-center py-8 text-center">
                     <div className="w-24 h-24 rounded-full border-4 border-muted flex items-center justify-center mb-3">
                       <Clock className="h-6 w-6 text-muted-foreground" />
@@ -744,24 +809,32 @@ export default function DashboardContent() {
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
                   Study Intensity
                 </h4>
-                <div className="grid grid-cols-7 gap-1.5 my-auto">
-                  {heatmapData.map((val, idx) => {
-                    const colors = [
-                      "bg-muted",
-                      "bg-primary/20",
-                      "bg-primary/40",
-                      "bg-primary/60",
-                      "bg-primary/80",
-                      "bg-primary",
-                    ];
-                    return (
-                      <div
-                        key={idx}
-                        className={`h-7 w-full rounded-sm ${colors[val]} transition-colors`}
-                      />
-                    );
-                  })}
-                </div>
+                {isLoading ? (
+                  <div className="grid grid-cols-7 gap-1.5 my-auto">
+                    {Array.from({ length: 28 }).map((_, idx) => (
+                      <Skeleton key={idx} className="h-7 w-full rounded-sm" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-7 gap-1.5 my-auto">
+                    {heatmapData.map((val, idx) => {
+                      const colors = [
+                        "bg-muted",
+                        "bg-primary/20",
+                        "bg-primary/40",
+                        "bg-primary/60",
+                        "bg-primary/80",
+                        "bg-primary",
+                      ];
+                      return (
+                        <div
+                          key={idx}
+                          className={`h-7 w-full rounded-sm ${colors[val]} transition-colors`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
                 <div className="flex justify-between items-center mt-4 text-xs text-muted-foreground">
                   <span>Less</span>
                   <div className="flex gap-1">
@@ -778,22 +851,34 @@ export default function DashboardContent() {
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   Today&apos;s Progress
                 </h4>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-extrabold text-foreground font-sora">
-                    {isLoading ? "—" : formatMinutes(todayMinutes)}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    / {isLoading ? "—" : formatMinutes(totalMinutes)} total
-                  </span>
-                </div>
-                <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{
-                      width: `${Math.min(100, totalMinutes > 0 ? (todayMinutes / Math.max(totalMinutes, 1)) * 100 : 0)}%`,
-                    }}
-                  />
-                </div>
+                {isLoading ? (
+                  <div className="space-y-3">
+                    <div className="flex items-baseline gap-2">
+                      <Skeleton className="h-8 w-20 rounded-lg" />
+                      <Skeleton className="h-4 w-24 rounded" />
+                    </div>
+                    <Skeleton className="h-2 w-full rounded-full" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-extrabold text-foreground font-sora">
+                        {formatMinutes(todayMinutes)}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        / {formatMinutes(totalMinutes)} total
+                      </span>
+                    </div>
+                    <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{
+                          width: `${Math.min(100, totalMinutes > 0 ? (todayMinutes / Math.max(totalMinutes, 1)) * 100 : 0)}%`,
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -832,44 +917,60 @@ export default function DashboardContent() {
                 )}
 
                 <div className="space-y-3 flex-1">
-                  {tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      onClick={() => toggleTask(task.id)}
-                      className={`p-3.5 rounded-xl flex items-center gap-3 border transition-colors cursor-pointer ${
-                        task.done
-                          ? "bg-muted/50 border-transparent opacity-60"
-                          : "bg-accent border-border hover:border-primary/30"
-                      }`}
-                    >
+                  {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
                       <div
-                        className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
+                        key={i}
+                        className="p-3.5 rounded-xl flex items-center gap-3 border border-border bg-accent"
+                      >
+                        <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-3/4 rounded" />
+                          <Skeleton className="h-3 w-1/2 rounded" />
+                        </div>
+                        <Skeleton className="h-4 w-4 rounded" />
+                      </div>
+                    ))
+                  ) : (
+                    tasks.map((task) => (
+                      <div
+                        key={task.id}
+                        onClick={() => toggleTask(task.id)}
+                        className={`p-3.5 rounded-xl flex items-center gap-3 border transition-colors cursor-pointer ${
                           task.done
-                            ? "bg-success/20 border-success text-success"
-                            : "border-border hover:border-primary"
+                            ? "bg-muted/50 border-transparent opacity-60"
+                            : "bg-accent border-border hover:border-primary/30"
                         }`}
                       >
-                        {task.done && <Check className="h-3 w-3 stroke-[3]" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className={`text-sm text-card-foreground truncate ${
+                        <div
+                          className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
                             task.done
-                              ? "line-through text-muted-foreground"
-                              : ""
+                              ? "bg-success/20 border-success text-success"
+                              : "border-border hover:border-primary"
                           }`}
                         >
-                          {task.title}
-                        </p>
-                        {task.subtitle && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {task.subtitle}
+                          {task.done && <Check className="h-3 w-3 stroke-[3]" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-sm text-card-foreground truncate ${
+                              task.done
+                                ? "line-through text-muted-foreground"
+                                : ""
+                            }`}
+                          >
+                            {task.title}
                           </p>
-                        )}
+                          {task.subtitle && (
+                            <p className="text-xs text-muted-foreground truncate">
+                              {task.subtitle}
+                            </p>
+                          )}
+                        </div>
+                        <GripVertical className="h-4 w-4 text-muted-foreground/50 shrink-0" />
                       </div>
-                      <GripVertical className="h-4 w-4 text-muted-foreground/50 shrink-0" />
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -877,75 +978,88 @@ export default function DashboardContent() {
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-6">
                   Performance Trends (14 Days)
                 </h4>
-                <div className="flex-1 relative w-full h-48 mt-auto">
-                  <svg
-                    className="absolute bottom-0 w-full h-full"
-                    preserveAspectRatio="none"
-                    viewBox="0 0 400 150"
-                  >
-                    <defs>
-                      <linearGradient
-                        id="trendGrad"
-                        x1="0"
-                        x2="0"
-                        y1="0"
-                        y2="1"
+                {isLoading ? (
+                  <div className="flex-1 flex flex-col gap-4">
+                    <Skeleton className="w-full h-48 rounded-xl" />
+                    <div className="flex justify-between px-2">
+                      <Skeleton className="h-3 w-10 rounded" />
+                      <Skeleton className="h-3 w-10 rounded" />
+                      <Skeleton className="h-3 w-10 rounded" />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex-1 relative w-full h-48 mt-auto">
+                      <svg
+                        className="absolute bottom-0 w-full h-full"
+                        preserveAspectRatio="none"
+                        viewBox="0 0 400 150"
                       >
-                        <stop
-                          offset="0%"
-                          stopColor="hsl(var(--success))"
-                          stopOpacity="0.3"
+                        <defs>
+                          <linearGradient
+                            id="trendGrad"
+                            x1="0"
+                            x2="0"
+                            y1="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="0%"
+                              stopColor="hsl(var(--success))"
+                              stopOpacity="0.3"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="hsl(var(--success))"
+                              stopOpacity="0"
+                            />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M0 150 L0 100 C 50 80, 100 120, 150 90 C 200 60, 250 110, 300 50 C 350 -10, 400 30, 400 30 L400 150 Z"
+                          fill="url(#trendGrad)"
                         />
-                        <stop
-                          offset="100%"
-                          stopColor="hsl(var(--success))"
-                          stopOpacity="0"
+                        <path
+                          d="M0 100 C 50 80, 100 120, 150 90 C 200 60, 250 110, 300 50 C 350 -10, 400 30, 400 30"
+                          fill="none"
+                          stroke="hsl(var(--success))"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="3"
                         />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0 150 L0 100 C 50 80, 100 120, 150 90 C 200 60, 250 110, 300 50 C 350 -10, 400 30, 400 30 L400 150 Z"
-                      fill="url(#trendGrad)"
-                    />
-                    <path
-                      d="M0 100 C 50 80, 100 120, 150 90 C 200 60, 250 110, 300 50 C 350 -10, 400 30, 400 30"
-                      fill="none"
-                      stroke="hsl(var(--success))"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="3"
-                    />
-                    <circle
-                      cx="150"
-                      cy="90"
-                      fill="hsl(var(--card))"
-                      r="4"
-                      stroke="hsl(var(--success))"
-                      strokeWidth="2"
-                    />
-                    <circle
-                      cx="300"
-                      cy="50"
-                      fill="hsl(var(--card))"
-                      r="4"
-                      stroke="hsl(var(--success))"
-                      strokeWidth="2"
-                    />
-                    <circle
-                      cx="400"
-                      cy="30"
-                      fill="hsl(var(--card))"
-                      r="4"
-                      stroke="hsl(var(--success))"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </div>
-                <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground px-2">
-                  <span>Mar 1</span>
-                  <span>Mar 7</span>
-                  <span>Mar 14</span>
-                </div>
+                        <circle
+                          cx="150"
+                          cy="90"
+                          fill="hsl(var(--card))"
+                          r="4"
+                          stroke="hsl(var(--success))"
+                          strokeWidth="2"
+                        />
+                        <circle
+                          cx="300"
+                          cy="50"
+                          fill="hsl(var(--card))"
+                          r="4"
+                          stroke="hsl(var(--success))"
+                          strokeWidth="2"
+                        />
+                        <circle
+                          cx="400"
+                          cy="30"
+                          fill="hsl(var(--card))"
+                          r="4"
+                          stroke="hsl(var(--success))"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex justify-between items-center mt-3 text-xs text-muted-foreground px-2">
+                      <span>Mar 1</span>
+                      <span>Mar 7</span>
+                      <span>Mar 14</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

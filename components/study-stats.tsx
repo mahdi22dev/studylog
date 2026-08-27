@@ -14,13 +14,53 @@ import { Label } from "@/components/ui/label";
 import { Calendar, Target, Settings, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatTime } from "@/lib/utils";
 
 interface StudyStatsProps {
   totalMinutes: number;
+  isLoading?: boolean;
 }
 
-export default function StudyStats({ totalMinutes }: StudyStatsProps) {
+export default function StudyStats({ totalMinutes, isLoading = false }: StudyStatsProps) {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <Skeleton className="h-4 w-36 rounded" />
+            <Skeleton className="h-6 w-6 rounded-lg" />
+          </div>
+          <Skeleton className="h-9 w-32 rounded-lg" />
+          <Skeleton className="h-3 w-40 rounded" />
+          <div className="pt-4 border-t border-border space-y-3">
+            <div className="flex justify-between">
+              <Skeleton className="h-4 w-32 rounded" />
+              <Skeleton className="h-4 w-8 rounded" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+            <Skeleton className="h-3 w-28 rounded" />
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <Skeleton className="h-5 w-28 rounded mb-1" />
+          <Skeleton className="h-3 w-40 rounded mb-4" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col items-center gap-2">
+              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-7 w-8 rounded" />
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-7 w-10 rounded" />
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const [weeklyGoal, setWeeklyGoal] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("weeklyGoalHours");

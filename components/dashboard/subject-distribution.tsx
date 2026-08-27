@@ -1,17 +1,47 @@
 ﻿"use client";
 
 import { PieChart } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { SubjectDistributionItem } from "@/lib/types";
 
 interface SubjectDistributionProps {
   items: SubjectDistributionItem[];
   totalHoursStr: string;
+  isLoading?: boolean;
 }
 
 export function SubjectDistribution({
   items,
   totalHoursStr,
+  isLoading = false,
 }: SubjectDistributionProps) {
+  if (isLoading) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-5 rounded" />
+            <Skeleton className="h-5 w-40 rounded" />
+          </div>
+          <Skeleton className="h-5 w-24 rounded-full" />
+        </div>
+        <div className="flex justify-center mb-8">
+          <Skeleton className="h-40 w-40 rounded-full" />
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-3 h-3 rounded-full" />
+                <Skeleton className="h-4 w-20 rounded" />
+              </div>
+              <Skeleton className="h-4 w-16 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between">
       <div className="flex items-center justify-between mb-6">

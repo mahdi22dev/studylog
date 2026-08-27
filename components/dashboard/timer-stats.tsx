@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { Clock, BookOpen, TrendingUp, Flame } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatMinutes } from "@/lib/utils";
 
 interface TimerStatsProps {
@@ -26,9 +27,13 @@ export function TimerStats({
           <span>Total Time</span>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="text-3xl font-extrabold text-card-foreground font-sora">
-          {isLoading ? "0m" : formatMinutes(totalMinutes)}
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        ) : (
+          <div className="text-3xl font-extrabold text-card-foreground font-sora">
+            {formatMinutes(totalMinutes)}
+          </div>
+        )}
         <div className="text-xs text-muted-foreground">All time</div>
       </div>
 
@@ -38,9 +43,13 @@ export function TimerStats({
           <span>Today</span>
           <TrendingUp className="h-4 w-4 text-primary" />
         </div>
-        <div className="text-3xl font-extrabold text-primary font-sora">
-          {isLoading ? "0m" : formatMinutes(todayMinutes)}
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        ) : (
+          <div className="text-3xl font-extrabold text-primary font-sora">
+            {formatMinutes(todayMinutes)}
+          </div>
+        )}
         <div className="text-xs text-muted-foreground">Today's progress</div>
       </div>
 
@@ -50,9 +59,13 @@ export function TimerStats({
           <span>Streak</span>
           <Flame className="h-4 w-4 text-success fill-success/20" />
         </div>
-        <div className="text-3xl font-extrabold text-success font-sora">
-          {isLoading ? "..." : `${streak} ${streak === 1 ? "day" : "days"}`}
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        ) : (
+          <div className="text-3xl font-extrabold text-success font-sora">
+            {`${streak} ${streak === 1 ? "day" : "days"}`}
+          </div>
+        )}
         <div className="text-xs text-muted-foreground">Current streak</div>
       </div>
 
@@ -62,9 +75,13 @@ export function TimerStats({
           <span>Sessions Today</span>
           <BookOpen className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="text-3xl font-extrabold text-card-foreground font-sora">
-          {isLoading ? "0" : String(sessionsCountToday)}
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-9 w-10 rounded-lg" />
+        ) : (
+          <div className="text-3xl font-extrabold text-card-foreground font-sora">
+            {String(sessionsCountToday)}
+          </div>
+        )}
         <div className="text-xs text-muted-foreground">Work sessions</div>
       </div>
     </div>

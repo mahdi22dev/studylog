@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 type Session = {
@@ -76,8 +77,15 @@ export function RecentSessionsTable({
       </CardHeader>
       <CardContent className="px-0 pb-0">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12 text-muted-foreground/50 text-sm">
-            Loading sessions…
+          <div className="p-4 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-4 w-14 rounded" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+            ))}
           </div>
         ) : workSessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 gap-2 text-muted-foreground/50">

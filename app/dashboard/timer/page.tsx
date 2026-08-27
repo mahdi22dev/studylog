@@ -82,6 +82,7 @@ export default function DashboardTimerPage() {
                   isBreak={isBreak}
                   isLongBreak={isLongBreak}
                   completedPomodoro={completedPomodoro}
+                  isLoading={isLoading}
                 />
 
                 <RecentSessionsTable sessions={recentSessions} isLoading={isLoading} />
@@ -91,9 +92,10 @@ export default function DashboardTimerPage() {
                 <SubjectDistribution
                   items={subjectDistribution.items}
                   totalHoursStr={subjectDistribution.totalHoursStr}
+                  isLoading={isLoading}
                 />
 
-                <StudyStats totalMinutes={totalMinutes} />
+                <StudyStats totalMinutes={totalMinutes} isLoading={isLoading} />
               </div>
             </div>
           </div>

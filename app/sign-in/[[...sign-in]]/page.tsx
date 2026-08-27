@@ -11,10 +11,16 @@ export default function SignInPage() {
   const { isLoaded, signIn, setActive } = useSignIn();
   const { userId, isSignedIn, isLoaded: isAuthLoaded } = useAuth();
   const router = useRouter();
+  const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/dashboard/me");
+  }, [router]);
 
   useEffect(() => {
     if (isAuthLoaded && isSignedIn && userId) {
-      router.replace("/dashboard/me");
+      setRedirecting(true);
+      window.location.replace("/dashboard/me");
     }
   }, [isAuthLoaded, isSignedIn, userId, router]);
 
@@ -43,7 +49,8 @@ export default function SignInPage() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/dashboard/me");
+        setRedirecting(true);
+        window.location.replace("/dashboard/me");
         return;
       }
 
@@ -118,7 +125,8 @@ export default function SignInPage() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/dashboard/me");
+        setRedirecting(true);
+        window.location.replace("/dashboard/me");
       } else {
         setError("Verification incomplete. Please check the code.");
       }
@@ -151,6 +159,17 @@ export default function SignInPage() {
     }
   };
 
+  if (redirecting) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm font-medium text-muted-foreground">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
       <Navbar />
@@ -166,7 +185,7 @@ export default function SignInPage() {
           <div className="w-full max-w-[440px] bg-popover/80 backdrop-blur-xl border border-border rounded-2xl p-8 shadow-2xl relative z-10 glow-active">
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="font-heading text-2xl font-bold text-white mb-2">
+            <h1 className="font-heading text-2xl font-bold text-foreground mb-2">
               Welcome back
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -179,7 +198,7 @@ export default function SignInPage() {
             type="button"
             disabled={googleLoading || loading}
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full border border-border bg-muted hover:bg-accent transition-colors text-sm font-semibold text-white mb-6 cursor-pointer disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full border border-border bg-card hover:bg-accent transition-colors text-sm font-semibold text-foreground shadow-sm mb-6 cursor-pointer disabled:opacity-50"
           >
             {googleLoading ? (
               <>
@@ -244,7 +263,7 @@ export default function SignInPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Enter your email or username"
-                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-sm text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
+                className="w-full bg-input border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
               />
             </div>
 
@@ -265,12 +284,12 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full bg-input border border-border rounded-xl pl-4 pr-11 py-3 text-sm text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
+                  className="w-full bg-input border border-border rounded-xl pl-4 pr-11 py-3 text-sm text-foreground placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -320,12 +339,12 @@ export default function SignInPage() {
             <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
               <Mail className="h-6 w-6 text-secondary" />
             </div>
-            <h2 className="font-heading text-2xl font-bold text-white mb-2">
+            <h2 className="font-heading text-2xl font-bold text-foreground mb-2">
               {factorStage === "second" ? "Two-factor verification" : "Verify your account"}
             </h2>
             <p className="text-sm text-muted-foreground mb-6">
               We sent a verification code to{" "}
-              <span className="font-semibold text-white">{identifier}</span>.
+              <span className="font-semibold text-foreground">{identifier}</span>.
               Enter it below to continue.
             </p>
 
@@ -345,7 +364,7 @@ export default function SignInPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="Enter 6-digit code"
-                  className="w-full bg-input border border-border rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-white placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-14"
+                  className="w-full bg-input border border-border rounded-xl px-4 py-3 text-center text-lg tracking-[0.2em] font-mono text-foreground placeholder-muted-foreground/40 focus:outline-none focus:border-primary transition-colors h-14"
                 />
               </div>
 
@@ -371,7 +390,7 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => setVerifying(false)}
-              className="mt-5 text-xs text-muted-foreground hover:text-white transition-colors"
+              className="mt-5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Back to sign in
             </button>
