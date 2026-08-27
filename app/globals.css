@@ -104,40 +104,40 @@
   :root {
     /* ── Light Theme (extracted from screenshot) ── */
 
-    --background: 223 33% 92%;          /* #e2e8f0 blue-grey */
-    --foreground: 222 47% 11%;          /* #1e293b dark slate */
+    --background: 223 33% 92%; /* #e2e8f0 blue-grey */
+    --foreground: 222 47% 11%; /* #1e293b dark slate */
 
-    --card: 0 0% 100%;                  /* #ffffff */
+    --card: 0 0% 100%; /* #ffffff */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 25 95% 45%;              /* #ea580c orange */
+    --primary: 25 95% 45%; /* #ea580c orange */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 91% 60%;           /* #3b82f6 blue */
+    --secondary: 217 91% 60%; /* #3b82f6 blue */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 14% 96%;              /* #f1f5f9 */
-    --muted-foreground: 215 16% 47%;    /* #64748b */
+    --muted: 220 14% 96%; /* #f1f5f9 */
+    --muted-foreground: 215 16% 47%; /* #64748b */
 
-    --accent: 220 14% 90%;             /* #e2e8f0 chips */
+    --accent: 220 14% 90%; /* #e2e8f0 chips */
     --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 84% 60%;           /* #dc2626 */
+    --destructive: 0 84% 60%; /* #dc2626 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;              /* #e2e8f0 */
+    --border: 220 13% 91%; /* #e2e8f0 */
     --input: 220 13% 91%;
     --ring: 25 95% 45%;
     --radius: 0.5rem;
 
-    --chart-1: 25 95% 45%;              /* orange */
-    --chart-2: 217 91% 60%;             /* blue */
-    --chart-3: 142 71% 45%;             /* green */
-    --chart-4: 0 84% 60%;               /* red */
-    --chart-5: 215 16% 47%;             /* grey */
+    --chart-1: 25 95% 45%; /* orange */
+    --chart-2: 217 91% 60%; /* blue */
+    --chart-3: 142 71% 45%; /* green */
+    --chart-4: 0 84% 60%; /* red */
+    --chart-5: 215 16% 47%; /* grey */
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
@@ -155,25 +155,25 @@
   [data-theme="dark"] {
     /* ── Dark Theme (matching screenshot palette) ── */
 
-    --background: 222 47% 11%;          /* #1e293b dark slate */
-    --foreground: 210 40% 98%;          /* #f8fafc */
+    --background: 222 47% 11%; /* #1e293b dark slate */
+    --foreground: 210 40% 98%; /* #f8fafc */
 
-    --card: 217 33% 17%;                /* #262f3f */
+    --card: 217 33% 17%; /* #262f3f */
     --card-foreground: 210 40% 98%;
 
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 25 95% 53%;              /* #ea580c brighter for dark bg */
+    --primary: 25 95% 53%; /* #ea580c brighter for dark bg */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 91% 65%;           /* #60a5fa lighter blue for dark */
+    --secondary: 217 91% 65%; /* #60a5fa lighter blue for dark */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217 33% 17%;              /* #262f3f */
-    --muted-foreground: 215 16% 57%;    /* #94a3b8 */
+    --muted: 217 33% 17%; /* #262f3f */
+    --muted-foreground: 215 16% 57%; /* #94a3b8 */
 
-    --accent: 217 33% 22%;             /* hover */
+    --accent: 217 33% 22%; /* hover */
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;

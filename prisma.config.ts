@@ -13,7 +13,7 @@ export default {
   earlyAccess: true,
   schema: path.join("prisma", "schema.prisma"),
   migrate: {
-    async adapter(env) {
+    async adapter(env: Env) {
       return new PrismaD1HTTP({
         CLOUDFLARE_D1_TOKEN: env.CLOUDFLARE_D1_TOKEN,
         CLOUDFLARE_ACCOUNT_ID: env.CLOUDFLARE_ACCOUNT_ID,
